@@ -38,3 +38,8 @@ class BMP(bin.File):
     
     class Options:
         endianness = bin.LittleEndian
+
+
+if __name__ == '__main__':
+    bmp = BMP(open('biwako.bmp', 'rb'))
+    print '%s x %s' % (bmp.width, bmp.height)
