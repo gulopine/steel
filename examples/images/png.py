@@ -69,9 +69,13 @@ class End(Chunk):
 class PNG(bin.File):
     signature = bin.FixedString('\x89PNG\x0d\x0a\x1a\x0a')
     header = Header()
-    chunks = bin.ChunkList(Chunk, required=(Data,), exclude=(End,))
-    end = End()
-
+    chunks = bin.ChunkList(Chunk, size=bin.REMAINDER)
+    
+    @property
+    def data_chunks(self):
+        for chunk in chunks:
+            if isinstance(chunk, Data):
+                yield chunk
 
 if __name__ == '__main__':
     png = PNG(open('biwako.png', 'rb'))
