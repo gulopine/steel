@@ -74,5 +74,5 @@ class PNG(bin.File):
 
 
 if __name__ == '__main__':
-    bmp = BMP(open('biwako.bmp', 'rb'))
-    print '%s x %s' % (bmp.width, bmp.height)
+    png = PNG(open('biwako.png', 'rb'))
+    print '%s x %s' % (png.width, png.height)
