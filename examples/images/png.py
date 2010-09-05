@@ -32,7 +32,7 @@ class Chunk(bin.Chunk):
 
 
 @Chunk('IHDR')
-class Header(Chunk):
+class Header(bin.Structure):
     width = bin.PositiveInteger(size=4, min_value=1)
     height = bin.PositiveInteger(size=4, min_value=1)
     bit_depth = bin.PositiveInteger(size=1, choices=(1, 2, 4, 8, 16))
@@ -49,7 +49,7 @@ class PaletteColor(bin.Structure):
 
 
 Chunk('PLTE')
-class Palette(Chunk):
+class Palette(bin.Structure):
     colors = bin.List(PaletteColor, size=bin.REMAINDER)
     
     def __iter__(self):
@@ -57,12 +57,12 @@ class Palette(Chunk):
 
 
 @Chunk('IDAT')
-class Data(Chunk):
+class Data(bin.Structure):
     pass
 
 
 @Chunk('IEND')
-class End(Chunk):
+class End(bin.Structure):
     pass
 
 
