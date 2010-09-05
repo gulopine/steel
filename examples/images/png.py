@@ -76,6 +76,9 @@ class PNG(bin.File):
         for chunk in chunks:
             if isinstance(chunk, Data):
                 yield chunk
+    
+    class Options:
+        endianness = bin.BigEndian
 
 if __name__ == '__main__':
     png = PNG(open('biwako.png', 'rb'))
