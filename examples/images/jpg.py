@@ -59,8 +59,8 @@ class JFIF(bin.File):
     header = Header()
     chunks = bin.ChunkList(Chunk)
 
-    width = bin.ChunkValue(Header.width)
-    height = bin.ChunkValue(Header.width)
+    width = bin.ChunkValue(StartFrame.width)
+    height = bin.ChunkValue(StartFrame.height)
     comment = bin.ChunkValue(Comment.value)
 
     class Options:
