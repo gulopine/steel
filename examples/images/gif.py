@@ -17,5 +17,5 @@ class GIF(bin.Structure):
 
 
 if __name__ == '__main__':
-    gif = GIF(open('biwako.gif', 'rb'))
+    gif = GIF(open(sys.argv[1], 'rb'))
     print '%s x %s' % (gif.width, gif.height)

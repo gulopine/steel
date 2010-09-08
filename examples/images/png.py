@@ -81,5 +81,5 @@ class PNG(bin.File):
         endianness = bin.BigEndian
 
 if __name__ == '__main__':
-    png = PNG(open('biwako.png', 'rb'))
+    png = PNG(open(sys.argv[1], 'rb'))
     print '%s x %s' % (png.width, png.height)
