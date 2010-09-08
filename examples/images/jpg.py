@@ -65,3 +65,8 @@ class JFIF(bin.File):
 
     class Options:
         endianness = bin.BigEndian
+
+
+if __name__ == '__main__':
+    jpg = JPG(open(sys.argv[1], 'rb'))
+    print '%s x %s' % (jpg.width, jpg.height)
