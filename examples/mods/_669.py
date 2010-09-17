@@ -48,7 +48,7 @@ class Pattern(bin.Structure):
 
 class _669(bin.File):
     marker = bin.FixedString('if')
-    message = bin.String(size=108, encoding='ascii', padding=' ')
+    message = bin.List(bin.String(size=36, encoding='ascii', padding=' '), size=3)
     sample_count = bin.PositiveInteger(size=1, max_value=64)
     pattern_count = bin.PositiveInteger(size=1, max_value=128)
     restart_position = bin.PositiveInteger(size=1)
@@ -58,20 +58,6 @@ class _669(bin.File):
     samples = bin.List(Sample, size=sample_count)
     patterns = bin.List(Pattern, size=pattern_count)
     sample_data = bin.ByteString(size=bin.REMAINDER)
-    
-    @message.getter
-    def message(self, raw_message):
-        padding = type(self).message.padding
-        return [
-            raw_message[0:36].strip(padding),
-            raw_message[36:72].strip(padding),
-            raw_message[72:108].strip(padding),
-        ]
-    
-    @message.setter
-    def message(self, message):
-        padding = type(self).message.padding
-        return ''.join(line.ljust(36, padding) for line in message)
     
     @sample_data.getter
     def sample_data(self, data):
