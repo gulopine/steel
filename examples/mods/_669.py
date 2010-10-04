@@ -65,6 +65,7 @@ class _669(bin.File):
         output = []
         for info in self.samples:
             output.append(data[offset:offset + info.size])
+            offset += info.size
         return output
     
     @sample_data.setter
