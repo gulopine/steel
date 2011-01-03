@@ -19,12 +19,58 @@ class LittleEndian:
         return sum(v * 0x100 ** i for i, v in enumerate(value[:size]))
 
 
+# Signed Number Representations
+
+class SignMagnitude:
+    def encode(self, value, size):
+        if value < 0:
+            # Set the sign to negative
+            return -value & (1 << (size * 8 - 1))
+        return value
+
+    def decode(self, value, size):
+        if value >> (size * 8 - 1):
+            # The sign is negative
+            return -(value ^ (2 ** (size * 8 - 1)))
+        return value
+
+
+class OnesComplement:
+    def encode(self, value, size):
+        if value < 0:
+            # Value is negative
+            return value & (2 ** (size - 8) - 1)
+        return value
+
+    def decode(self, value, size):
+        if value >> (size * 8 - 1):
+            # Value is negative
+            pass
+        return value
+
+
+class TwosComplement:
+    def encode(self, value, size):
+        if value < 0:
+            # Value is negative
+            pass
+        return value
+
+    def decode(self, value, size):
+        if value > 2 ** (size * 8 - 1) - 1:
+            # Value is negative
+            pass
+        return value
+
+
 # Numeric types
 
 class Integer(Field):
-    def __init__(self, *args, signed=True, endianness=BigEndian, **kwargs):
+    def __init__(self, *args, signed=True, endianness=BigEndian,
+                 signing=TwosComplement, **kwargs):
         self.endianness = endianness
         self.signed = signed
+        self.signing = signing
         super(Integer, self).__init__(*args, **kwargs)
 
     def encode(self, value):
