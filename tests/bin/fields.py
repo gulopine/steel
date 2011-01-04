@@ -27,18 +27,27 @@ class SigningTest(unittest.TestCase):
         encoded_value = 0b10101010
         self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
+        # Make sure it doesn't muck up positive values
+        self.assertEqual(signer.encode(42, size=1), 42)
+        self.assertEqual(signer.decode(42, size=1), 42)
 
     def test_OnesComplement(self):
         signer = fields.OnesComplement()
         encoded_value = 0b11010101
         self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
+        # Make sure it doesn't muck up positive values
+        self.assertEqual(signer.encode(42, size=1), 42)
+        self.assertEqual(signer.decode(42, size=1), 42)
 
     def test_TwosComplement(self):
         signer = fields.TwosComplement()
         encoded_value = 0b11010110
         self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
+        # Make sure it doesn't muck up positive values
+        self.assertEqual(signer.encode(42, size=1), 42)
+        self.assertEqual(signer.decode(42, size=1), 42)
 
 
 if __name__ == '__main__':
