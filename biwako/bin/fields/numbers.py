@@ -53,13 +53,13 @@ class TwosComplement:
     def encode(self, value, size):
         if value < 0:
             # Value is negative
-            pass
+            return (~(-value) & (2 ** (size * 8) - 1)) + 1
         return value
 
     def decode(self, value, size):
         if value > 2 ** (size * 8 - 1) - 1:
             # Value is negative
-            pass
+            return -(~value & (2 ** (size * 8) - 1)) - 1
         return value
 
 
