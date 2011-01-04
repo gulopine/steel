@@ -5,7 +5,7 @@ from .base import Field
 
 class BigEndian:
     def encode(self, value, size):
-        return bytes((value >> i * 8) & 0xff for i in range(size))
+        return bytes((value >> (size - i - 1) * 8) & 0xff for i in range(size))
 
     def decode(self, value, size):
         return sum(v * 0x100 ** (size - i - 1) for i, v in enumerate(value[:size]))
@@ -13,7 +13,7 @@ class BigEndian:
 
 class LittleEndian:
     def encode(self, value, size):
-        return bytes((value >> (size - i - 1) * 8) & 0xff for i in range(size))
+        return bytes((value >> i * 8) & 0xff for i in range(size))
 
     def decode(self, value, size):
         return sum(v * 0x100 ** i for i, v in enumerate(value[:size]))
