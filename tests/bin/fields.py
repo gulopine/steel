@@ -34,6 +34,12 @@ class SigningTest(unittest.TestCase):
         self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
 
+    def test_TwosComplement(self):
+        signer = fields.TwosComplement()
+        encoded_value = 0b11010110
+        self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
+        self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
+
 
 if __name__ == '__main__':
     unittest.main()
