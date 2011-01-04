@@ -39,7 +39,7 @@ class OnesComplement:
     def encode(self, value, size):
         if value < 0:
             # Value is negative
-            return value & (2 ** (size - 8) - 1)
+            return value & (2 ** (size * 8) - 1)
         return value
 
     def decode(self, value, size):
@@ -66,8 +66,8 @@ class TwosComplement:
 # Numeric types
 
 class Integer(Field):
-    def __init__(self, *args, signed=True, endianness=BigEndian,
-                 signing=TwosComplement, **kwargs):
+    def __init__(self, *args, signed=True, endianness=BigEndian(),
+                 signing=TwosComplement(), **kwargs):
         self.endianness = endianness
         self.signed = signed
         self.signing = signing
