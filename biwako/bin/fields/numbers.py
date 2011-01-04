@@ -25,7 +25,7 @@ class SignMagnitude:
     def encode(self, value, size):
         if value < 0:
             # Set the sign to negative
-            return -value & (1 << (size * 8 - 1))
+            return -value | (1 << (size * 8 - 1))
         return value
 
     def decode(self, value, size):
@@ -39,13 +39,13 @@ class OnesComplement:
     def encode(self, value, size):
         if value < 0:
             # Value is negative
-            return value & (2 ** (size * 8) - 1)
+            return ~(-value) & (2 ** (size * 8) - 1)
         return value
 
     def decode(self, value, size):
         if value >> (size * 8 - 1):
             # Value is negative
-            pass
+            return -(~value & (2 ** (size * 8) - 1))
         return value
 
 
