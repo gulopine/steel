@@ -61,13 +61,17 @@ class TestInteger(unittest.TestCase):
             field.encode(128)
 
     def test_unsigned(self):
-        field = fields.Integer(signed=False, size=1)
+        field = fields.Integer(size=1, signed=False)
         self.assertEqual(field.encode(127), b'\x7f')
         self.assertEqual(field.encode(128), b'\x80')
 
         # Negative values can't be encoded
         with self.assertRaises(ValueError):
             field.encode(-127)
+
+        # Values higher than 255 can't be encoded
+        with self.assertRaises(ValueError):
+            field.encode(256)
 
 
 if __name__ == '__main__':
