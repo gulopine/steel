@@ -23,6 +23,8 @@ class LittleEndian:
 
 class SignMagnitude:
     def encode(self, value, size):
+        if value > (1 << (size * 8)) - 1:
+            raise ValueError("Value is too large to encode.")
         if value < 0:
             # Set the sign to negative
             return -value | (1 << (size * 8 - 1))
@@ -37,6 +39,8 @@ class SignMagnitude:
 
 class OnesComplement:
     def encode(self, value, size):
+        if value > (1 << (size * 8)) - 1:
+            raise ValueError("Value is too large to encode.")
         if value < 0:
             # Value is negative
             return ~(-value) & (2 ** (size * 8) - 1)
@@ -51,6 +55,8 @@ class OnesComplement:
 
 class TwosComplement:
     def encode(self, value, size):
+        if value > (1 << (size * 8 - 1)) - 1:
+            raise ValueError("Value is too large to encode.")
         if value < 0:
             # Value is negative
             return (~(-value) & (2 ** (size * 8) - 1)) + 1
@@ -74,10 +80,19 @@ class Integer(Field):
         super(Integer, self).__init__(*args, **kwargs)
 
     def encode(self, value):
+        if self.signed:
+            value = self.signing.encode(value, self.size)
+        elif value < 0:
+            raise ValueError("Value cannot be negative.")
+        if value > (1 << (self.size * 8)) - 1:
+            raise ValueError("Value is large for this field.")
         return self.endianness.encode(value, self.size)
 
     def decode(self, value):
-        return self.endianness.decode(value, self.size)
+        value = self.endianness.decode(value, self.size)
+        if self.signed:
+            value = self.signing.decode(value, self.size)
+        return value
 
 
 class PositiveInteger(Integer):
