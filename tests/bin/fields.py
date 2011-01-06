@@ -74,5 +74,25 @@ class TestInteger(unittest.TestCase):
             field.encode(256)
 
 
+class StringTest(unittest.TestCase):
+    def test_ascii(self):
+        field = fields.String(encoding='ascii')
+        self.assertEqual(field.encode('test'), b'test')
+        self.assertEqual(field.decode(b'test'), 'test')
+        
+        # Most Unicode can't be encoded in ASCII
+        with self.assertRaises(ValueError):
+            field.encode('\u00fcber')
+
+    def test_unicode(self):
+        field = fields.String(encoding='utf8')
+        self.assertEqual(field.encode('\u00fcber'), b'\xc3\xbcber')
+        self.assertEqual(field.decode(b'\xc3\xbcber'), '\u00fcber')
+
+    def test_invalid_encoding(self):
+        with self.assertRaises(LookupError):
+            fields.String(encoding='invalid')
+
+
 if __name__ == '__main__':
     unittest.main()
