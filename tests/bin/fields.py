@@ -84,14 +84,53 @@ class StringTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             field.encode('\u00fcber')
 
-    def test_unicode(self):
+    def test_utf8(self):
         field = fields.String(encoding='utf8')
         self.assertEqual(field.encode('\u00fcber'), b'\xc3\xbcber')
         self.assertEqual(field.decode(b'\xc3\xbcber'), '\u00fcber')
 
     def test_invalid_encoding(self):
+        with self.assertRaises(TypeError):
+            fields.String()
         with self.assertRaises(LookupError):
             fields.String(encoding='invalid')
+
+
+class FixedStringTest(unittest.TestCase):
+    def test_bytes(self):
+        field = fields.FixedString(b'valid')
+        field.encode(b'valid')
+        field.decode(b'valid')
+
+        with self.assertRaises(ValueError):
+            field.decode(b'invalid')
+
+        # Encoding a Unicode string isn't possible with a bytes FixedString
+        with self.assertRaises(ValueError):
+            field.decode('valid')
+
+    def test_ascii(self):
+        field = fields.FixedString('valid')
+        field.encode('valid')
+        field.decode(b'valid')
+
+        with self.assertRaises(ValueError):
+            field.encode('invalid')
+
+        with self.assertRaises(ValueError):
+            field.decode(b'invalid')
+
+    def test_utf8(self):
+        field = fields.FixedString('\u00fcber', encoding='utf8')
+        field.encode('\u00fcber')
+        field.decode(b'\xc3\xbcber')
+
+        # If the value doesn't match what was specified, it's an error
+        with self.assertRaises(ValueError):
+            field.encode('uber')
+
+        with self.assertRaises(ValueError):
+            field.decode(b'uber')
 
 
 if __name__ == '__main__':
