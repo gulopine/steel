@@ -23,8 +23,8 @@ class FixedString(String):
             self.decoded_value = value
             self.encoding = None
         elif isinstance(value, str):
-            self.encoded_value = value.encode(encoding)
             self.decoded_value = value
+            self.encoded_value = super(FixedString, self).encode(value)
         self.size = len(self.encoded_value)
 
     def encode(self, value):
