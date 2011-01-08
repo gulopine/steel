@@ -1,6 +1,30 @@
+import io
 import unittest
 
 from biwako.bin import fields
+
+
+class IOTest(unittest.TestCase):
+    data = b'\x2a\x42'
+
+    def setUp(self):
+        self.input = io.BytesIO(b'\x2a\x42')
+        self.output = io.BytesIO()
+
+    def test_read(self):
+        # If no size is provided, a simple field can't be read.
+        field = fields.Field()
+        with self.assertRaises(NotImplementedError):
+            field.read(self.input)
+
+        field = fields.Field(size=2)
+        data = field.read(self.input)
+        self.assertEqual(data, self.data)
+
+    def test_write(self):
+        field = fields.Field(size=2)
+        field.write(self.output, self.data)
+        self.assertEqual(self.output.getvalue(), self.data)
 
 
 class EndiannessTest(unittest.TestCase):
