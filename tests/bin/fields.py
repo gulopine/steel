@@ -98,6 +98,19 @@ class TestInteger(unittest.TestCase):
             field.encode(256)
 
 
+class TestFixedInteger(unittest.TestCase):
+    def test(self):
+        field = fields.FixedInteger(42, size=1)
+        self.assertEqual(field.encode(42), b'\x2a')
+        self.assertEqual(field.decode(b'\x2a'), 42)
+
+        with self.assertRaises(ValueError):
+            field.encode(43)
+
+        with self.assertRaises(ValueError):
+            field.decode(b'\x2b')
+
+
 class StringTest(unittest.TestCase):
     def test_ascii(self):
         field = fields.String(encoding='ascii')

@@ -95,6 +95,25 @@ class Integer(Field):
         return value
 
 
+class FixedInteger(Integer):
+    def __init__(self, value, *args, **kwargs):
+        super(FixedInteger, self).__init__(*args, signed=value < 0, **kwargs)
+        if not self.size:
+            raise TypeError("Size is required for fixed integers")
+        self.decoded_value = value
+        self.encoded_value = super(FixedInteger, self).encode(value)
+
+    def encode(self, value):
+        if value != self.decoded_value:
+            raise ValueError('Expected %r, got %r.' % (self.decoded_value, value))
+        return self.encoded_value
+
+    def decode(self, value):
+        if value != self.encoded_value:
+            raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
+        return self.decoded_value
+
+
 class PositiveInteger(Integer):
     def __init__(self, *args, signed=False, **kwargs):
         super(PositiveInteger, self).__init__(*args, signed=signed, **kwargs)
