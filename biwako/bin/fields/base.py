@@ -23,3 +23,9 @@ class Field:
         # fields can/should override it if necessary
         obj.write(value)
 
+    def attach_to_class(self, cls, name):
+        self.name = name
+        label = self.label or name.replace('_', ' ')
+        self.label = label.title()
+        cls._fields.append(self)
+
