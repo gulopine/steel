@@ -15,9 +15,9 @@ class StructureMeta(type):
         return iter(cls.__dict__)
 
 class Structure(metaclass=StructureMeta):
-    def __init__(self, file=None):
-        self.file = file
-        self.mode = file and 'rb' or 'wb'
+    def __init__(self, *args, **kwargs):
+        self.file = len(args) > 0 and args[0] or None
+        self.mode = self.file and 'rb' or 'wb'
         self.position = 0
 
     def read(self, size=None):
