@@ -15,4 +15,19 @@ class StructureMeta(type):
         return iter(cls.__dict__)
 
 class Structure(metaclass=StructureMeta):
-    pass
+    def __init__(self, file=None):
+        self.file = file
+        self.mode = file and 'rb' or 'wb'
+        self.position = 0
+
+    def read(self, size=None):
+        if self.mode != 'rb':
+            raise IOError("not readable")
+        return self.file.read(size)
+
+    def write(self, data):
+        if self.mode != 'wb':
+            raise IOError("not writable")
+        pass
+
+
