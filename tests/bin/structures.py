@@ -24,6 +24,20 @@ class AttributeTest(unittest.TestCase):
         self.assertEqual(self.struct._fields[0].label, 'Number')
         self.assertEqual(self.struct._fields[1].label, 'String')
 
+    def test_assignment(self):
+        struct = self.struct()
+        struct.integer = 37
+        struct.string = 'still valid'
+        self.assertEqual(struct.integer, 37)
+        self.assertEqual(struct.string, 'still valid')
+
+        struct = self.struct(integer=42, string='valid')
+        self.assertEqual(struct.integer, 42)
+        self.assertEqual(struct.string, 'valid')
+
+        with self.assertRaises(TypeError):
+            struct = self.struct(io.BytesIO(), integer=1, string='invalid')
+
 
 class IOTest(unittest.TestCase):
     data = b'\x2a\x00\x42valid'
