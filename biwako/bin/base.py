@@ -20,6 +20,12 @@ class Structure(metaclass=StructureMeta):
         self.mode = self.file and 'rb' or 'wb'
         self.position = 0
 
+        if self.file and kwargs:
+            raise TypeError("Cannot supply a file and attributes together")
+
+        for name, value in kwargs.items():
+            setattr(self, name, value)
+
     def read(self, size=None):
         if self.mode != 'rb':
             raise IOError("not readable")
