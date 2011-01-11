@@ -38,7 +38,6 @@ class AttributeTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             struct = self.struct(io.BytesIO(), integer=1, string='invalid')
 
-
 class IOTest(unittest.TestCase):
     data = b'\x2a\x00\x42valid'
 
@@ -68,5 +67,9 @@ class IOTest(unittest.TestCase):
         struct = self.struct()
         struct.write(self.data)
 
-
+    def test_attributes(self):
+        struct = self.struct(io.BytesIO(self.data))
+        self.assertEqual(struct.forty_two, 42)
+        self.assertEqual(struct.sixty_six, 66)
+        self.assertEqual(struct.string, 'valid')
 
