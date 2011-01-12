@@ -44,7 +44,10 @@ There is no version of Biwako that works with Python 2.x, and there are no plans
 to make one. The goal is to work with binary data, and Biwako takes advantage of
 the differences between bytes and strings. Prior to version 3, Python failed to
 make a proper distinction between those two types, which complicates the design
-of a framework .
+of a framework that deals specifically with binary data.
+
+Beyond that, Biwako has no dependencies on any external libraries. Everything
+you need is in the box.
 
 .. Topics
 .. ======
