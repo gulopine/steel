@@ -81,6 +81,6 @@ it's appropriately named :class:`~biwako.bin.fields.numbers.LittleEndian`.
       height = bin.Integer(size=2, signed=False)
 
       class Options:
-        endianness = bin.LittleEndian()
+          endianness = bin.LittleEndian()
 
 And that's it!
