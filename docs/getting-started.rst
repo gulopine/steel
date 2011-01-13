@@ -1,0 +1,86 @@
+Getting Started
+===============
+
+Most of the tools you'll need for describing a file format can be found in the
+:mod:`biwako.bin` namespace. It's typically best to import :mod:`~biwako.bin`
+directly, so the name is kept short in all your references to it throughout
+the module.
+
+::
+
+  from biwako import bin
+
+Many different classes are available in this namespace, but you'll spend most
+of your time working with two different types: structures and fields. The most
+basic structure is simply called :class:`~biwako.bin.base.Structure`, and it
+works using a declarative approach. To start off, simply subclass `Structure`.
+
+::
+
+  class GIF(bin.Structure):
+      pass
+
+Inside that class, you can define any number of fields and methods, which will
+control how files are parsed and saved. For a GIF image, the first piece of
+data is a static string tag, ``"GIF"``, which is followed by a three-character
+string containing the version number of the format used to save the file.
+
+Because the first string, ``"GIF"`` is always the same across all files that
+use this format, it can use a :class:`~biwako.bin.fields.strings.FixedString`.
+This type of field will always check for the specific string and will consider
+the file to be invalid if any other string is found.
+
+The version string is similar, but it can be one of a couple different values,
+depending on the file used. Because the length of the string is known, though,
+it can be specified as a :class:`~biwako.bin.fields.strings.FixedLengthString`.
+This field will read in the specified number of bytes and convert them to a
+native string using the encoding provided.
+
+::
+
+  class GIF(bin.Structure):
+      tag = bin.FixedString('GIF')
+      version = bin.FixedLengthString(size=3, encoding='ascii')
+
+The width and height are eaiser to describe, because they're simply numbers,
+and they're represented as :class:`~biwako.bin.fields.numbers.Integer` fields.
+Since numbers can come in a few different sizes, you must specify how many
+bytes are used to store the number, so that it can be processed correctly.
+Each of the numbers for the image dimensions in a GIF file are stored in two
+bytes, and because there can never be a negative value in either dimension,
+you simply specify that the values should never be processed as signed numbers.
+
+::
+
+  class GIF(bin.Structure):
+      tag = bin.FixedString('GIF')
+      version = bin.FixedLengthString(size=3, encoding='ascii')
+      width = bin.Integer(size=2, signed=False)
+      height = bin.Integer(size=2, signed=False)
+
+The one remaining detail for this simple format is that, when numbers span more
+than one byte, different systems keep track of those bytes in different orders.
+Most computers these days work as big-endian systems, where the most significant
+byte comes first, but GIF was specified to use the little-endian format, where
+the least significant byte is stored first. In order to decode numbers properly,
+this endianness specification must also be included in the class definition.
+
+Unlike most details of fields, though, endianness is typically the same
+throughout the entire file, so it doesn't make much sense to include it on each
+and every field. Instead, you can provide an :class:`Options` class inside your
+main class definition and include the endianness there. The class you'll need
+to instantiate is also available from the :mod:`~biwako.bin` namespace, and
+it's appropriately named :class:`~biwako.bin.fields.numbers.LittleEndian`.
+
+::
+
+  class GIF(bin.Structure):
+      tag = bin.FixedString('GIF')
+      version = bin.FixedLengthString(size=3, encoding='ascii')
+      width = bin.Integer(size=2, signed=False)
+      height = bin.Integer(size=2, signed=False)
+
+      class Options:
+        endianness = bin.LittleEndian()
+
+And that's it!

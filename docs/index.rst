@@ -1,16 +1,10 @@
-.. Biwako documentation master file, created by
-   sphinx-quickstart on Tue Jan 11 22:01:13 2011.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Binary Data Made Easy
-=====================
+File Formats Made Easy
+======================
 
 Biwako makes it easy to define, parse, edit, validate and store data in binary
-formats. Its primary use case is to help you work with file formats defined by
-other applications, but it's flexible enough to work with any form of binary
-data and it's simple enough that you can use it to roll your own file formats
-quickly and easily.
+file formats. Its primary goal is to help you work with formats defined by
+other applications, but it's also easy to roll your own file formats and it's
+flexible enough to work with binary data from most file-like objects.
 
 Consider a simple format to retrieve the width and height out of GIF images::
 
@@ -26,7 +20,9 @@ Consider a simple format to retrieve the width and height out of GIF images::
           endianness = bin.LittleEndian()
 
 That's all it takes to create a class capable of parsing a GIF into a Python
-object. Accessing the data in that object then works just as you'd expect::
+object. There's certainly more to the GIF image format than just what you see
+here, but if all you need is to retrieve the width and height, this will do
+exactly that. Accessing the data in that object then works as you'd expect::
 
   >>> image = GIF(open('example.gif', 'rb'))
   >>> image.version
@@ -49,9 +45,12 @@ of a framework that deals specifically with binary data.
 Beyond that, Biwako has no dependencies on any external libraries. Everything
 you need is in the box.
 
-.. Topics
-.. ======
+Topics
+======
 
 .. toctree::
    :maxdepth: 2
 
+   getting-started
+..   structures
+..   fields
