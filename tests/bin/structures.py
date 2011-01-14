@@ -67,17 +67,10 @@ class IOTest(unittest.TestCase):
         struct = self.struct()
         struct.write(self.data)
 
-    def test_attributes(self):
-        struct = self.struct(io.BytesIO(self.data))
-        self.assertEqual(struct.forty_two, 42)
-        self.assertEqual(struct.sixty_six, 66)
-        self.assertEqual(struct.string, 'valid')
-
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):
         class TestStructure(bin.Structure, attribute='test'):
-#        class TestStructure(bin.Structure):
             pass
 
 

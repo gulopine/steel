@@ -29,10 +29,3 @@ class Field:
         self.label = label.title()
         cls._fields.append(self)
 
-    def __get__(self, instance, owner):
-        if not instance:
-            return self
-        if self.name not in instance.__dict__:
-            instance.__dict__[self.name] = 42
-        return instance.__dict__[self.name]
-
