@@ -67,20 +67,16 @@ this endianness specification must also be included in the class definition.
 
 Unlike most details of fields, though, endianness is typically the same
 throughout the entire file, so it doesn't make much sense to include it on each
-and every field. Instead, you can provide an :class:`Options` class inside your
-main class definition and include the endianness there. The class you'll need
-to instantiate is also available from the :mod:`~biwako.bin` namespace, and
-it's appropriately named :class:`~biwako.bin.fields.numbers.LittleEndian`.
+and every field. Instead, you can provide it as an argument to the main class
+definition itself. The functionality you'll need is controlled by a class named
+:class:`~biwako.bin.fields.numbers.LittleEndian`.
 
 ::
 
-  class GIF(bin.Structure):
+  class GIF(bin.Structure, endianness=bin.LittleEndian):
       tag = bin.FixedString('GIF')
       version = bin.FixedLengthString(size=3, encoding='ascii')
       width = bin.Integer(size=2, signed=False)
       height = bin.Integer(size=2, signed=False)
-
-      class Options:
-          endianness = bin.LittleEndian()
 
 And that's it!
