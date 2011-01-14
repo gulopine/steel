@@ -46,7 +46,7 @@ class IOTest(unittest.TestCase):
         self.output = io.BytesIO()
         
         class TestStructure(bin.Structure):
-            forty_two = bin.Integer(size=2, endianness=bin.LittleEndian())
+            forty_two = bin.Integer(size=2, endianness=bin.LittleEndian)
             sixty_six = bin.Integer(size=1)
             string = bin.String(encoding='ascii')
 
@@ -72,4 +72,12 @@ class IOTest(unittest.TestCase):
         self.assertEqual(struct.forty_two, 42)
         self.assertEqual(struct.sixty_six, 66)
         self.assertEqual(struct.string, 'valid')
+
+
+class OptionsTest(unittest.TestCase):
+    def test_arguments(self):
+        class TestStructure(bin.Structure, attribute='test'):
+#        class TestStructure(bin.Structure):
+            pass
+
 

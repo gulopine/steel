@@ -31,47 +31,47 @@ class EndiannessTest(unittest.TestCase):
     decoded_value = 42
     
     def test_BigEndian(self):
-        endianness = fields.BigEndian()
+        endianness = fields.BigEndian(size=2)
         encoded_value = b'\x00*'
-        self.assertEqual(endianness.encode(self.decoded_value, size=2), encoded_value)
-        self.assertEqual(endianness.decode(encoded_value, size=2), self.decoded_value)
+        self.assertEqual(endianness.encode(self.decoded_value), encoded_value)
+        self.assertEqual(endianness.decode(encoded_value), self.decoded_value)
 
     def test_LittleEndian(self):
-        endianness = fields.LittleEndian()
+        endianness = fields.LittleEndian(size=2)
         encoded_value = b'*\x00'
-        self.assertEqual(endianness.encode(self.decoded_value, size=2), encoded_value)
-        self.assertEqual(endianness.decode(encoded_value, size=2), self.decoded_value)
+        self.assertEqual(endianness.encode(self.decoded_value), encoded_value)
+        self.assertEqual(endianness.decode(encoded_value), self.decoded_value)
 
 
 class SigningTest(unittest.TestCase):
     decoded_value = -42
 
     def test_SignMagnitude(self):
-        signer = fields.SignMagnitude()
+        signer = fields.SignMagnitude(size=1)
         encoded_value = 0b10101010
-        self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
-        self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
+        self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
+        self.assertEqual(signer.decode(encoded_value), self.decoded_value)
         # Make sure it doesn't muck up positive values
-        self.assertEqual(signer.encode(42, size=1), 42)
-        self.assertEqual(signer.decode(42, size=1), 42)
+        self.assertEqual(signer.encode(42), 42)
+        self.assertEqual(signer.decode(42), 42)
 
     def test_OnesComplement(self):
-        signer = fields.OnesComplement()
+        signer = fields.OnesComplement(size=1)
         encoded_value = 0b11010101
-        self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
-        self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
+        self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
+        self.assertEqual(signer.decode(encoded_value), self.decoded_value)
         # Make sure it doesn't muck up positive values
-        self.assertEqual(signer.encode(42, size=1), 42)
-        self.assertEqual(signer.decode(42, size=1), 42)
+        self.assertEqual(signer.encode(42), 42)
+        self.assertEqual(signer.decode(42), 42)
 
     def test_TwosComplement(self):
-        signer = fields.TwosComplement()
+        signer = fields.TwosComplement(size=1)
         encoded_value = 0b11010110
-        self.assertEqual(bin(signer.encode(self.decoded_value, size=1)), bin(encoded_value))
-        self.assertEqual(signer.decode(encoded_value, size=1), self.decoded_value)
+        self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
+        self.assertEqual(signer.decode(encoded_value), self.decoded_value)
         # Make sure it doesn't muck up positive values
-        self.assertEqual(signer.encode(42, size=1), 42)
-        self.assertEqual(signer.decode(42, size=1), 42)
+        self.assertEqual(signer.encode(42), 42)
+        self.assertEqual(signer.decode(42), 42)
 
 
 class TestInteger(unittest.TestCase):

@@ -23,9 +23,16 @@ class Field:
         # fields can/should override it if necessary
         obj.write(value)
 
-    def attach_to_class(self, cls, name):
+    def attach_to_class(self, cls, name, **options):
         self.name = name
         label = self.label or name.replace('_', ' ')
         self.label = label.title()
         cls._fields.append(self)
+
+    def __get__(self, instance, owner):
+        if not instance:
+            return self
+        if self.name not in instance.__dict__:
+            instance.__dict__[self.name] = 42
+        return instance.__dict__[self.name]
 

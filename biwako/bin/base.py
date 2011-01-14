@@ -1,14 +1,19 @@
 import collections
 
 class StructureMeta(type):
-    def __init__(cls, name, bases, attrs):
+    def __new__(cls, name, bases, attrs, **options):
+        # Nothing to do here, but we need to make sure options
+        # don't get passed in to type.__new__() itself.
+        return type.__new__(cls, name, bases, attrs)
+
+    def __init__(cls, name, bases, attrs, **options):
         cls._fields = []
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
-                attr.attach_to_class(cls, name)
+                attr.attach_to_class(cls, name, **options)
 
     @classmethod
-    def __prepare__(metacls, name, bases, **kwargs):
+    def __prepare__(metacls, name, bases, **options):
         return collections.OrderedDict()
 
     def __iter__(cls):
