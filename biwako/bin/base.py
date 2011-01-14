@@ -21,24 +21,37 @@ class StructureMeta(type):
 
 class Structure(metaclass=StructureMeta):
     def __init__(self, *args, **kwargs):
-        self.file = len(args) > 0 and args[0] or None
-        self.mode = self.file and 'rb' or 'wb'
-        self.position = 0
+        self._file = len(args) > 0 and args[0] or None
+        self._mode = self._file and 'rb' or 'wb'
+        self._position = 0
+        self._raw_values = {}
 
-        if self.file and kwargs:
+        if self._file and kwargs:
             raise TypeError("Cannot supply a file and attributes together")
 
         for name, value in kwargs.items():
             setattr(self, name, value)
 
     def read(self, size=None):
-        if self.mode != 'rb':
+        if self._mode != 'rb':
             raise IOError("not readable")
-        return self.file.read(size)
+        return self._file.read(size)
 
     def write(self, data):
-        if self.mode != 'wb':
+        if self._mode != 'wb':
             raise IOError("not writable")
         pass
+
+    def _get_value(self, field):
+        if field.offset is not None and hasattr(self, 'seek'):
+            self.seek(field.offset)
+            self._raw_values[field.name] = field.read(self)
+        else:
+            for other_field in self.__class__._fields:
+                if other_field.name not in self._raw_values:
+                    self._raw_values[field.name] = other_field.read(self)
+                if other_field is field:
+                    break
+        return field.decode(self._raw_values[field.name])
 
 

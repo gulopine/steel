@@ -110,7 +110,7 @@ class Integer(Field):
     def decode(self, value):
         value = self.endianness.decode(value)
         if self.signed:
-            value = self.signing.decode(value, self.size)
+            value = self.signing.decode(value)
         return value
 
 

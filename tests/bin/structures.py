@@ -54,10 +54,10 @@ class IOTest(unittest.TestCase):
 
     def test_mode(self):
         struct = self.struct(self.input)
-        self.assertEqual(struct.mode, 'rb')
+        self.assertEqual(struct._mode, 'rb')
 
         struct = self.struct()
-        self.assertEqual(struct.mode, 'wb')
+        self.assertEqual(struct._mode, 'wb')
 
     def test_read(self):
         struct = self.struct(self.input)
@@ -66,6 +66,12 @@ class IOTest(unittest.TestCase):
     def test_write(self):
         struct = self.struct()
         struct.write(self.data)
+
+    def test_attributes(self):
+        struct = self.struct(io.BytesIO(self.data))
+        self.assertEqual(struct.forty_two, 42)
+        self.assertEqual(struct.sixty_six, 66)
+        self.assertEqual(struct.string, 'valid')
 
 
 class OptionsTest(unittest.TestCase):

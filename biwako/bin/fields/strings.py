@@ -7,6 +7,10 @@ class String(Field):
         self.encoding = encoding
         super(String, self).__init__(*args, **kwargs)
 
+    def read(self, obj):
+        data = obj.read(32)
+        return data
+
     def encode(self, value):
         return value.encode(self.encoding)
 

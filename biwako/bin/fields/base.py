@@ -1,7 +1,8 @@
 class Field:
-    def __init__(self, label=None, size=None):
+    def __init__(self, label=None, size=None, offset=None):
         self.label = label
         self.size = size
+        self.offset = offset
 
     def calculate_size(self, obj):
         return self.size
@@ -28,4 +29,11 @@ class Field:
         label = self.label or name.replace('_', ' ')
         self.label = label.title()
         cls._fields.append(self)
+
+    def __get__(self, instance, owner):
+        if not instance:
+            return self
+        if self.name not in instance.__dict__:
+            instance.__dict__[self.name] = instance._get_value(self)
+        return instance.__dict__[self.name]
 
