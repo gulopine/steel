@@ -8,8 +8,14 @@ class String(Field):
         super(String, self).__init__(*args, **kwargs)
 
     def read(self, obj):
-        data = obj.read(32)
-        return data
+        # TODO: There's gotta be a better way, but it works for now
+        value = b''
+        while 1:
+            data = obj.read(1)
+            try:
+                return value + data[:data.index(b'\x00')]
+            except ValueError:
+                value += data
 
     def encode(self, value):
         return value.encode(self.encoding)

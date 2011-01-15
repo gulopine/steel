@@ -39,7 +39,7 @@ class AttributeTest(unittest.TestCase):
             struct = self.struct(io.BytesIO(), integer=1, string='invalid')
 
 class IOTest(unittest.TestCase):
-    data = b'\x2a\x00\x42valid'
+    data = b'\x2a\x00\x42valid\x00test\x00'
 
     def setUp(self):
         self.input = io.BytesIO(self.data)
@@ -48,7 +48,8 @@ class IOTest(unittest.TestCase):
         class TestStructure(bin.Structure):
             forty_two = bin.Integer(size=2, endianness=bin.LittleEndian)
             sixty_six = bin.Integer(size=1)
-            string = bin.String(encoding='ascii')
+            valid = bin.String(encoding='ascii')
+            test = bin.String(encoding='ascii')
 
         self.struct = TestStructure
 
@@ -61,7 +62,7 @@ class IOTest(unittest.TestCase):
 
     def test_read(self):
         struct = self.struct(self.input)
-        self.assertEqual(struct.read(10), self.data)
+        self.assertEqual(struct.read(), self.data)
 
     def test_write(self):
         struct = self.struct()
@@ -71,7 +72,8 @@ class IOTest(unittest.TestCase):
         struct = self.struct(io.BytesIO(self.data))
         self.assertEqual(struct.forty_two, 42)
         self.assertEqual(struct.sixty_six, 66)
-        self.assertEqual(struct.string, 'valid')
+        self.assertEqual(struct.valid, 'valid')
+        self.assertEqual(struct.test, 'test')
 
 
 class OptionsTest(unittest.TestCase):
