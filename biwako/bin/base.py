@@ -51,7 +51,7 @@ class Structure(metaclass=StructureMeta):
         else:
             for other_field in self.__class__._fields:
                 if other_field.name not in self._raw_values:
-                    self._raw_values[field.name] = other_field.read(self)
+                    self._raw_values[other_field.name] = other_field.read(self)
                 if other_field is field:
                     break
         return field.decode(self._raw_values[field.name])

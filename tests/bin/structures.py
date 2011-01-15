@@ -75,6 +75,13 @@ class IOTest(unittest.TestCase):
         self.assertEqual(struct.valid, 'valid')
         self.assertEqual(struct.test, 'test')
 
+        # Now test them again in a random order
+        struct = self.struct(io.BytesIO(self.data))
+        self.assertEqual(struct.valid, 'valid')
+        self.assertEqual(struct.forty_two, 42)
+        self.assertEqual(struct.test, 'test')
+        self.assertEqual(struct.sixty_six, 66)
+
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):
