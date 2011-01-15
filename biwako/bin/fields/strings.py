@@ -47,3 +47,19 @@ class FixedString(String):
             raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
         return self.decoded_value
 
+
+class Bytes(Field):
+    def __init__(self, *args, **kwargs):
+        super(Bytes, self).__init__(*args, **kwargs)
+        if not self.size:
+            raise TypeError("Size is required for Bytes fields")
+
+    def encode(self, value):
+        # Nothing to do here
+        return value
+
+    def decode(self, value):
+        # Nothing to do here
+        return value
+
+
