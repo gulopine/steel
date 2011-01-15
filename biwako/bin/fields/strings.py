@@ -2,31 +2,49 @@ from .base import Field
 
 
 class String(Field):
-    def __init__(self, *args, encoding=None, **kwargs):
+    def __init__(self, *args, encoding=None, padding=b'\x00',
+                 terminator=b'\x00', **kwargs):
         ''.encode(encoding)  # Check for a valid encoding
         self.encoding = encoding
+        self.padding = padding
+        self.terminator = terminator
         super(String, self).__init__(*args, **kwargs)
 
     def read(self, obj):
+        if self.size:
+            return super(String, self).read(obj)
+
         # TODO: There's gotta be a better way, but it works for now
         value = b''
-        while 1:
+        while True:
             data = obj.read(1)
-            try:
-                return value + data[:data.index(b'\x00')]
-            except ValueError:
-                value += data
+            value += data
+            if data == self.terminator:
+                return value
 
     def encode(self, value):
-        return value.encode(self.encoding)
+        value = value.encode(self.encoding)
+        if self.size:
+            if len(value) > self.size:
+                raise ValueError("String too long to encode")
+            value = value.ljust(self.size, self.padding)
+        else:
+            value += self.terminator
+        return value
 
     def decode(self, value):
-        return value.decode(self.encoding)
+        if self.size:
+            value = value.rstrip(self.padding)
+        else:
+            value = value.rstrip(self.terminator)
+        value = value.decode(self.encoding)
+        return value
 
 
 class FixedString(String):
     def __init__(self, value, *args, encoding='ascii', **kwargs):
-        super(FixedString, self).__init__(*args, encoding=encoding, size=None, **kwargs)
+        super(FixedString, self).__init__(*args, encoding=encoding, size=None,
+                                          padding=b'', terminator=b'', **kwargs)
         if isinstance(value, bytes):
             # If raw bytes are supplied, encoding is not used
             self.encoded_value = value

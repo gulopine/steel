@@ -114,8 +114,8 @@ class TestFixedInteger(unittest.TestCase):
 class StringTest(unittest.TestCase):
     def test_ascii(self):
         field = fields.String(encoding='ascii')
-        self.assertEqual(field.encode('test'), b'test')
-        self.assertEqual(field.decode(b'test'), 'test')
+        self.assertEqual(field.encode('test'), b'test\x00')
+        self.assertEqual(field.decode(b'test\x00'), 'test')
         
         # Most Unicode can't be encoded in ASCII
         with self.assertRaises(ValueError):
@@ -123,8 +123,8 @@ class StringTest(unittest.TestCase):
 
     def test_utf8(self):
         field = fields.String(encoding='utf8')
-        self.assertEqual(field.encode('\u00fcber'), b'\xc3\xbcber')
-        self.assertEqual(field.decode(b'\xc3\xbcber'), '\u00fcber')
+        self.assertEqual(field.encode('\u00fcber'), b'\xc3\xbcber\x00')
+        self.assertEqual(field.decode(b'\xc3\xbcber\x00'), '\u00fcber')
 
     def test_invalid_encoding(self):
         with self.assertRaises(TypeError):
