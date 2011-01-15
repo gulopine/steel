@@ -87,7 +87,7 @@ class TwosComplement:
 # Numeric types
 
 class Integer(Field):
-    def __init__(self, *args, signed=True, endianness=BigEndian,
+    def __init__(self, *args, signed=False, endianness=BigEndian,
                  signing=TwosComplement, **kwargs):
         super(Integer, self).__init__(*args, **kwargs)
         self.endianness = endianness(self.size)
@@ -131,11 +131,6 @@ class FixedInteger(Integer):
         if value != self.encoded_value:
             raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
         return self.decoded_value
-
-
-class PositiveInteger(Integer):
-    def __init__(self, *args, signed=False, **kwargs):
-        super(PositiveInteger, self).__init__(*args, signed=signed, **kwargs)
 
 
 class Byte(Integer):
