@@ -35,6 +35,8 @@ class Structure(metaclass=StructureMeta):
     def read(self, size=None):
         if self._mode != 'rb':
             raise IOError("not readable")
+        if size is None:
+            return self._file.read()
         return self._file.read(size)
 
     def write(self, data):

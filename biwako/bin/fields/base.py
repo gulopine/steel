@@ -1,3 +1,7 @@
+# Special object used to instruct the reader to continue to the end of the file
+Remainder = object()
+
+
 class Field:
     def __init__(self, label=None, size=None, offset=None):
         self.label = label
@@ -9,6 +13,10 @@ class Field:
 
     def read(self, obj):
         size = self.calculate_size(obj)
+
+        # In this special case, the field gets everything that's left
+        if self.size is Remainder:
+            return obj.read()
 
         # If the size can be determined easily, read
         # that number of bytes and return it directly.
