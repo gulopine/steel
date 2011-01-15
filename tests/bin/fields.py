@@ -174,12 +174,12 @@ class BytesTest(unittest.TestCase):
     data = b'\x42\x00\x2a'
 
     def test_encode(self):
-        struct = fields.Bytes(size=3)
-        self.assertEqual(struct.encode(self.data), self.data)
+        field = fields.Bytes(size=3)
+        self.assertEqual(field.encode(self.data), self.data)
 
     def test_decode(self):
-        struct = fields.Bytes(size=3)
-        self.assertEqual(struct.decode(self.data), self.data)
+        field = fields.Bytes(size=3)
+        self.assertEqual(field.decode(self.data), self.data)
 
 
 if __name__ == '__main__':
