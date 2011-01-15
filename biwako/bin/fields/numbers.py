@@ -133,8 +133,3 @@ class FixedInteger(Integer):
         return self.decoded_value
 
 
-class Byte(Integer):
-    def __init__(self, *args, size=1, **kwargs):
-        super(Byte, self).__init__(*args, size=size, **kwargs)
-
-
