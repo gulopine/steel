@@ -182,5 +182,26 @@ class BytesTest(unittest.TestCase):
         self.assertEqual(field.decode(self.data), self.data)
 
 
+class ListTest(unittest.TestCase):
+    encoded_data = b'\x42\x52\x2a\x3a'
+    decoded_data = [66, 82, 42, 58]
+
+    def setUp(self):
+        self.field = fields.List(fields.Integer(size=1), size=4)
+
+    def test_read(self):
+        data = self.field.read(io.BytesIO(self.encoded_data))
+        self.assertSequenceEqual(data, [b'\x42', b'\x52', b'\x2a', b'\x3a'])
+
+    def test_encode(self):
+        data = self.field.encode(self.decoded_data)
+        self.assertEqual(data, self.encoded_data)
+
+    def test_decode(self):
+        data = self.field.read(io.BytesIO(self.encoded_data))
+        data = self.field.decode(data)
+        self.assertSequenceEqual(data, self.decoded_data)
+
+
 if __name__ == '__main__':
     unittest.main()
