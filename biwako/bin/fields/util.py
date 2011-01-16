@@ -28,3 +28,11 @@ class List(Field):
             decoded_values.append(self.field.decode(value))
         return decoded_values
 
+class Reserved(Field):
+    def encode(self, value):
+        return b'\x00' * self.size
+
+    def decode(self, value):
+        return None
+
+
