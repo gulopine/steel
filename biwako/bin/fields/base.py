@@ -2,6 +2,14 @@
 Remainder = object()
 
 
+class Arg:
+    def __init__(self, default=None):
+        self.default = default
+
+    def __getattr__(self, name):
+        return getattr(self.default, name)
+
+
 class Field:
     def __init__(self, label=None, size=None, offset=None):
         self.label = label
