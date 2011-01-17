@@ -2,7 +2,24 @@
 Remainder = object()
 
 
-class Field:
+class FieldMeta(type):
+    def __new__(cls, name, bases, attrs, **options):
+        # Nothing to do here, but we need to make sure options
+        # don't get passed in to type.__new__() itself.
+        return type.__new__(cls, name, bases, attrs)
+
+    def __init__(cls, name, bases, attrs, **options):
+        cls._args = []
+        for name, attr in attrs.items():
+            if hasattr(attr, 'attach_to_class'):
+                attr.attach_to_class(cls, name, **options)
+
+    @classmethod
+    def __prepare__(metacls, name, bases, **options):
+        return collections.OrderedDict()
+
+
+class Field(metaclass=FieldMeta):
     def __init__(self, label=None, size=None, offset=None):
         self.label = label
         self.size = size
