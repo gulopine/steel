@@ -1,4 +1,4 @@
-from .base import Field
+from .base import Field, Arg
 
 
 # Endianness options
@@ -87,16 +87,17 @@ class TwosComplement:
 # Numeric types
 
 class Integer(Field):
-    def __init__(self, *args, signed=False, endianness=BigEndian,
-                 signing=TwosComplement, **kwargs):
+    def __init__(self, *args, signed=False, endianness=Arg(BigEndian),
+                 signing=Arg(TwosComplement), **kwargs):
         super(Integer, self).__init__(*args, **kwargs)
-        self.endianness = endianness(self.size)
+        self.endianness = endianness
         self.signed = signed
-        self.signing = signing(self.size)
+        self.signing = signing
 
-    def attach_to_class(self, cls, name, endianness=BigEndian,
-                        signing=TwosComplement, **options):
+    def attach_to_class(self, cls, name, **options):
         super(Integer, self).attach_to_class(cls, name, **options)
+        self.endianness = self.endianness(self.size)
+        self.signing = self.signing(self.size)
 
     def encode(self, value):
         if self.signed:
@@ -119,17 +120,17 @@ class FixedInteger(Integer):
         super(FixedInteger, self).__init__(*args, signed=value < 0, **kwargs)
         if not self.size:
             raise TypeError("Size is required for fixed integers")
-        self.decoded_value = value
-        self.encoded_value = super(FixedInteger, self).encode(value)
+        self.value = value
 
     def encode(self, value):
-        if value != self.decoded_value:
-            raise ValueError('Expected %r, got %r.' % (self.decoded_value, value))
-        return self.encoded_value
+        if value != self.value:
+            raise ValueError('Expected %r, got %r.' % (self.value, value))
+        return self.super(FixedInteger, self).encode(value)
 
     def decode(self, value):
-        if value != self.encoded_value:
-            raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
+        encoded_value = self.super(FixedInteger, self).encode(value)
+        if value != encoded_value:
+            raise ValueError('Expected %r, got %r.' % (encoded_value, value))
         return self.decoded_value
 
 

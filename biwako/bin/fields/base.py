@@ -45,6 +45,12 @@ class Field:
         label = self.label or name.replace('_', ' ')
         self.label = label.title()
         cls._fields.append(self)
+        for name, attr in self.__dict__.items():
+            if isinstance(attr, Arg):
+                if name in options:
+                    setattr(self, name, options[name])
+                else:
+                    setattr(self, name, attr.default)
 
     def __get__(self, instance, owner):
         if not instance:

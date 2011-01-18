@@ -1,14 +1,17 @@
-from .base import Field
+from .base import Field, Arg
 
 
 class String(Field):
-    def __init__(self, *args, encoding=None, padding=b'\x00',
+    def __init__(self, *args, encoding=Arg('utf8'), padding=b'\x00',
                  terminator=b'\x00', **kwargs):
-        ''.encode(encoding)  # Check for a valid encoding
         self.encoding = encoding
         self.padding = padding
         self.terminator = terminator
         super(String, self).__init__(*args, **kwargs)
+
+    def attach_to_class(self, cls, name, **options):
+        super(String, self).attach_to_class(cls, name, **options)
+        ''.encode(self.encoding)  # Check for a valid encoding
 
     def read(self, obj):
         if self.size:
