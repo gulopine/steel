@@ -12,6 +12,8 @@ class FieldMeta(type):
         if FieldMeta._registry.options:
             options = FieldMeta._registry.options.copy()
             options.update(kwargs)
+        else:
+            options = kwargs
         return super(FieldMeta, cls).__call__(*args, **options)
 
 
