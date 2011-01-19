@@ -1,4 +1,4 @@
-from .base import Field
+from .base import Field, Option
 
 
 # Endianness options
@@ -87,16 +87,20 @@ class TwosComplement:
 # Numeric types
 
 class Integer(Field):
-    def __init__(self, *args, signed=False, endianness=BigEndian,
-                 signing=TwosComplement, **kwargs):
-        super(Integer, self).__init__(*args, **kwargs)
-        self.endianness = endianness(self.size)
-        self.signed = signed
-        self.signing = signing(self.size)
+    endianness = Option(default=BigEndian)
+    signing = Option(default=TwosComplement)
 
-    def attach_to_class(self, cls, name, endianness=BigEndian,
-                        signing=TwosComplement, **options):
-        super(Integer, self).attach_to_class(cls, name, **options)
+    @endianness.init
+    def init_endianness(self, value):
+        return value(self.size)
+    
+    @signing.init
+    def init_signing(self, value):
+        return value(self.size)
+    
+    def __init__(self, *args, signed=False, **kwargs):
+        super(Integer, self).__init__(*args, **kwargs)
+        self.signed = signed
 
     def encode(self, value):
         if self.signed:
