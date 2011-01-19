@@ -94,10 +94,6 @@ class Integer(Field):
         self.signed = signed
         self.signing = signing(self.size)
 
-    def attach_to_class(self, cls, name, endianness=BigEndian,
-                        signing=TwosComplement, **options):
-        super(Integer, self).attach_to_class(cls, name, **options)
-
     def encode(self, value):
         if self.signed:
             value = self.signing.encode(value)

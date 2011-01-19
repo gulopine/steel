@@ -2,8 +2,15 @@
 Remainder = object()
 
 
-class Field:
-    def __init__(self, label=None, size=None, offset=None):
+class FieldMeta(type):
+    def __call__(cls, *args, **kwargs):
+        field = super(FieldMeta, cls).__call__(*args, **kwargs)
+        field._arguments = (args, kwargs)
+        return field
+
+
+class Field(metaclass=FieldMeta):
+    def __init__(self, label=None, size=None, offset=None, **kwargs):
         self.label = label
         self.size = size
         self.offset = offset
@@ -33,6 +40,11 @@ class Field:
         obj.write(value)
 
     def attach_to_class(self, cls, name, **options):
+        # Supply any inherited arguments to the constructor
+        args, kwargs = self._arguments
+        options.update(kwargs)
+        self.__init__(*args, **options)
+
         self.name = name
         label = self.label or name.replace('_', ' ')
         self.label = label.title()
