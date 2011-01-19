@@ -1,9 +1,22 @@
+import threading
+
 # Special object used to instruct the reader to continue to the end of the file
 Remainder = object()
 
 
-class Field:
-    def __init__(self, label=None, size=None, offset=None):
+class FieldMeta(type):
+    _registry = threading.local()
+    _registry.options = {}
+
+    def __call__(cls, *args, **kwargs):
+        if FieldMeta._registry.options:
+            options = FieldMeta._registry.options.copy()
+            options.update(kwargs)
+        return super(FieldMeta, cls).__call__(*args, **options)
+
+
+class Field(metaclass=FieldMeta):
+    def __init__(self, label=None, size=None, offset=None, **kwargs):
         self.label = label
         self.size = size
         self.offset = offset

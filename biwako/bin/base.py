@@ -1,4 +1,5 @@
 import collections
+from .fields.base import FieldMeta
 
 class StructureMeta(type):
     def __new__(cls, name, bases, attrs, **options):
@@ -11,9 +12,11 @@ class StructureMeta(type):
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls, name, **options)
+        FieldMeta._registry.options = {}
 
     @classmethod
     def __prepare__(metacls, name, bases, **options):
+        FieldMeta._registry.options = options
         return collections.OrderedDict()
 
     def __iter__(cls):
