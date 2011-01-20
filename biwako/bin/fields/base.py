@@ -18,10 +18,12 @@ class FieldMeta(type):
 
 
 class Field(metaclass=FieldMeta):
-    def __init__(self, label=None, size=None, offset=None, **kwargs):
+    def __init__(self, label=None, size=None, offset=None, choices=(), **kwargs):
         self.label = label
         self.size = size
         self.offset = offset
+        # TODO: Actually support choices properly later
+        self.choices = choices
 
     def calculate_size(self, obj):
         return self.size
