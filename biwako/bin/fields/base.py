@@ -59,6 +59,9 @@ class Field(metaclass=FieldMeta):
         if not instance:
             return self
         if self.name not in instance.__dict__:
-            instance.__dict__[self.name] = instance._get_value(self)
+            try:
+                instance.__dict__[self.name] = instance._get_value(self)
+            except IOError:
+                raise AttributeError("Attribute %r has no data" % self.name)
         return instance.__dict__[self.name]
 

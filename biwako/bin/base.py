@@ -1,4 +1,5 @@
 import collections
+import io
 from .fields.base import FieldMeta
 
 class StructureMeta(type):
@@ -28,6 +29,7 @@ class Structure(metaclass=StructureMeta):
         self._mode = self._file and 'rb' or 'wb'
         self._position = 0
         self._raw_values = {}
+        self._write_buffer = b''
 
         if self._file and kwargs:
             raise TypeError("Cannot supply a file and attributes together")
@@ -45,18 +47,42 @@ class Structure(metaclass=StructureMeta):
     def write(self, data):
         if self._mode != 'wb':
             raise IOError("not writable")
-        pass
+        file = EOFBytesIO(self._write_buffer + data)
+        last_position = 0
+        for field in self.__class__._fields:
+            if field.name not in self._raw_values:
+                try:
+                    self._raw_values[field.name] = field.read(file)
+                    last_position = file.tell()
+                except EOFError:
+                    file.seek(last_position)
+                    self._write_buffer = file.read()
+                else:
+                    self._write_buffer = b''
 
     def _get_value(self, field):
-        if field.offset is not None and hasattr(self, 'seek'):
-            self.seek(field.offset)
-            self._raw_values[field.name] = field.read(self)
-        else:
-            for other_field in self.__class__._fields:
-                if other_field.name not in self._raw_values:
-                    self._raw_values[other_field.name] = other_field.read(self)
-                if other_field is field:
-                    break
+        if field.name not in self._raw_values:
+            if field.offset is not None and hasattr(self, 'seek'):
+                self.seek(field.offset)
+                self._raw_values[field.name] = field.read(self)
+            else:
+                for other_field in self.__class__._fields:
+                    if other_field.name not in self._raw_values:
+                        self._raw_values[other_field.name] = other_field.read(self)
+                    if other_field is field:
+                        break
         return field.decode(self._raw_values[field.name])
+
+
+class EOFBytesIO(io.BytesIO):
+    """
+    A customized BytesIO that raises an EOFError if more data was requested
+    than is available in the data stream.
+    """
+    def read(self, size=None):
+        data = super(EOFBytesIO, self).read(size)
+        if size is not None and len(data) < size:
+            raise EOFError
+        return data
 
 

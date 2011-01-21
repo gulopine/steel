@@ -67,6 +67,33 @@ class IOTest(unittest.TestCase):
     def test_write(self):
         struct = self.struct()
         struct.write(self.data)
+        self.assertEqual(struct.forty_two, 42)
+        self.assertEqual(struct.sixty_six, 66)
+        self.assertEqual(struct.valid, 'valid')
+        self.assertEqual(struct.test, 'test')
+
+        # Writing just part of the data populates some of the fields
+        struct = self.struct()
+        struct.write(self.data[:6])
+        self.assertEqual(struct.forty_two, 42)
+        self.assertEqual(struct.sixty_six, 66)
+        with self.assertRaises(AttributeError):
+            struct.valid
+
+        # Writing more will populate more fields
+        struct.write(self.data[6:12])
+        self.assertEqual(struct.forty_two, 42)
+        self.assertEqual(struct.sixty_six, 66)
+        self.assertEqual(struct.valid, 'valid')
+        with self.assertRaises(AttributeError):
+            struct.test
+
+        # Finishing up the data populates the rest of the fields
+        struct.write(self.data[12:])
+        self.assertEqual(struct.forty_two, 42)
+        self.assertEqual(struct.sixty_six, 66)
+        self.assertEqual(struct.valid, 'valid')
+        self.assertEqual(struct.test, 'test')
 
     def test_attributes(self):
         struct = self.struct(io.BytesIO(self.data))
