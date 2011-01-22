@@ -151,6 +151,12 @@ class CalculatedValueTest(unittest.TestCase):
         calc_field = 42 // self.field
         self.assertEqual(calc_field.decode(b'\x02'), 21)
 
+    def test_chaining(self):
+        calc_field = self.field + 2 + 2
+        self.assertEqual(calc_field.decode(b'\x2a'), 46)
+        calc_field = (self.field + 2 - 2) * 5 // 4
+        self.assertEqual(calc_field.decode(b'\x2a'), 52)
+
 
 class StringTest(unittest.TestCase):
     def test_ascii(self):
