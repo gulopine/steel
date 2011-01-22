@@ -113,6 +113,56 @@ class Integer(Field):
             value = self.signing.decode(value)
         return value
 
+    def __add__(self, other):
+        return CalculatedValue(self, lambda x: x + other)
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        return CalculatedValue(self, lambda x: x - other)
+
+    def __rsub__(self, other):
+        return CalculatedValue(self, lambda x: other - x)
+
+    def __mul__(self, other):
+        return CalculatedValue(self, lambda x: x * other)
+    __rmul__ = __mul__
+
+    def __pow__(self, other):
+        return CalculatedValue(self, lambda x: other ** x)
+
+    def __rpow__(self, other):
+        return CalculatedValue(self, lambda x: x ** other)
+
+    def __truediv__(self, other):
+        return CalculatedValue(self, lambda x: x / other)
+
+    def __rtruediv__(self, other):
+        return CalculatedValue(self, lambda x: other / x)
+
+    def __floordiv__(self, other):
+        return CalculatedValue(self, lambda x: x // other)
+
+    def __rfloordiv__(self, other):
+        return CalculatedValue(self, lambda x: other // x)
+
+    def __divmod__(self, other):
+        return CalculatedValue(self, lambda x: divmod(x, other))
+
+    def __rdivmod__(self, other):
+        return CalculatedValue(self, lambda x: divmod(other, x))
+
+    def __and__(self, other):
+        return CalculatedValue(self, lambda x: other & x)
+    __rand__ = __and__
+
+    def __or__(self, other):
+        return CalculatedValue(self, lambda x: other | x)
+    __ror__ = __or__
+
+    def __xor__(self, other):
+        return CalculatedValue(self, lambda x: other ^ x)
+    __rxor__ = __xor__
+
 
 class FixedInteger(Integer):
     def __init__(self, value, *args, size=None, **kwargs):
@@ -131,5 +181,20 @@ class FixedInteger(Integer):
         if value != self.encoded_value:
             raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
         return self.decoded_value
+
+
+class CalculatedValue(Integer):
+    def __init__(self, field, calculate=(lambda x: x)):
+        self.field = field
+#        self.name = field.name
+        self.calculate = calculate
+
+    def read(self, obj):
+        # Defer to the stored field in order to get a base value
+        return self.field.read(obj)
+
+    def decode(self, value):
+        value = self.field.decode(value)
+        return self.calculate(value)
 
 

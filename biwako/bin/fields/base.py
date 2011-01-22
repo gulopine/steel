@@ -26,6 +26,9 @@ class Field(metaclass=FieldMeta):
         self.choices = choices
 
     def calculate_size(self, obj):
+        if isinstance(self.size, Field):
+            size = obj._get_value(self.size)
+            return size
         return self.size
 
     def read(self, obj):

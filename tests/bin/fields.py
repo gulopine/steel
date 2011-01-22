@@ -111,6 +111,47 @@ class TestFixedInteger(unittest.TestCase):
             field.decode(b'\x2b')
 
 
+class CalculatedValueTest(unittest.TestCase):
+    def setUp(self):
+        self.field = fields.Integer(size=1)
+
+    def test_add(self):
+        calc_field = self.field + 2
+        self.assertEqual(calc_field.decode(b'\x2a'), 44)
+        calc_field = 2 + self.field
+        self.assertEqual(calc_field.decode(b'\x2a'), 44)
+
+    def test_subtract(self):
+        calc_field = self.field - 2
+        self.assertEqual(calc_field.decode(b'\x2a'), 40)
+        calc_field = 42 - self.field
+        self.assertEqual(calc_field.decode(b'\x02'), 40)
+
+    def test_multiply(self):
+        calc_field = self.field * 2
+        self.assertEqual(calc_field.decode(b'\x2a'), 84)
+        calc_field = 2 * self.field
+        self.assertEqual(calc_field.decode(b'\x2a'), 84)
+
+    def test_power(self):
+        calc_field = self.field ** 2
+        self.assertEqual(calc_field.decode(b'\x2a'), 1764)
+        calc_field = 2 ** self.field
+        self.assertEqual(calc_field.decode(b'\x10'), 65536)
+
+    def test_true_divide(self):
+        calc_field = self.field / 2
+        self.assertEqual(calc_field.decode(b'\x2a'), 21)
+        calc_field = 42 / self.field
+        self.assertEqual(calc_field.decode(b'\x02'), 21)
+
+    def test_floor_divide(self):
+        calc_field = self.field // 2
+        self.assertEqual(calc_field.decode(b'\x2a'), 21)
+        calc_field = 42 // self.field
+        self.assertEqual(calc_field.decode(b'\x02'), 21)
+
+
 class StringTest(unittest.TestCase):
     def test_ascii(self):
         field = fields.String(encoding='ascii')
