@@ -12,7 +12,7 @@ class StructureMeta(type):
         cls._fields = []
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
-                attr.attach_to_class(cls, name, **options)
+                attr.attach_to_class(cls, name)
         FieldMeta._registry.options = {}
 
     @classmethod
