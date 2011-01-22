@@ -115,10 +115,10 @@ class Integer(Field):
 
 
 class FixedInteger(Integer):
-    def __init__(self, value, *args, **kwargs):
-        super(FixedInteger, self).__init__(*args, signed=value < 0, **kwargs)
-        if not self.size:
-            raise TypeError("Size is required for fixed integers")
+    def __init__(self, value, *args, size=None, **kwargs):
+        if size is None:
+            size = int((value.bit_length() + 7) / 8) or 1
+        super(FixedInteger, self).__init__(*args, size=size, signed=value < 0, **kwargs)
         self.decoded_value = value
         self.encoded_value = super(FixedInteger, self).encode(value)
 
