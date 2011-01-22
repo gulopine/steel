@@ -128,10 +128,10 @@ class Integer(Field):
     __rmul__ = __mul__
 
     def __pow__(self, other):
-        return CalculatedValue(self, lambda x: other ** x)
+        return CalculatedValue(self, lambda x: x ** other)
 
     def __rpow__(self, other):
-        return CalculatedValue(self, lambda x: x ** other)
+        return CalculatedValue(self, lambda x: other ** x)
 
     def __truediv__(self, other):
         return CalculatedValue(self, lambda x: x / other)
