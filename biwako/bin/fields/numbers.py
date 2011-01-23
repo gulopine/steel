@@ -94,10 +94,6 @@ class Integer(Field):
         self.signed = signed
         self.signing = signing(self.size)
 
-    def attach_to_class(self, cls, name, endianness=BigEndian,
-                        signing=TwosComplement, **options):
-        super(Integer, self).attach_to_class(cls, name, **options)
-
     def encode(self, value):
         if self.signed:
             value = self.signing.encode(value)
@@ -186,7 +182,6 @@ class FixedInteger(Integer):
 class CalculatedValue(Integer):
     def __init__(self, field, calculate=(lambda x: x)):
         self.field = field
-#        self.name = field.name
         self.calculate = calculate
 
     def read(self, obj):
