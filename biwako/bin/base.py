@@ -2,6 +2,19 @@ import collections
 import io
 from .fields.base import FieldMeta
 
+
+class NameAwareOrderedDict(collections.OrderedDict):
+    """
+    A custom namespace that not only orders its items, but can
+    also make those items aware of their names immediately.
+    """
+
+    def __setitem__(self, name, obj):
+        super(NameAwareOrderedDict, self).__setitem__(name, obj)
+        if hasattr(obj, 'set_name'):
+            obj.set_name(name)
+
+
 class StructureMeta(type):
     def __new__(cls, name, bases, attrs, **options):
         # Nothing to do here, but we need to make sure options
@@ -12,13 +25,13 @@ class StructureMeta(type):
         cls._fields = []
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
-                attr.attach_to_class(cls, name)
+                attr.attach_to_class(cls)
         FieldMeta._registry.options = {}
 
     @classmethod
     def __prepare__(metacls, name, bases, **options):
         FieldMeta._registry.options = options
-        return collections.OrderedDict()
+        return NameAwareOrderedDict()
 
     def __iter__(cls):
         return iter(cls.__dict__)

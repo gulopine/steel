@@ -52,10 +52,12 @@ class Field(metaclass=FieldMeta):
         # fields can/should override it if necessary
         obj.write(value)
 
-    def attach_to_class(self, cls, name):
+    def set_name(self, name):
         self.name = name
         label = self.label or name.replace('_', ' ')
         self.label = label.title()
+
+    def attach_to_class(self, cls):
         cls._fields.append(self)
 
     def __get__(self, instance, owner):
