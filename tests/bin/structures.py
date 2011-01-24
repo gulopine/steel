@@ -109,6 +109,17 @@ class IOTest(unittest.TestCase):
         self.assertEqual(struct.test, 'test')
         self.assertEqual(struct.sixty_six, 66)
 
+    def test_save(self):
+        struct = self.struct()
+        struct.forty_two = 42
+        struct.sixty_six = 66
+        struct.valid = 'valid'
+        struct.test = 'test'
+
+        output = io.BytesIO()
+        struct.save(output)
+        self.assertEqual(output.getvalue(), self.data)
+
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):

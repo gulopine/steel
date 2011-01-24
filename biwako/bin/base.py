@@ -86,6 +86,11 @@ class Structure(metaclass=StructureMeta):
                         break
         return field.decode(self._raw_values[field.name])
 
+    def save(self, file):
+        for field in self.__class__._fields:
+            value = getattr(self, field.name)
+            file.write(field.encode(value))
+
 
 class EOFBytesIO(io.BytesIO):
     """

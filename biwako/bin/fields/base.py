@@ -70,3 +70,6 @@ class Field(metaclass=FieldMeta):
                 raise AttributeError("Attribute %r has no data" % self.name)
         return instance.__dict__[self.name]
 
+    def __set__(self, instance, value):
+        instance.__dict__[self.name] = value
+
