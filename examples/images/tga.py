@@ -22,34 +22,31 @@ ORIGINS = (
 
 
 class ColorMap(bin.Structure):
-    first_entry_index = bin.PositiveInteger(size=2)
-    length = bin.PositiveInteger(size=2)
-    entry_size = bin.PositiveInteger(size=1)
+    first_entry_index = bin.Integer(size=2)
+    length = bin.Integer(size=2)
+    entry_size = bin.Integer(size=1)
 
 
 class AlphaOrigin(bin.PackedStructure):
     Reserved(size=2)
-    image_origin = bin.PositiveInteger(size=2, choices=ORIGINS)
-    alpha_depth = bin.PositiveInteger(size=4)
+    image_origin = bin.Integer(size=2, choices=ORIGINS)
+    alpha_depth = bin.Integer(size=4)
 
 
-class TGA(bin.File):
-    id_size = bin.PositiveInteger(size=1)
-    color_map_type = bin.PositiveInteger(size=1, choices=COLOR_MAP_TYPES)
-    image_type = bin.PositiveInteger(size=1, choices=IMAGE_TYPES)
+class TGA(bin.Structure, endianness=bin.LittleEndian):
+    id_size = bin.Integer(size=1)
+    color_map_type = bin.Integer(size=1, choices=COLOR_MAP_TYPES)
+    image_type = bin.Integer(size=1, choices=IMAGE_TYPES)
     color_map_info = bin.SubStructure(ColorMap)
-    x_origin = bin.PositiveInteger(size=2)
-    y_origin = bin.PositiveInteger(size=2)
-    width = bin.PositiveInteger(size=2)
-    height = bin.PositiveInteger(size=2)
-    bit_depth = bin.PositiveInteger(size=1)
+    x_origin = bin.Integer(size=2)
+    y_origin = bin.Integer(size=2)
+    width = bin.Integer(size=2)
+    height = bin.Integer(size=2)
+    bit_depth = bin.Integer(size=1)
     image_origin, alpha_depth = bin.SubStructure(AlphaOrigin)
-    image_id = bin.ByteString(size=id_size)
-    color_map_data = bin.List(PositiveInteger(size=color_map_info.entry_size) / 8, size=color_map_info.length)
-    image_data = bin.List(size=width * height * bit_depth)
-    
-    class Options:
-        endianness = bin.LittleEndian
+    image_id = bin.Bytes(size=id_size)
+    color_map_data = bin.List(bin.Integer(size=color_map_info.entry_size) / 8, size=color_map_info.length)
+    image_data = bin.List(bin.Integer(size=1), size=width * height * bit_depth)
 
 
 if __name__ == '__main__':

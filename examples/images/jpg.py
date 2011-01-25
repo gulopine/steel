@@ -9,9 +9,9 @@ DENSITY_UNITS = (
 
 class Chunk(bin.Chunk):
     ff = bin.FixedNumber(0xFF)
-    type = bin.PositiveInteger(size=1)
-    size = bin.PositiveInteger(size=2)
-    payload = bin.ByteString(size=size - 2)
+    type = bin.Integer(size=1)
+    size = bin.Integer(size=2)
+    payload = bin.Bytes(size=size - 2)
 
 
 Chunk(0xD8)
@@ -55,16 +55,13 @@ class End(bin.Structure):
     payload = None
 
 
-class JFIF(bin.File):
+class JFIF(bin.Structure, endianness=bin.BigEndian):
     header = Header()
     chunks = bin.ChunkList(Chunk)
 
     width = bin.ChunkValue(StartFrame.width)
     height = bin.ChunkValue(StartFrame.height)
     comment = bin.ChunkValue(Comment.value)
-
-    class Options:
-        endianness = bin.BigEndian
 
 
 if __name__ == '__main__':
