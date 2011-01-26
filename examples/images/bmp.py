@@ -38,7 +38,5 @@ class BMP(bin.Structure, endianness=bin.LittleEndian):
 
 
 if __name__ == '__main__':
-#    bmp = BMP(open(sys.argv[1], 'rb'))
-    bmp = BMP(open('biwako.bmp', 'rb'))
+    bmp = BMP(open(sys.argv[1], 'rb'))
     print('%s x %s' % (bmp.width, bmp.height))
-    print(bmp.palette)

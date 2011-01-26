@@ -13,6 +13,5 @@ class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
 
 
 if __name__ == '__main__':
-#    gif = GIF(open(sys.argv[1], 'rb'))
-    gif = GIF(open('biwako.gif', 'rb'))
+    gif = GIF(open(sys.argv[1], 'rb'))
     print('%s x %s' % (gif.width, gif.height))
