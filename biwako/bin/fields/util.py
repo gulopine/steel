@@ -10,26 +10,20 @@ class List(Field):
         field_size = self.field.calculate_size(obj)
         return field_size * super(List, self).calculate_size(obj)
 
-    def read(self, obj):
+    def extract(self, obj):
         values = []
-        for i in range(super(List, self).calculate_size(obj)):
-            values.append(self.field.read(obj))
+        for i in range(self.size(obj)):
+            values.append(self.field.extract(obj))
         return values
 
-    def encode(self, values):
+    def encode(self, obj, values):
         encoded_values = []
         for value in values:
-            encoded_values.append(self.field.encode(value))
+            encoded_values.append(self.field.encode(obj, value))
         return b''.join(encoded_values)
 
-    def decode(self, values):
-        decoded_values = []
-        for value in values:
-            decoded_values.append(self.field.decode(value))
-        return decoded_values
-
 class Reserved(Field):
-    def encode(self, value):
+    def encode(self, obj, value):
         return b'\x00' * self.size
 
     def decode(self, value):

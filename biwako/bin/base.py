@@ -41,7 +41,6 @@ class Structure(metaclass=StructureMeta):
         self._file = len(args) > 0 and args[0] or None
         self._mode = self._file and 'rb' or 'wb'
         self._position = 0
-        self._raw_values = {}
         self._write_buffer = b''
 
         if self._file and kwargs:
@@ -63,9 +62,9 @@ class Structure(metaclass=StructureMeta):
         file = EOFBytesIO(self._write_buffer + data)
         last_position = 0
         for field in self.__class__._fields:
-            if field.name not in self._raw_values:
+            if field.name not in self.__dict__:
                 try:
-                    self._raw_values[field.name] = field.read(file)
+                    self.__dict__[field.name] = field.extract(file)
                     last_position = file.tell()
                 except EOFError:
                     file.seek(last_position)
@@ -74,22 +73,22 @@ class Structure(metaclass=StructureMeta):
                     self._write_buffer = b''
 
     def _get_value(self, field):
-        if field.name not in self._raw_values:
+        if field.name not in self.__dict__:
             if field.offset is not None and hasattr(self, 'seek'):
                 self.seek(field.offset)
-                self._raw_values[field.name] = field.read(self)
+                self.__dict__[field.name] = field.extract(self)
             else:
                 for other_field in self.__class__._fields:
-                    if other_field.name not in self._raw_values:
-                        self._raw_values[other_field.name] = other_field.read(self)
+                    if other_field.name not in self.__dict__:
+                        self.__dict__[other_field.name] = other_field.extract(self)
                     if other_field is field:
                         break
-        return field.decode(self._raw_values[field.name])
+        return self.__dict__[field.name]
 
     def save(self, file):
         for field in self.__class__._fields:
             value = getattr(self, field.name)
-            file.write(field.encode(value))
+            file.write(field.encode(self, value))
 
 
 class EOFBytesIO(io.BytesIO):

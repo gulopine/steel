@@ -1,9 +1,5 @@
 import threading
 
-# Special object used to instruct the reader to continue to the end of the file
-Remainder = object()
-
-
 class FieldMeta(type):
     _registry = threading.local()
     _registry.options = {}
@@ -18,30 +14,23 @@ class FieldMeta(type):
 
 
 class Field(metaclass=FieldMeta):
-    def __init__(self, label=None, size=None, offset=None, choices=(), **kwargs):
+    def __init__(self, label=None, *, size=None, offset=None, choices=(), **kwargs):
         self.label = label
-        self.size = size
+        self.size = DynamicValue(size)
         self.offset = offset
         # TODO: Actually support choices properly later
         self.choices = choices
 
-    def calculate_size(self, obj):
-        if isinstance(self.size, Field):
-            size = obj._get_value(self.size)
-            return size
-        return self.size
+    def extract(self, obj):
+        return self.decode(self.read(obj))
 
     def read(self, obj):
-        size = self.calculate_size(obj)
-
-        # In this special case, the field gets everything that's left
-        if self.size is Remainder:
-            return obj.read()
+        size = self.size(obj)
 
         # If the size can be determined easily, read
         # that number of bytes and return it directly.
-        if self.size is not None:
-            return obj.read(self.size)
+        if size is not None:
+            return obj.read(size)
 
         # Otherwise, the field needs to supply its own
         # technique for determining how much data to read.
@@ -72,4 +61,23 @@ class Field(metaclass=FieldMeta):
 
     def __set__(self, instance, value):
         instance.__dict__[self.name] = value
+
+
+class DynamicValue:
+    def __init__(self, value):
+        self.value = value
+
+    def __call__(self, obj):
+        if isinstance(self.value, Field):
+            return field.extract(obj)
+        elif hasattr(self.value, '__call__'):
+            return self.value(obj)
+        else:
+            return self.value
+
+
+# Special object used to instruct the reader to continue to the end of the file
+def Remainder(obj):
+    return -1
+
 

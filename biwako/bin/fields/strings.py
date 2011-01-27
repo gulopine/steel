@@ -1,43 +1,42 @@
-from .base import Field
+from .base import Field, DynamicValue
+from .numbers import Integer
 
 
 class String(Field):
-    def __init__(self, *args, encoding=None, padding=b'\x00',
+    def __init__(self, *args, encoding, padding=b'\x00',
                  terminator=b'\x00', **kwargs):
         ''.encode(encoding)  # Check for a valid encoding
-        self.encoding = encoding
+        self.encoding = DynamicValue(encoding)
         self.padding = padding
         self.terminator = terminator
         super(String, self).__init__(*args, **kwargs)
 
-    def read(self, obj):
-        if self.size:
-            return super(String, self).read(obj)
+    def extract(self, obj):
+        size = self.size(obj)
 
+        if size is not None:
+            value = obj.read(size).rstrip(self.padding)
+
+        else:
         # TODO: There's gotta be a better way, but it works for now
-        value = b''
-        while True:
-            data = obj.read(1)
-            value += data
-            if data == self.terminator:
-                return value
+            value = b''
+            while True:
+                data = obj.read(1)
+                if data == self.terminator:
+                    break
+                value += data
 
-    def encode(self, value):
-        value = value.encode(self.encoding)
-        if self.size:
-            if len(value) > self.size:
-                raise ValueError("String too long to encode")
-            value = value.ljust(self.size, self.padding)
+        return value.decode(self.encoding(obj))
+
+    def encode(self, obj, value):
+        value = value.encode(self.encoding(obj))
+        size = self.size(obj)
+        if size is not None:
+            if len(value) > size:
+                raise ValueError("String %r too is longer than %r bytes." % (value, size))
+            value = value.ljust(size, self.padding)
         else:
             value += self.terminator
-        return value
-
-    def decode(self, value):
-        if self.size:
-            value = value.rstrip(self.padding)
-        else:
-            value = value.rstrip(self.terminator)
-        value = value.decode(self.encoding)
         return value
 
 
@@ -52,10 +51,10 @@ class FixedString(String):
             self.encoding = None
         elif isinstance(value, str):
             self.decoded_value = value
-            self.encoded_value = super(FixedString, self).encode(value)
-        self.size = len(self.encoded_value)
+            self.encoded_value = super(FixedString, self).encode(None, value)
+        self.size = DynamicValue(len(self.encoded_value))
 
-    def encode(self, value):
+    def encode(self, obj, value):
         if value != self.decoded_value:
             raise ValueError('Expected %r, got %r.' % (self.decoded_value, value))
         return self.encoded_value
@@ -72,7 +71,7 @@ class Bytes(Field):
         if not self.size:
             raise TypeError("Size is required for Bytes fields")
 
-    def encode(self, value):
+    def encode(self, obj, value):
         # Nothing to do here
         return value
 

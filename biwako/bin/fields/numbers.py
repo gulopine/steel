@@ -87,19 +87,19 @@ class TwosComplement:
 # Numeric types
 
 class Integer(Field):
-    def __init__(self, *args, signed=False, endianness=BigEndian,
+    def __init__(self, *args, size, signed=False, endianness=BigEndian,
                  signing=TwosComplement, **kwargs):
-        super(Integer, self).__init__(*args, **kwargs)
-        self.endianness = endianness(self.size)
+        super(Integer, self).__init__(*args, size=size, **kwargs)
+        self.endianness = endianness(size)
         self.signed = signed
-        self.signing = signing(self.size)
+        self.signing = signing(size)
 
-    def encode(self, value):
+    def encode(self, obj, value):
         if self.signed:
             value = self.signing.encode(value)
         elif value < 0:
             raise ValueError("Value cannot be negative.")
-        if value > (1 << (self.size * 8)) - 1:
+        if value > (1 << (self.size(obj) * 8)) - 1:
             raise ValueError("Value is large for this field.")
         return self.endianness.encode(value)
 
@@ -166,9 +166,9 @@ class FixedInteger(Integer):
             size = int((value.bit_length() + 7) / 8) or 1
         super(FixedInteger, self).__init__(*args, size=size, signed=value < 0, **kwargs)
         self.decoded_value = value
-        self.encoded_value = super(FixedInteger, self).encode(value)
+        self.encoded_value = super(FixedInteger, self).encode(None, value)
 
-    def encode(self, value):
+    def encode(self, obj, value):
         if value != self.decoded_value:
             raise ValueError('Expected %r, got %r.' % (self.decoded_value, value))
         return self.encoded_value
