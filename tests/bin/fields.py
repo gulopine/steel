@@ -180,6 +180,21 @@ class StringTest(unittest.TestCase):
             fields.String(encoding='invalid')
 
 
+class LengthIndexedString(unittest.TestCase):
+    encoded_data = b'\x05valid'
+    decoded_data = 'valid'
+
+    def setUp(self):
+        self.field = fields.LengthIndexedString(size=1, encoding='ascii')
+
+    def test_encode(self):
+        self.assertEqual(self.field.encode(None, self.decoded_data), self.encoded_data)
+
+    def test_extract(self):
+        file = io.BytesIO(self.encoded_data)
+        self.assertEqual(self.field.extract(file), self.decoded_data)
+
+
 class FixedStringTest(unittest.TestCase):
     def test_bytes(self):
         field = fields.FixedString(b'valid')

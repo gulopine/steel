@@ -40,6 +40,20 @@ class String(Field):
         return value
 
 
+class LengthIndexedString(String):
+    def extract(self, obj):
+        length_field = Integer(size=self.size(obj))
+        length = length_field.extract(obj)
+        value = obj.read(length)
+        return value.decode(self.encoding(obj))
+
+    def encode(self, obj, value):
+        length_field = Integer(size=self.size(obj))
+        content = value.encode(self.encoding(obj))
+        length = length_field.encode(obj, len(content))
+        return length + content
+
+
 class FixedString(String):
     def __init__(self, value, *args, encoding='ascii', **kwargs):
         super(FixedString, self).__init__(*args, encoding=encoding, size=None,
