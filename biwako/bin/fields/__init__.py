@@ -3,3 +3,4 @@ from .util import List, Reserved
 
 from .numbers import *
 from .strings import *
+from .compounds import *
