@@ -1,4 +1,4 @@
-from .base import Field
+from .base import Field, DynamicValue
 
 
 # Endianness options
@@ -110,53 +110,53 @@ class Integer(Field):
         return value
 
     def __add__(self, other):
-        return CalculatedValue(self, lambda x: x + other)
+        return CalculatedValue(self, other, lambda a, b: a + b)
     __radd__ = __add__
 
     def __sub__(self, other):
-        return CalculatedValue(self, lambda x: x - other)
+        return CalculatedValue(self, other, lambda a, b: a - b)
 
     def __rsub__(self, other):
-        return CalculatedValue(self, lambda x: other - x)
+        return CalculatedValue(self, other, lambda a, b: b - a)
 
     def __mul__(self, other):
-        return CalculatedValue(self, lambda x: x * other)
+        return CalculatedValue(self, other, lambda a, b: a * b)
     __rmul__ = __mul__
 
     def __pow__(self, other):
-        return CalculatedValue(self, lambda x: x ** other)
+        return CalculatedValue(self, other, lambda a, b: a ** b)
 
     def __rpow__(self, other):
-        return CalculatedValue(self, lambda x: other ** x)
+        return CalculatedValue(self, other, lambda a, b: b ** a)
 
     def __truediv__(self, other):
-        return CalculatedValue(self, lambda x: x / other)
+        return CalculatedValue(self, other, lambda a, b: a / b)
 
     def __rtruediv__(self, other):
-        return CalculatedValue(self, lambda x: other / x)
+        return CalculatedValue(self, other, lambda a, b: b / a)
 
     def __floordiv__(self, other):
-        return CalculatedValue(self, lambda x: x // other)
+        return CalculatedValue(self, other, lambda a, b: a // b)
 
     def __rfloordiv__(self, other):
-        return CalculatedValue(self, lambda x: other // x)
+        return CalculatedValue(self, other, lambda a, b: b // a)
 
     def __divmod__(self, other):
-        return CalculatedValue(self, lambda x: divmod(x, other))
+        return CalculatedValue(self, other, lambda a, b: divmod(a, b))
 
     def __rdivmod__(self, other):
-        return CalculatedValue(self, lambda x: divmod(other, x))
+        return CalculatedValue(self, other, lambda a, b: divmod(b, a))
 
     def __and__(self, other):
-        return CalculatedValue(self, lambda x: other & x)
+        return CalculatedValue(self, other, lambda a, b: a & b)
     __rand__ = __and__
 
     def __or__(self, other):
-        return CalculatedValue(self, lambda x: other | x)
+        return CalculatedValue(self, other, lambda a, b: a | b)
     __ror__ = __or__
 
     def __xor__(self, other):
-        return CalculatedValue(self, lambda x: other ^ x)
+        return CalculatedValue(self, other, lambda a, b: a ^ b)
     __rxor__ = __xor__
 
 
@@ -180,15 +180,17 @@ class FixedInteger(Integer):
 
 
 class CalculatedValue(Integer):
-    def __init__(self, field, calculate=(lambda x: x), **kwargs):
+    def __init__(self, field, other, calculate, **kwargs):
         super(CalculatedValue, self).__init__(size=None, **kwargs)
         self.field = field
+        self.other = DynamicValue(other)
         self.calculate = calculate
         self.set_name(field.name)
 
     def extract(self, obj):
         # Defer to the stored field in order to get a base value
         value = obj._get_value(self.field)
-        return self.calculate(value)
+        other = self.other(obj)
+        return self.calculate(value, other)
 
 
