@@ -81,9 +81,11 @@ class Structure(metaclass=StructureMeta):
                 for other_field in self.__class__._fields:
                     if other_field.name not in self.__dict__:
                         self.__dict__[other_field.name] = other_field.extract(self)
-                    if other_field is field:
+                    if other_field.name == field.name:
                         break
-        return self.__dict__[field.name]
+        if field is getattr(self.__class__, field.name):
+            return self.__dict__[field.name]
+        return field.extract(self)
 
     def save(self, file):
         for field in self.__class__._fields:

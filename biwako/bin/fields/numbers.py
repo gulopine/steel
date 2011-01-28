@@ -180,16 +180,15 @@ class FixedInteger(Integer):
 
 
 class CalculatedValue(Integer):
-    def __init__(self, field, calculate=(lambda x: x)):
+    def __init__(self, field, calculate=(lambda x: x), **kwargs):
+        super(CalculatedValue, self).__init__(size=None, **kwargs)
         self.field = field
         self.calculate = calculate
+        self.set_name(field.name)
 
-    def read(self, obj):
+    def extract(self, obj):
         # Defer to the stored field in order to get a base value
-        return self.field.read(obj)
-
-    def decode(self, value):
-        value = self.field.decode(value)
+        value = obj._get_value(self.field)
         return self.calculate(value)
 
 
