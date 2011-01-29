@@ -83,7 +83,11 @@ class ChunkList(bin.Field):
             if chunk.id in self.known_types:
                 type = self.known_types[chunk.id]
                 chunks.append(type(chunk.payload))
+            elif chunk.id:
+                # This is a valid chunk, just not a recognized type
+                continue
             else:
+                # This is not a valid chunk, which is probably the end of the file
                 break
         return chunks
 
