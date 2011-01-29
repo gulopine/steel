@@ -77,7 +77,7 @@ class ChunkList(bin.Field):
         super(ChunkList, self).__init__()
 
     def extract(self, obj):
-        chunks = []
+        chunks = ChunkValueList()
         while 1:
             chunk = self.base_chunk.extract(obj)
             if chunk.id in self.known_types:
@@ -90,5 +90,10 @@ class ChunkList(bin.Field):
                 # This is not a valid chunk, which is probably the end of the file
                 break
         return chunks
+
+
+class ChunkValueList(list):
+    def of_type(self, type):
+        return [chunk for chunk in self if isinstance(chunk, type)]
 
 
