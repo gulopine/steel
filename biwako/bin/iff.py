@@ -1,25 +1,44 @@
+import collections
 import io
+
 from biwako import bin
 
 
+class Payload(bin.Bytes):
+    def extract(self, obj):
+        bytes = super(Payload, self).extract(obj)
+        return io.BytesIO(bytes)
+
+
 class Chunk:
-    def __init__(self, marker):
-        if len(marker) != 4:
+    def __init__(self, chunk_id):
+        if len(chunk_id) != 4:
             raise TypeError('Chunk ID must be exactly 4 characters')
-        if isinstance(marker, str):
-            marker = marker.encode('ascii')
-        self.marker = marker
+        if isinstance(chunk_id, str):
+            chunk_id = chunk_id.encode('ascii')
+        self.id = chunk_id
 
     def __call__(self, structure):
-        class ChunkStructure(bin.Structure, encoding='ascii'):
-            tag = bin.FixedString(self.marker)
-            length = bin.Integer(size=4)
-            payload = bin.Bytes(size=length)
-
-        structure._chunk_structure = ChunkStructure
+        structure._chunk_id = self.id
+        structure._chunk_structure = self.Structure
         if ChunkMixin not in structure.__bases__:
             structure.__bases__ = (ChunkMixin,) + structure.__bases__
         return structure
+
+    @classmethod
+    def extract(cls, obj):
+        value = cls.Structure(obj)
+        # Force the evaluation of the entire structure in
+        # order to make sure other fields work properly
+        for field in cls.Structure._fields:
+            getattr(value, field.name)
+
+        return value
+
+    class Structure(bin.Structure, encoding='ascii'):
+        id = bin.Bytes(size=4)
+        length = bin.Integer(size=4)
+        payload = Payload(size=length)
 
 
 class ChunkMixin:
@@ -32,7 +51,7 @@ class ChunkMixin:
             raise IOError("not readable")
         if not self._chunk_decoded:
             chunk = self._chunk_structure(self._file)
-            self._file = io.BytesIO(chunk.payload)
+            self._file = chunk.payload
             self._chunk_decoded = True
         return super(ChunkMixin, self).read(size)
 
@@ -43,23 +62,30 @@ class ChunkMixin:
         pass  # TODO
 
 
-class ChunkList(bin.Field):
-    def __init__(self, *classes, terminator):
-        pass  # TODO
-
-
 class Form(Chunk):
-    def __call__(self, structure):
-        structure = super(Form, self).__call__(structure)
+    @Chunk('FORM')
+    class Structure(bin.Structure, encoding='ascii'):
+        id = bin.Bytes(size=4)
+        payload = Payload(size=bin.Remainder)
 
-        @Chunk('FORM')
-        class FormStructure(bin.Structure, encoding='ascii'):
-            type = bin.FixedString(self.marker)
-            payload = bin.Bytes(size=bin.Remainder)
 
-        structure._chunk_structure = FormStructure
-        if ChunkMixin not in structure.__bases__:
-            structure.__bases__ = (ChunkMixin,) + structure.__bases__
-        return structure
+class ChunkList(bin.Field):
+    def __init__(self, base_chunk, known_classes=(), terminator=None):
+        self.base_chunk = base_chunk
+        self.terminator = terminator
+        self.known_types = {cls._chunk_id: cls for cls in known_classes}
+        super(ChunkList, self).__init__()
+
+    def extract(self, obj):
+        chunks = []
+        print(self.known_types)
+        while 1:
+            chunk = self.base_chunk.extract(obj)
+            if chunk.id in self.known_types:
+                type = self.known_types[chunk.id]
+                chunks.append(type(chunk.payload))
+            else:
+                break
+        return chunks
 
 
