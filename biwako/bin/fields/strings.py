@@ -68,15 +68,16 @@ class FixedString(String):
             self.encoded_value = super(FixedString, self).encode(None, value)
         self.size = DynamicValue(len(self.encoded_value))
 
+    def extract(self, obj):
+        value = obj.read(self.size(obj))
+        if value != self.encoded_value:
+            raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
+        return self.decoded_value
+
     def encode(self, obj, value):
         if value != self.decoded_value:
             raise ValueError('Expected %r, got %r.' % (self.decoded_value, value))
         return self.encoded_value
-
-    def decode(self, value):
-        if value != self.encoded_value:
-            raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
-        return self.decoded_value
 
 
 class Bytes(Field):
