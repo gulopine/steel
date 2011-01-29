@@ -78,7 +78,6 @@ class ChunkList(bin.Field):
 
     def extract(self, obj):
         chunks = []
-        print(self.known_types)
         while 1:
             chunk = self.base_chunk.extract(obj)
             if chunk.id in self.known_types:
