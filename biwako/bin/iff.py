@@ -81,8 +81,10 @@ class ChunkList(bin.Field):
         while 1:
             chunk = self.base_chunk.extract(obj)
             if chunk.id in self.known_types:
-                type = self.known_types[chunk.id]
-                chunks.append(type(chunk.payload))
+                chunk = self.known_types[chunk.id](chunk.payload)
+                if self.terminator and isinstance(chunk.id, self.terminator):
+                    break
+                chunks.append(chunk)
             elif chunk.id:
                 # This is a valid chunk, just not a recognized type
                 continue
