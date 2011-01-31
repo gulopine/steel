@@ -1,5 +1,5 @@
 from .base import Field, Remainder
-from .util import List, Reserved
+from .util import Reserved
 
 from .numbers import *
 from .strings import *
