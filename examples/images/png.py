@@ -1,3 +1,4 @@
+import sys
 from biwako import bin
 
 COMPRESSION_CHOICES = (
@@ -8,16 +9,17 @@ INTERLACE_CHOICES = (
 )
 
 
-class Chunk(bin.Chunk):
+class Chunk(bin.Chunk, encoding='ascii'):
     """
     A special chunk for PNG, which puts the size before the type
     and includes a CRC field for verifying data integrity.
     """
-    size = bin.PositiveInteger(size=4)
-    type = bin.FixedLengthString(size=4)
-    payload = bin.ByteString(size=size)
-    crc = bin.CRC(payload, size=4)
-    
+    size = bin.Integer(size=4)
+    id = bin.String(size=4)
+    payload = bin.Payload(size=size)
+#    crc = bin.CRC(payload, size=4)
+    crc = bin.Integer(size=4)
+
     @property
     def is_critical(self):
         # Critical chunks will always have an uppercase letter for the
@@ -33,24 +35,24 @@ class Chunk(bin.Chunk):
 
 @Chunk('IHDR')
 class Header(bin.Structure):
-    width = bin.PositiveInteger(size=4, min_value=1)
-    height = bin.PositiveInteger(size=4, min_value=1)
-    bit_depth = bin.PositiveInteger(size=1, choices=(1, 2, 4, 8, 16))
-    color_type = bin.PositiveInteger(size=1, choices=(0, 2, 3, 4, 6))
-    compression_method  = bin.PositiveInteger(size=1, choices=COMPRESSION_CHOICES)
-    filter_method = bin.PositiveInteger(size=1, choices=FILTER_CHOICES)
-    interlace_method = bin.PositiveInteger(size=1, choices=INTERLACE_CHOICES)
+    width = bin.Integer(size=4, min_value=1)
+    height = bin.Integer(size=4, min_value=1)
+    bit_depth = bin.Integer(size=1, choices=(1, 2, 4, 8, 16))
+    color_type = bin.Integer(size=1, choices=(0, 2, 3, 4, 6))
+    compression_method  = bin.Integer(size=1, choices=COMPRESSION_CHOICES)
+    filter_method = bin.Integer(size=1, choices=FILTER_CHOICES)
+    interlace_method = bin.Integer(size=1, choices=INTERLACE_CHOICES)
 
 
 class PaletteColor(bin.Structure):
-    red = bin.PositiveInteger(size=1)
-    green = bin.PositiveInteger(size=1)
-    blue = bin.PositiveInteger(size=1)
+    red = bin.Integer(size=1)
+    green = bin.Integer(size=1)
+    blue = bin.Integer(size=1)
 
 
-Chunk('PLTE')
+@Chunk('PLTE')
 class Palette(bin.Structure):
-    colors = bin.List(PaletteColor, size=bin.REMAINDER)
+    colors = bin.List(bin.SubStructure(PaletteColor), size=bin.Remainder)
     
     def __iter__(self):
         return iter(self.colors)
@@ -58,7 +60,7 @@ class Palette(bin.Structure):
 
 @Chunk('IDAT')
 class Data(bin.Structure):
-    pass
+    data = bin.Bytes(size=bin.Remainder)
 
 
 @Chunk('IEND')
@@ -66,10 +68,10 @@ class End(bin.Structure):
     pass
 
 
-class PNG(bin.File):
-    signature = bin.FixedString('\x89PNG\x0d\x0a\x1a\x0a')
-    header = Header()
-    chunks = bin.ChunkList(Chunk, size=bin.REMAINDER)
+class PNG(bin.Structure):
+    signature = bin.FixedString(b'\x89PNG\x0d\x0a\x1a\x0a')
+    header = bin.SubStructure(Header)
+    chunks = bin.ChunkList(Chunk, (Header, Palette, Data), terminator=End)#, size=bin.Remainder)
     
     @property
     def data_chunks(self):
@@ -81,5 +83,8 @@ class PNG(bin.File):
         endianness = bin.BigEndian
 
 if __name__ == '__main__':
+    import sys
+    sys.argv[1] = 'biwako.png'
     png = PNG(open(sys.argv[1], 'rb'))
-    print '%s x %s' % (png.width, png.height)
+    print(png.chunks)
+#    print('%s x %s' % (png.width, png.height))
