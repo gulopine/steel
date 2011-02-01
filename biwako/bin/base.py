@@ -1,6 +1,7 @@
 import collections
 import io
-from .fields.base import FieldMeta
+
+from biwako.bin import data
 
 
 class NameAwareOrderedDict(collections.OrderedDict):
@@ -26,11 +27,11 @@ class StructureMeta(type):
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)
-        FieldMeta._registry.options = {}
+        data.fields.options = {}
 
     @classmethod
     def __prepare__(metacls, name, bases, **options):
-        FieldMeta._registry.options = options
+        data.fields.options = options
         return NameAwareOrderedDict()
 
     def __iter__(cls):

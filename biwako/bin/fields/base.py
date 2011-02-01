@@ -1,12 +1,9 @@
-import threading
+from biwako.bin import data
 
 class FieldMeta(type):
-    _registry = threading.local()
-    _registry.options = {}
-
     def __call__(cls, *args, **kwargs):
-        if FieldMeta._registry.options:
-            options = FieldMeta._registry.options.copy()
+        if data.fields.options:
+            options = data.fields.options.copy()
             options.update(kwargs)
         else:
             options = kwargs
