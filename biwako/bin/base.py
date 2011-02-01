@@ -1,7 +1,7 @@
 import collections
 import io
 
-from biwako.bin import data
+from ..bin import data
 
 
 class NameAwareOrderedDict(collections.OrderedDict):
