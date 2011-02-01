@@ -77,6 +77,8 @@ class ChunkMixin:
     def __init__(self, *args, process_chunk=True, **kwargs):
         if process_chunk:
             chunk = self._chunk.structure(*args, **kwargs)
+            for field in chunk._fields:
+                getattr(chunk, field.name)
             id = chunk.id
             id = self._chunk.id
             if chunk.id != self._chunk.id:
