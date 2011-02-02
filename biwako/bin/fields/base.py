@@ -59,6 +59,9 @@ class Field(metaclass=FieldMeta):
     def __set__(self, instance, value):
         instance.__dict__[self.name] = value
 
+    def __repr__(self):
+        return '<%s: %s>' % (self.name, type(self).__name__)
+
 
 class DynamicValue:
     def __init__(self, value):
