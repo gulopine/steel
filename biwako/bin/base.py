@@ -93,6 +93,12 @@ class Structure(metaclass=StructureMeta):
             value = getattr(self, field.name)
             file.write(field.encode(self, value))
 
+    def __str__(self):
+        return '<Binary Data>'
+
+    def __repr__(self):
+        return '<%s: %s>' % (type(self).__name__, self)
+
 
 class EOFBytesIO(io.BytesIO):
     """
