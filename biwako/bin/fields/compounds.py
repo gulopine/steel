@@ -30,10 +30,6 @@ class List(Field):
         super(List, self).__init__(*args, **kwargs)
         self.field = field
 
-    def calculate_size(self, obj):
-        field_size = self.field.calculate_size(obj)
-        return field_size * super(List, self).calculate_size(obj)
-
     def extract(self, obj):
         values = []
         for i in range(self.size(obj)):
