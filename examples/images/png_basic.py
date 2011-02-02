@@ -1,4 +1,3 @@
-import decimal
 import sys
 from biwako import bin
 
