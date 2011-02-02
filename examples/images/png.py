@@ -16,8 +16,11 @@ PHYSICAL_UNIT_CHOICES = (
     (1, 'Meters'),
 )
 FILTER_CHOICES = (
+    (0, 'Adaptive Filtering'),
 )
 INTERLACE_CHOICES = (
+    (0, '<No Interlacing>'),
+    (1, 'Adam7'),
 )
 
 
