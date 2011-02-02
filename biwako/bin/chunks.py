@@ -11,8 +11,9 @@ class ChunkMeta(StructureMeta):
 
 
 class Chunk(metaclass=ChunkMeta):
-    def __init__(self, id):
+    def __init__(self, id, multiple=False):
         self.id = id
+        self.multiple = multiple
 
     def __call__(self, cls):
         cls._chunk = self
