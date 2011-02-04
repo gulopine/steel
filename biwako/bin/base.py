@@ -93,6 +93,15 @@ class Structure(metaclass=StructureMeta):
             value = getattr(self, field.name)
             file.write(field.encode(self, value))
 
+    def validate(self):
+        errors = []
+        for field in self._fields:
+            try:
+                field.validate(getattr(self, field.name))
+            except ValueError as error:
+                errors.append(str(error))
+        return errors
+
     def __str__(self):
         return '<Binary Data>'
 

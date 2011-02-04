@@ -46,6 +46,12 @@ class Field(metaclass=FieldMeta):
     def attach_to_class(self, cls):
         cls._fields.append(self)
 
+    def validate(self, value):
+        # This should raise a ValueError if the value is invalid
+        # It should simply return without an error if it's valid
+        if self.choices and value not in set(v for v, desc in self.choices):
+            raise ValueError("%r is not a valid choice" % value)
+
     def __get__(self, instance, owner):
         if not instance:
             return self
