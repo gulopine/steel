@@ -97,7 +97,7 @@ class Structure(metaclass=StructureMeta):
         errors = []
         for field in self._fields:
             try:
-                field.validate(getattr(self, field.name))
+                field.validate(self, getattr(self, field.name))
             except ValueError as error:
                 errors.append(str(error))
         return errors

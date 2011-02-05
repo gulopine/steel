@@ -33,7 +33,7 @@ class String(Field):
         size = self.size(obj)
         if size is not None:
             if len(value) > size:
-                raise ValueError("String %r too is longer than %r bytes." % (value, size))
+                raise ValueError("String %r is longer than %r bytes." % (value, size))
             value = value.ljust(size, self.padding)
         else:
             value += self.terminator
