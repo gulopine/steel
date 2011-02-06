@@ -30,7 +30,7 @@ exactly that. Accessing the data in that object then works as you'd expect::
   300
 
 Requirements
-============
+------------
 
 Let's get to the elephant in the room first: **Biwako requires Python 3.1.**
 There is no version of Biwako that works with Python 2.x, and there are no plans
@@ -43,7 +43,7 @@ Beyond that, Biwako has no dependencies on any external libraries. Everything
 you need is in the box.
 
 Topics
-======
+------
 
 .. toctree::
    :maxdepth: 2
