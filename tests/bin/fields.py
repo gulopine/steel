@@ -114,6 +114,7 @@ class TestFixedInteger(unittest.TestCase):
 class CalculatedValueTest(unittest.TestCase):
     def setUp(self):
         self.field = fields.Integer(size=1)
+        self.name = 'test'
 
     def test_add(self):
         calc_field = self.field + 2
