@@ -261,5 +261,21 @@ class ListTest(unittest.TestCase):
         self.assertSequenceEqual(data, self.decoded_data)
 
 
+class ZlibTest(unittest.TestCase):
+    encoded_data = b'x\x9c+I-.\x01\x00\x04]\x01\xc1'
+    decoded_data = 'test'
+
+    def setUp(self):
+        self.field = fields.Zlib(fields.String(size=4, encoding='ascii'), size=fields.Remainder)
+
+    def test_encode(self):
+        data = self.field.encode(None, self.decoded_data)
+        self.assertEqual(data, self.encoded_data)
+
+    def test_extract(self):
+        data = self.field.extract(io.BytesIO(self.encoded_data))
+        self.assertSequenceEqual(data, self.decoded_data)
+
+
 if __name__ == '__main__':
     unittest.main()
