@@ -1,5 +1,23 @@
 from ...bin import data
 
+
+class Trigger:
+    def __init__(self):
+        self.functions = set()
+
+    def __iter__(self):
+        return iter(self.function)
+
+    def __call__(self, func):
+        # Used as a decorator
+        self.functions.add(func)
+
+    def apply(self, *args, **kwargs):
+        # Called from within the appropriate code
+        for func in self.functions:
+            func(*args, **kwargs)
+
+
 class FieldMeta(type):
     def __call__(cls, *args, **kwargs):
         if data.fields.options:
@@ -56,6 +74,9 @@ class Field(metaclass=FieldMeta):
         # Then make sure it's a valid option, if applicable
         if self.choices and value not in set(v for v, desc in self.choices):
             raise ValueError("%r is not a valid choice" % value)
+
+    after_encode = Trigger()
+    after_extract = Trigger()
 
     def __get__(self, instance, owner):
         if not instance:
