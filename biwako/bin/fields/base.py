@@ -30,6 +30,7 @@ class FieldMeta(type):
 
 class Field(metaclass=FieldMeta):
     def __init__(self, label=None, *, size=None, offset=None, choices=(), **kwargs):
+        self.name = ''
         self.label = label
         self.size = DynamicValue(size)
         self.offset = offset

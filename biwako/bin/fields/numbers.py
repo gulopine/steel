@@ -181,7 +181,7 @@ class FixedInteger(Integer):
 
 class CalculatedValue(Integer):
     def __init__(self, field, other, calculate, **kwargs):
-        super(CalculatedValue, self).__init__(size=None, **kwargs)
+        super(CalculatedValue, self).__init__(size=field.size, **kwargs)
         self.field = field
         self.other = DynamicValue(other)
         self.calculate = calculate

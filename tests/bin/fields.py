@@ -200,37 +200,37 @@ class FixedStringTest(unittest.TestCase):
     def test_bytes(self):
         field = fields.FixedString(b'valid')
         field.encode(None, b'valid')
-        field.decode(b'valid')
+        field.extract(io.BytesIO(b'valid'))
 
         with self.assertRaises(ValueError):
-            field.decode(b'invalid')
+            field.extract(io.BytesIO(b'invalid'))
 
         # Encoding a Unicode string isn't possible with a bytes FixedString
         with self.assertRaises(ValueError):
-            field.decode('valid')
+            field.extract(io.TextIOBase('valid'))
 
     def test_ascii(self):
         field = fields.FixedString('valid')
         field.encode(None, 'valid')
-        field.decode(b'valid')
+        field.extract(io.BytesIO(b'valid'))
 
         with self.assertRaises(ValueError):
             field.encode(None, 'invalid')
 
         with self.assertRaises(ValueError):
-            field.decode(b'invalid')
+            field.extract(io.BytesIO(b'invalid'))
 
     def test_utf8(self):
         field = fields.FixedString('\u00fcber', encoding='utf8')
         field.encode(None, '\u00fcber')
-        field.decode(b'\xc3\xbcber')
+        field.extract(io.BytesIO(b'\xc3\xbcber'))
 
         # If the value doesn't match what was specified, it's an error
         with self.assertRaises(ValueError):
             field.encode(None, 'uber')
 
         with self.assertRaises(ValueError):
-            field.decode(b'uber')
+            field.extract(io.BytesIO(b'uber'))
 
 
 class BytesTest(unittest.TestCase):
