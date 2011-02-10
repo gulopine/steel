@@ -91,7 +91,7 @@ class Structure(metaclass=StructureMeta):
     def save(self, file):
         for field in self.__class__._fields:
             value = getattr(self, field.name)
-            file.write(field.encode(self, value))
+            file.write(self.__dict__[field.get_encoded_name()])
 
     def validate(self):
         errors = []

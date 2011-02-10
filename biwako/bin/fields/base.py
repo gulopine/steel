@@ -75,6 +75,9 @@ class Field(metaclass=FieldMeta):
         if self.choices and value not in set(v for v, desc in self.choices):
             raise ValueError("%r is not a valid choice" % value)
 
+    def get_encoded_name(self):
+        return '%s_encoded' % self.name
+
     after_encode = Trigger()
     after_extract = Trigger()
 
@@ -84,12 +87,15 @@ class Field(metaclass=FieldMeta):
         if self.name not in instance.__dict__:
             try:
                 instance.__dict__[self.name] = instance._get_value(self)
+                self.after_extract.apply(instance, instance.__dict__[self.name])
             except IOError:
                 raise AttributeError("Attribute %r has no data" % self.name)
         return instance.__dict__[self.name]
 
     def __set__(self, instance, value):
         instance.__dict__[self.name] = value
+        instance.__dict__[self.get_encoded_name()] = self.encode(instance, value)
+        self.after_encode.apply(instance, value)
 
     def __repr__(self):
         return '<%s: %s>' % (self.name, type(self).__name__)
