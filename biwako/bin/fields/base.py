@@ -3,6 +3,19 @@ from ...bin import data
 
 class Trigger:
     def __init__(self):
+        self.cache = {}
+
+    def __get__(self, instance, owner):
+        if owner is None:
+            return self
+        if instance not in self.cache:
+            self.cache[instance] = BoundTrigger(instance)
+        return self.cache[instance]
+
+
+class BoundTrigger:
+    def __init__(self, field):
+        self.field = field
         self.functions = set()
 
     def __iter__(self):
@@ -33,6 +46,10 @@ class Field(metaclass=FieldMeta):
         self.name = ''
         self.label = label
         self.size = DynamicValue(size)
+        if isinstance(size, Field):
+            @self.after_encode
+            def update_size(obj, value):
+                setattr(obj, size.name, len(value))
         self.offset = offset
         # TODO: Actually support choices properly later
         self.choices = choices

@@ -37,6 +37,19 @@ class AttributeTest(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             struct = self.struct(io.BytesIO(), integer=1, string='invalid')
+            
+    def test_related(self):
+        class TestStructure(bin.Structure):
+            length = bin.Integer('number', size=1)
+            content = bin.String(encoding='ascii', size=length)
+        
+        struct = TestStructure(io.BytesIO(b'\x05validpadding'))
+        self.assertEqual(struct.length, 5)
+        self.assertEqual(struct.content, 'valid')
+        
+        struct.content = 'automatic'
+        self.assertEqual(struct.content, 'automatic')
+        self.assertEqual(struct.length, 9)
 
 class IOTest(unittest.TestCase):
     data = b'\x2a\x00\x42valid\x00test\x00'
