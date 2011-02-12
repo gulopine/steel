@@ -32,12 +32,17 @@ class String(Field):
         value = value.encode(self.encoding(obj))
         size = self.size(obj)
         if size is not None:
-            if len(value) > size:
-                raise ValueError("String %r is longer than %r bytes." % (value, size))
             value = value.ljust(size, self.padding)
         else:
             value += self.terminator
         return value
+
+    def validate(self, obj, value):
+        value = value.encode(self.encoding(obj))
+        size = self.size(obj)
+        if size is not None:
+            if len(value) > size:
+                raise ValueError("String %r is longer than %r bytes." % (value, size))
 
 
 class LengthIndexedString(String):
