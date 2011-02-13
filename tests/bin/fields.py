@@ -118,45 +118,45 @@ class CalculatedValueTest(unittest.TestCase):
 
     def test_add(self):
         calc_field = self.field + 2
-        self.assertEqual(calc_field.decode(b'\x2a'), 44)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 44)
         calc_field = 2 + self.field
-        self.assertEqual(calc_field.decode(b'\x2a'), 44)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 44)
 
     def test_subtract(self):
         calc_field = self.field - 2
-        self.assertEqual(calc_field.decode(b'\x2a'), 40)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 40)
         calc_field = 42 - self.field
-        self.assertEqual(calc_field.decode(b'\x02'), 40)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x02')), 40)
 
     def test_multiply(self):
         calc_field = self.field * 2
-        self.assertEqual(calc_field.decode(b'\x2a'), 84)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 84)
         calc_field = 2 * self.field
-        self.assertEqual(calc_field.decode(b'\x2a'), 84)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 84)
 
     def test_power(self):
         calc_field = self.field ** 2
-        self.assertEqual(calc_field.decode(b'\x2a'), 1764)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 1764)
         calc_field = 2 ** self.field
-        self.assertEqual(calc_field.decode(b'\x10'), 65536)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x10')), 65536)
 
     def test_true_divide(self):
         calc_field = self.field / 2
-        self.assertEqual(calc_field.decode(b'\x2a'), 21)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 21)
         calc_field = 42 / self.field
-        self.assertEqual(calc_field.decode(b'\x02'), 21)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x02')), 21)
 
     def test_floor_divide(self):
         calc_field = self.field // 2
-        self.assertEqual(calc_field.decode(b'\x2a'), 21)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 21)
         calc_field = 42 // self.field
-        self.assertEqual(calc_field.decode(b'\x02'), 21)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x02')), 21)
 
     def test_chaining(self):
         calc_field = self.field + 2 + 2
-        self.assertEqual(calc_field.decode(b'\x2a'), 46)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 46)
         calc_field = (self.field + 2 - 2) * 5 // 4
-        self.assertEqual(calc_field.decode(b'\x2a'), 52)
+        self.assertEqual(calc_field.extract(io.BytesIO(b'\x2a')), 52)
 
 
 class StringTest(unittest.TestCase):

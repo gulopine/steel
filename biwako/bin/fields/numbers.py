@@ -189,7 +189,7 @@ class CalculatedValue(Integer):
 
     def extract(self, obj):
         # Defer to the stored field in order to get a base value
-        value = obj._get_value(self.field)
+        value = self.field.extract(obj)
         other = self.other(obj)
         return self.calculate(value, other)
 
