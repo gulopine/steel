@@ -1,30 +1,9 @@
 import io
 
-from ..common import data, NameAwareOrderedDict
+from biwako import common
 
 
-class StructureMeta(type):
-    def __new__(cls, name, bases, attrs, **options):
-        # Nothing to do here, but we need to make sure options
-        # don't get passed in to type.__new__() itself.
-        return type.__new__(cls, name, bases, attrs)
-
-    def __init__(cls, name, bases, attrs, **options):
-        cls._fields = []
-        for name, attr in attrs.items():
-            if hasattr(attr, 'attach_to_class'):
-                attr.attach_to_class(cls)
-        data.field_options = {}
-
-    @classmethod
-    def __prepare__(metacls, name, bases, **options):
-        data.field_options = options
-        return NameAwareOrderedDict()
-
-    def __iter__(cls):
-        return iter(cls.__dict__)
-
-class Structure(metaclass=StructureMeta):
+class Structure(metaclass=common.DeclarativeMetaclass):
     def __init__(self, *args, **kwargs):
         self._file = len(args) > 0 and args[0] or None
         self._mode = self._file and 'rb' or 'wb'

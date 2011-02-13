@@ -1,4 +1,4 @@
-from ...bin import data
+from biwako import common
 
 
 class Trigger:
@@ -31,17 +31,7 @@ class BoundTrigger:
             func(*args, **kwargs)
 
 
-class FieldMeta(type):
-    def __call__(cls, *args, **kwargs):
-        if data.field_options:
-            options = data.field_options.copy()
-            options.update(kwargs)
-        else:
-            options = kwargs
-        return super(FieldMeta, cls).__call__(*args, **options)
-
-
-class Field(metaclass=FieldMeta):
+class Field(metaclass=common.DeclarativeFieldMetaclass):
     def __init__(self, label=None, *, size=None, offset=None, choices=(), **kwargs):
         self.name = ''
         self.label = label

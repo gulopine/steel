@@ -1,6 +1,6 @@
 import csv
 
-from ..common import data, NameAwareOrderedDict
+from biwako import common
 
 __all__ = ['Row', 'Reader', 'Writer']
 
@@ -15,27 +15,13 @@ class Dialect:
         self.fields.append(field)
 
 
-class RowMeta(type):
-    def __new__(cls, name, bases, attrs, **options):
-        # Nothing to do here, but we need to make sure options
-        # don't get passed in to type.__new__() itself.
-        return type.__new__(cls, name, bases, attrs)
-
+class RowMetaclass(common.DeclarativeMetaclass):
     def __init__(cls, name, bases, attrs, **options):
-        cls._fields = []
-        for name, attr in attrs.items():
-            if hasattr(attr, 'attach_to_class'):
-                attr.attach_to_class(cls)
-        data.field_options = {}
+        super(RowMetaclass, cls).__init__(name, bases, attrs, **options)
         cls._dialect = Dialect(**options)
 
-    @classmethod
-    def __prepare__(cls, name, bases, **options):
-        data.field_options = options
-        return NameAwareOrderedDict()
 
-
-class Row(metaclass=RowMeta):
+class Row(metaclass=RowMetaclass):
     def __init__(self, *args, **kwargs):
         field_names = [field.name for field in self._dialect.fields]
 

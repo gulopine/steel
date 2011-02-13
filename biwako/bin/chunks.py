@@ -1,16 +1,17 @@
 import io
 
+from biwako import common
 from .fields import Field
-from .base import StructureMeta, Structure
+from .base import Structure
 from .fields.strings import Bytes
 
 
-class ChunkMeta(StructureMeta):
+class ChunkMetaclass(common.DeclarativeMetaclass):
     def __init__(cls, name, bases, attrs, **options):
-        cls.structure = StructureMeta(name, (Structure,), attrs, **options)
+        cls.structure = common.DeclarativeMetaclass(name, (Structure,), attrs, **options)
 
 
-class Chunk(metaclass=ChunkMeta):
+class Chunk(metaclass=ChunkMetaclass):
     def __init__(self, id, multiple=False):
         self.id = id
         self.multiple = multiple
