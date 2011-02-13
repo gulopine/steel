@@ -1,19 +1,6 @@
-import collections
 import io
 
-from ..bin import data
-
-
-class NameAwareOrderedDict(collections.OrderedDict):
-    """
-    A custom namespace that not only orders its items, but can
-    also make those items aware of their names immediately.
-    """
-
-    def __setitem__(self, name, obj):
-        super(NameAwareOrderedDict, self).__setitem__(name, obj)
-        if hasattr(obj, 'set_name'):
-            obj.set_name(name)
+from ..common import data, NameAwareOrderedDict
 
 
 class StructureMeta(type):
@@ -27,11 +14,11 @@ class StructureMeta(type):
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)
-        data.fields.options = {}
+        data.field_options = {}
 
     @classmethod
     def __prepare__(metacls, name, bases, **options):
-        data.fields.options = options
+        data.field_options = options
         return NameAwareOrderedDict()
 
     def __iter__(cls):

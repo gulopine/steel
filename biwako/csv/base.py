@@ -1,21 +1,8 @@
 import csv
-import collections
 
-from ..csv import data
+from ..common import data, NameAwareOrderedDict
 
 __all__ = ['Row', 'Reader', 'Writer']
-
-
-class NameAwareOrderedDict(collections.OrderedDict):
-    """
-    A custom namespace that not only orders its items, but can
-    also make those items aware of their names immediately.
-    """
-
-    def __setitem__(self, name, obj):
-        super(NameAwareOrderedDict, self).__setitem__(name, obj)
-        if hasattr(obj, 'set_name'):
-            obj.set_name(name)
 
 
 class Dialect:
@@ -39,11 +26,12 @@ class RowMeta(type):
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)
-        data.fields.options = {}
+        data.field_options = {}
         cls._dialect = Dialect(**options)
 
     @classmethod
-    def __prepare__(cls, name, bases):
+    def __prepare__(cls, name, bases, **options):
+        data.field_options = options
         return NameAwareOrderedDict()
 
 

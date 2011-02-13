@@ -33,8 +33,8 @@ class BoundTrigger:
 
 class FieldMeta(type):
     def __call__(cls, *args, **kwargs):
-        if data.fields.options:
-            options = data.fields.options.copy()
+        if data.field_options:
+            options = data.field_options.copy()
             options.update(kwargs)
         else:
             options = kwargs

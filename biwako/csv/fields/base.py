@@ -1,7 +1,17 @@
 import functools
 
 
-class Field:
+class FieldMeta(type):
+    def __call__(cls, *args, **kwargs):
+        if data.field_options:
+            options = data.field_options.copy()
+            options.update(kwargs)
+        else:
+            options = kwargs
+        return super(FieldMeta, cls).__call__(*args, **options)
+
+
+class Field(metaclass=FieldMeta):
     """
     An individual column within a CSV file. This serves as a base for attributes
     and methods that are common to all types of fields. Subclasses of Field
