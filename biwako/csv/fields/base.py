@@ -1,5 +1,7 @@
 import functools
 
+from ...bin import data
+
 
 class FieldMeta(type):
     def __call__(cls, *args, **kwargs):
