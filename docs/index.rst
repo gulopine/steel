@@ -1,10 +1,10 @@
 File Formats Made Easy
 ======================
 
-Biwako makes it easy to define, parse, edit, validate and store data in binary
+Biwako makes it easy to define, parse, edit, validate and store data in various
 file formats. Its primary goal is to help you work with formats defined by
 other applications, but it's also easy to roll your own file formats and it's
-flexible enough to work with binary data from most file-like objects.
+flexible enough to work with data from most file-like objects.
 
 Consider a simple format to retrieve the width and height out of GIF images::
 
@@ -33,11 +33,12 @@ Requirements
 ------------
 
 Let's get to the elephant in the room first: **Biwako requires Python 3.1.**
-There is no version of Biwako that works with Python 2.x, and there are no plans
-to make one. The goal is to work with binary data, and Biwako takes advantage of
-the differences between bytes and strings. Prior to version 3, Python failed to
-make a proper distinction between those two types, which complicates the design
-of a framework that deals specifically with binary data.
+There is no version of Biwako that works with Python 2.x, and there are no
+plans to make one. One of the primary goal is to work with binary data, and
+Biwako takes advantage of the differences between bytes and strings. Prior to
+version 3, Python failed to make a proper distinction between those two types,
+which complicates the design of a framework that deals specifically with
+binary data.
 
 Beyond that, Biwako has no dependencies on any external libraries. Everything
 you need is in the box.
