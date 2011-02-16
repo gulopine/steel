@@ -32,15 +32,15 @@ the file to be invalid if any other string is found.
 
 The version string is similar, but it can be one of a couple different values,
 depending on the file used. Because the length of the string is known, though,
-it can be specified as a :class:`~biwako.bin.fields.strings.FixedLengthString`.
-This field will read in the specified number of bytes and convert them to a
-native string using the encoding provided.
+it can be specified right in the field definition. This way, the field will
+read in the specified number of bytes and convert them to a native string
+using the encoding provided.
 
 ::
 
   class GIF(bin.Structure):
       tag = bin.FixedString('GIF')
-      version = bin.FixedLengthString(size=3, encoding='ascii')
+      version = bin.String(size=3, encoding='ascii')
 
 The width and height are eaiser to describe, because they're simply numbers,
 and they're represented as :class:`~biwako.bin.fields.numbers.Integer` fields.
@@ -48,15 +48,16 @@ Since numbers can come in a few different sizes, you must specify how many
 bytes are used to store the number, so that it can be processed correctly.
 Each of the numbers for the image dimensions in a GIF file are stored in two
 bytes, and because there can never be a negative value in either dimension,
-you simply specify that the values should never be processed as signed numbers.
+the default unsigned behavior makes sure that no values will be processed as
+negative numbers.
 
 ::
 
   class GIF(bin.Structure):
       tag = bin.FixedString('GIF')
       version = bin.FixedLengthString(size=3, encoding='ascii')
-      width = bin.Integer(size=2, signed=False)
-      height = bin.Integer(size=2, signed=False)
+      width = bin.Integer(size=2)
+      height = bin.Integer(size=2)
 
 The one remaining detail for this simple format is that, when numbers span more
 than one byte, different systems keep track of those bytes in different orders.
@@ -75,8 +76,8 @@ definition itself. The functionality you'll need is controlled by a class named
 
   class GIF(bin.Structure, endianness=bin.LittleEndian):
       tag = bin.FixedString('GIF')
-      version = bin.FixedLengthString(size=3, encoding='ascii')
-      width = bin.Integer(size=2, signed=False)
-      height = bin.Integer(size=2, signed=False)
+      version = bin.String(size=3, encoding='ascii')
+      width = bin.Integer(size=2)
+      height = bin.Integer(size=2)
 
 And that's it!

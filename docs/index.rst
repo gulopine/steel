@@ -12,9 +12,9 @@ Consider a simple format to retrieve the width and height out of GIF images::
 
   class GIF(bin.Structure, endianness=bin.LittleEndian):
       tag = bin.FixedString('GIF')
-      version = bin.FixedLengthString(size=3, encoding='ascii')
-      width = bin.PositiveInteger(size=2)
-      height = bin.PositiveInteger(size=2)
+      version = bin.String(size=3, encoding='ascii')
+      width = bin.Integer(size=2)
+      height = bin.Integer(size=2)
 
 That's all it takes to create a class capable of parsing a GIF into a Python
 object. There's certainly more to the GIF image format than just what you see
