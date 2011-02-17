@@ -50,5 +50,5 @@ Topics
    :maxdepth: 2
 
    getting-started
-..   structures
-..   fields
+   bin/structures
+   bin/fields
