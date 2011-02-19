@@ -1,7 +1,7 @@
 import io
 import unittest
 
-from biwako.bin import fields
+from biwako.bin import fields, Structure
 
 
 class IOTest(unittest.TestCase):
@@ -275,6 +275,57 @@ class ZlibTest(unittest.TestCase):
     def test_extract(self):
         data = self.field.extract(io.BytesIO(self.encoded_data))
         self.assertSequenceEqual(data, self.decoded_data)
+
+
+class CheckSumTest(unittest.TestCase):
+    original_data = b'\x00\x01\x02\x03\x00\x04\x00\x00\x00\x05\x00\x0f'
+    modified_data = b'\x00\x02\x02\x03\x00\x04\x00\x00\x00\x05\x00\x0f'
+    modified_csum = b'\x00\x01\x02\x03\x00\x04\x00\x00\x00\x05\x00\x10'
+    modified_both = b'\x00\x02\x02\x03\x00\x04\x00\x00\x00\x05\x00\x10'
+
+    class IntegrityStructure(Structure):
+        a = fields.Integer(size=2)
+        b = fields.Integer(size=1)
+        c = fields.Integer(size=1)
+        d = fields.Integer(size=2)
+        e = fields.Integer(size=4)
+        checksum = fields.CheckSum(size=2)
+
+    def test_encode(self):
+        pass
+#        data = self.field.encode(None, self.decoded_data)
+#        self.assertEqual(data, self.encoded_data)
+
+    def test_extract(self):
+        struct = self.IntegrityStructure(io.BytesIO(self.original_data))
+        self.assertEqual(struct.a, 1)
+        self.assertEqual(struct.b, 2)
+        self.assertEqual(struct.c, 3)
+        self.assertEqual(struct.d, 4)
+        self.assertEqual(struct.e, 5)
+        self.assertEqual(struct.checksum, 15)
+
+    def test_modified_data(self):
+        struct = self.IntegrityStructure(io.BytesIO(self.modified_data))
+        with self.assertRaises(fields.IntegrityError):
+            self.assertNotEqual(struct.checksum, 15)
+
+    def test_modified_both(self):
+        struct = self.IntegrityStructure(io.BytesIO(self.original_data))
+        self.assertEqual(struct.a, 1)
+        self.assertEqual(struct.b, 2)
+        self.assertEqual(struct.c, 3)
+        self.assertEqual(struct.d, 4)
+        self.assertEqual(struct.e, 5)
+        struct.a = 2
+        data = io.BytesIO()
+        struct.save(data)
+        self.assertEqual(data.getvalue(), self.modified_both)
+
+    def test_modified_checksum(self):
+        struct = self.IntegrityStructure(io.BytesIO(self.modified_csum))
+        with self.assertRaises(fields.IntegrityError):
+            self.assertNotEqual(struct.checksum, 15)
 
 
 if __name__ == '__main__':
