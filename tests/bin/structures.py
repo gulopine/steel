@@ -133,6 +133,13 @@ class IOTest(unittest.TestCase):
         struct.save(output)
         self.assertEqual(output.getvalue(), self.data)
 
+    def test_read_and_save(self):
+        struct = self.struct(io.BytesIO(self.data))
+
+        output = io.BytesIO()
+        struct.save(output)
+        self.assertEqual(output.getvalue(), self.data)
+
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):
