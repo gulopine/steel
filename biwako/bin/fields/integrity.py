@@ -1,5 +1,6 @@
 import collections
 import functools
+import zlib
 
 from .numbers import Integer
 
@@ -61,5 +62,21 @@ class CheckSum(Integer):
 
     def calculate(self, data):
         return sum(data)
+
+
+class CRC32(CheckSum):
+    def __init__(self, *args, **kwargs):
+        super(CRC32, self).__init__(*args, size=4, **kwargs)
+
+    def calculate(self, data):
+        return zlib.crc32(data) & 0xffffffff
+
+
+class Adler32(CheckSum):
+    def __init__(self, *args, **kwargs):
+        super(Adler32, self).__init__(*args, size=4, **kwargs)
+
+    def calculate(self, data):
+        return zlib.adler32(data) & 0xffffffff
 
 
