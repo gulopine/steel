@@ -32,8 +32,7 @@ class Chunk(bin.Chunk, encoding='ascii'):
     size = bin.Integer(size=4)
     id = bin.String(size=4)
     payload = bin.Payload(size=size)
-#    crc = bin.CRC(payload, size=4)
-    crc = bin.Integer(size=4)
+    crc = bin.CRC32(first=id)
 
     @property
     def is_critical(self):
