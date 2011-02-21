@@ -41,15 +41,11 @@ class Structure(metaclass=common.DeclarativeMetaclass):
 
     def _get_value(self, field):
         if field.name not in self.__dict__:
-            if field.offset is not None and hasattr(self, 'seek'):
-                self.seek(field.offset)
-                self.__dict__[field.name] = field.extract(self)
-            else:
-                for other_field in self.__class__._fields:
-                    if other_field.name not in self.__dict__:
-                        self.__dict__[other_field.name] = other_field.extract(self)
-                    if other_field.name == field.name:
-                        break
+            for other_field in self.__class__._fields:
+                if other_field.name not in self.__dict__:
+                    self.__dict__[other_field.name] = other_field.extract(self)
+                if other_field.name == field.name:
+                    break
         if field is getattr(self.__class__, field.name):
             return self.__dict__[field.name]
         return field.extract(self)
