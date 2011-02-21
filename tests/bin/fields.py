@@ -328,5 +328,35 @@ class CheckSumTest(unittest.TestCase):
             self.assertNotEqual(struct.checksum, 15)
 
 
+class ReservedTest(unittest.TestCase):
+    class ReservedStructure(Structure):
+        a = fields.Integer(size=1)
+        fields.Reserved(size=1)
+        b = fields.Integer(size=1)
+    data = b'\x01\x00\x02'
+
+    def test_assignment(self):
+        # Giving no name is the correct approach
+        class ReservedStructure(Structure):
+            fields.Reserved(size=1)
+
+        with self.assertRaises(TypeError):
+            class ReservedStructure(Structure):
+                name = fields.Reserved(size=1)
+
+    def test_read(self):
+        obj = self.ReservedStructure(io.BytesIO(self.data))
+        self.assertEqual(obj.a, 1)
+        self.assertEqual(obj.b, 2)
+
+    def test_save(self):
+        obj = self.ReservedStructure(io.BytesIO())
+        obj.a = 1
+        obj.b = 2
+        data = io.BytesIO()
+        obj.save(data)
+        self.assertEqual(data.getvalue(), self.data)
+
+
 if __name__ == '__main__':
     unittest.main()
