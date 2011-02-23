@@ -32,6 +32,9 @@ class Chunk(metaclass=ChunkMetaclass):
 
         return value
 
+    def _extract(self, field):
+        return self.structure._extract(field)
+
 
 class ChunkMixin:
     def __init__(self, *args, process_chunk=True, **kwargs):

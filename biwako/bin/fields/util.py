@@ -26,8 +26,8 @@ class Reserved(Field):
             raise TypeError('Reserved fields must not be given an attribute name')
         super(Reserved, self).set_name(name)
 
-    def encode(self, obj, value):
-        return b'\x00' * self.size(obj)
+    def encode(self, value):
+        return b'\x00' * self.size
 
     def decode(self, value):
         return None

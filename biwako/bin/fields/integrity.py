@@ -53,11 +53,10 @@ class CheckSum(Integer):
         return given_value
 
     def get_calculated_value(self, instance):
-        data = b''.join(instance.__dict__[field.get_encoded_name()] for field in self.fields)
+        data = b''.join(instance._extract(field) for field in self.fields)
         return self.calculate(data)
 
     def update_encoded_value(self, instance, value):
-        self.build_cache(instance)
         setattr(instance, self.name, self.get_calculated_value(instance))
 
     def calculate(self, data):

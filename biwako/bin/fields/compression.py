@@ -10,11 +10,11 @@ class Zlib(Field):
         self.field = field
 
     def extract(self, obj):
-        data = obj.read(self.size(obj))
+        data = obj.read(self.size)
         data = zlib.decompress(data)
         return self.field.extract(io.BytesIO(data))
 
-    def encode(self, obj, value):
-        data = self.field.encode(obj, value)
+    def encode(self, value):
+        data = self.field.encode(value)
         return zlib.compress(data)
 

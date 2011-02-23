@@ -1,3 +1,5 @@
+import copy
+
 from biwako import common
 
 
@@ -43,17 +45,25 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         self.offset = offset
         # TODO: Actually support choices properly later
         self.choices = choices
+        self.instance = None
+
+    def for_instance(self, instance):
+        field = copy.copy(self)
+        for name, attr in self.__dict__.items():
+            if isinstance(attr, DynamicValue):
+                setattr(field, name, attr(instance))
+        field.instance = instance
+        return field
 
     def extract(self, obj):
-        return self.decode(self.read(obj))
+        field = self.for_instance(obj)
+        return field.decode(field.read(obj))
 
     def read(self, obj):
-        size = self.size(obj)
-
         # If the size can be determined easily, read
         # that number of bytes and return it directly.
-        if size is not None:
-            return obj.read(size)
+        if self.size is not None:
+            return obj.read(self.size)
 
         # Otherwise, the field needs to supply its own
         # technique for determining how much data to read.
@@ -75,9 +85,10 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def validate(self, obj, value):
         # This should raise a ValueError if the value is invalid
         # It should simply return without an error if it's valid
+        field = self.for_instance(obj)
 
         # First, make sure the value can be encoded
-        self.encode(obj, value)
+        field.encode(value)
 
         # Then make sure it's a valid option, if applicable
         if self.choices and value not in set(v for v, desc in self.choices):
@@ -87,26 +98,55 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         return '%s_encoded' % self.name
 
     after_encode = Trigger()
-    after_extract = Trigger()
+    after_decode = Trigger()
+
+    def _extract(self, instance):
+        field = self.for_instance(instance)
+        try:
+            return field.read(instance), None
+        except FullyDecoded as obj:
+            return obj.bytes, obj.value
+
+    def read_value(self, file):
+        try:
+            bytes = self.read(file)
+            value = self.decode(bytes)
+            return bytes, value
+        except FullyDecoded as obj:
+            return obj.bytes, obj.value
 
     def __get__(self, instance, owner):
         if not instance:
             return self
-        if self.name not in instance.__dict__:
-            try:
-                instance.__dict__[self.name] = instance._get_value(self)
-                self.after_extract.apply(instance, instance.__dict__[self.name])
-            except IOError:
-                raise AttributeError("Attribute %r has no data" % self.name)
-        return instance.__dict__[self.name]
+
+        # Customizes the field for this particular instance
+        # Use field instead of self for the rest of the method
+        field = self.for_instance(instance)
+
+        try:
+            value = instance._extract(field)
+        except IOError:
+            raise AttributeError("Attribute %r has no data" % field.name)
+
+        if field.name not in instance.__dict__:
+            instance.__dict__[field.name] = field.decode(value)
+            field.after_decode.apply(instance, value)
+        return instance.__dict__[field.name]
 
     def __set__(self, instance, value):
+        field = self.for_instance(instance)
         instance.__dict__[self.name] = value
-        instance.__dict__[self.get_encoded_name()] = self.encode(instance, value)
+        instance.__dict__[self.get_encoded_name()] = field.encode(value)
         self.after_encode.apply(instance, value)
 
     def __repr__(self):
         return '<%s: %s>' % (self.name, type(self).__name__)
+
+
+class FullyDecoded(Exception):
+    def __init__(self, bytes, value):
+        self.bytes = bytes
+        self.value = value
 
 
 class DynamicValue:

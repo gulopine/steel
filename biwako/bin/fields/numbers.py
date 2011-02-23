@@ -94,12 +94,12 @@ class Integer(Field):
         self.signed = signed
         self.signing = signing(size)
 
-    def encode(self, obj, value):
+    def encode(self, value):
         if self.signed:
             value = self.signing.encode(value)
         elif value < 0:
             raise ValueError("Value cannot be negative.")
-        if value > (1 << (self.size(obj) * 8)) - 1:
+        if value > (1 << (self.size * 8)) - 1:
             raise ValueError("Value is large for this field.")
         return self.endianness.encode(value)
 
@@ -165,10 +165,11 @@ class FixedInteger(Integer):
         if size is None:
             size = int((value.bit_length() + 7) / 8) or 1
         super(FixedInteger, self).__init__(*args, size=size, signed=value < 0, **kwargs)
+        self.size = self.size.value
         self.decoded_value = value
-        self.encoded_value = super(FixedInteger, self).encode(None, value)
+        self.encoded_value = super(FixedInteger, self).encode(value)
 
-    def encode(self, obj, value):
+    def encode(self, value):
         if value != self.decoded_value:
             raise ValueError('Expected %r, got %r.' % (self.decoded_value, value))
         return self.encoded_value

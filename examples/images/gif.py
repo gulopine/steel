@@ -1,3 +1,5 @@
+import sys
+
 from biwako import bin
 
 VERSIONS = (
