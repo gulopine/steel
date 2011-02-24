@@ -1,6 +1,7 @@
 import io
 
 from biwako import common
+from .fields import FullyDecoded
 
 
 class Structure(metaclass=common.DeclarativeMetaclass):
@@ -55,11 +56,13 @@ class Structure(metaclass=common.DeclarativeMetaclass):
         if field.name not in self._raw_values:
             for other_field in self._fields:
                 if other_field.name not in self._raw_values:
-                    print('Extracting from %s' % other_field.name)
-                    instance_field = field.for_instance(self)
-                    bytes, value = instance_field._extract(self)
+                    instance_field = other_field.for_instance(self)
+                    try:
+                        bytes = instance_field.read(self)
+                    except FullyDecoded as obj:
+                        bytes = obj.bytes
+                        self.__dict__[other_field.name] = obj.value
                     self._raw_values[instance_field.name] = bytes
-#                    self.__dict__[other_field.name] = value
                 if other_field is field:
                     break
         return self._raw_values[field.name]
