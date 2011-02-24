@@ -34,13 +34,13 @@ class List(Field):
         value_bytes = b''
         values = []
         if self.instance:
-            instance_field = field.for_instance(self.instance)
+            instance_field = self.field.for_instance(self.instance)
 
         for i in range(self.size):
             bytes, value = instance_field.read_value(file)
             value_bytes += bytes
             values.append(value)
-        return values
+        raise FullyDecoded(value_bytes, values)
 
     def encode(self, obj, values):
         encoded_values = []
