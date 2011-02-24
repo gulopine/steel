@@ -1,4 +1,4 @@
-from .base import Field, DynamicValue
+from .base import Field, DynamicValue, FullyDecoded
 
 
 # Endianness options
@@ -188,10 +188,10 @@ class CalculatedValue(Integer):
         self.calculate = calculate
         self.set_name(field.name)
 
-    def extract(self, obj):
+    def read(self, file):
         # Defer to the stored field in order to get a base value
-        value = self.field.extract(obj)
-        other = self.other(obj)
-        return self.calculate(value, other)
+        field = self.field.for_instance(self.instance)
+        bytes, value = field.read_value(file)
+        return self.calculate(value, self.other)
 
 
