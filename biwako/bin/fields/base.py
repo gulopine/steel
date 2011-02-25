@@ -63,6 +63,8 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         # If the size can be determined easily, read
         # that number of bytes and return it directly.
         if self.size is not None:
+            if self.size > 2 ** 10:
+                print('%s is too big!' % self.name)
             return obj.read(self.size)
 
         # Otherwise, the field needs to supply its own

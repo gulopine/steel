@@ -8,7 +8,13 @@ from .fields.strings import Bytes
 
 class ChunkMetaclass(common.DeclarativeMetaclass):
     def __init__(cls, name, bases, attrs, **options):
+        print(attrs)
         cls.structure = common.DeclarativeMetaclass(name, (Structure,), attrs, **options)
+        for name, attr in attrs.items():
+            if isinstance(attr, Field):
+                print('Deleting %s' % name)
+                delattr(cls, name)
+#        del cls._fields
 
 
 class Chunk(metaclass=ChunkMetaclass):
@@ -38,10 +44,12 @@ class Chunk(metaclass=ChunkMetaclass):
 
 class ChunkMixin:
     def __init__(self, *args, process_chunk=True, **kwargs):
+        print('Initializing %s' % self.__class__.__name__)
         if process_chunk:
             chunk = self._chunk.structure(*args, **kwargs)
             for field in chunk._fields:
-                getattr(chunk, field.name)
+                print(field.name)
+                print(getattr(chunk, field.name))
             id = chunk.id
             id = self._chunk.id
             if chunk.id != self._chunk.id:
