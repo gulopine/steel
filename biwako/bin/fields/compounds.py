@@ -19,7 +19,7 @@ class SubStructure(Field):
 
         raise FullyDecoded(value_bytes, value)
 
-    def encode(self, obj, value):
+    def encode(self, value):
         output = io.BytesIO()
         value.save(output)
         return output.getvalue()
@@ -42,10 +42,12 @@ class List(Field):
             values.append(value)
         raise FullyDecoded(value_bytes, values)
 
-    def encode(self, obj, values):
+    def encode(self, values):
         encoded_values = []
+        if self.instance:
+            instance_field = self.field.for_instance(self.instance)
         for value in values:
-            encoded_values.append(self.field.encode(obj, value))
+            encoded_values.append(instance_field.encode(value))
         return b''.join(encoded_values)
 
 

@@ -1,20 +1,17 @@
 import io
 
 from biwako import common
-from .fields import Field
+from .fields import Field, FullyDecoded
 from .base import Structure
 from .fields.strings import Bytes
 
 
 class ChunkMetaclass(common.DeclarativeMetaclass):
     def __init__(cls, name, bases, attrs, **options):
-        print(attrs)
         cls.structure = common.DeclarativeMetaclass(name, (Structure,), attrs, **options)
         for name, attr in attrs.items():
             if isinstance(attr, Field):
-                print('Deleting %s' % name)
                 delattr(cls, name)
-#        del cls._fields
 
 
 class Chunk(metaclass=ChunkMetaclass):
@@ -29,14 +26,16 @@ class Chunk(metaclass=ChunkMetaclass):
         return cls
 
     @classmethod
-    def extract(cls, obj):
-        value = cls.structure(obj)
+    def read(cls, file):
+        value = cls.structure(file)
         # Force the evaluation of the entire structure in
         # order to make sure other fields work properly
+        value_bytes = b''
         for field in cls.structure._fields:
             getattr(value, field.name)
+            value_bytes += value._raw_values[field.name]
 
-        return value
+        return value_bytes, value
 
     def _extract(self, field):
         return self.structure._extract(field)
@@ -44,12 +43,10 @@ class Chunk(metaclass=ChunkMetaclass):
 
 class ChunkMixin:
     def __init__(self, *args, process_chunk=True, **kwargs):
-        print('Initializing %s' % self.__class__.__name__)
         if process_chunk:
             chunk = self._chunk.structure(*args, **kwargs)
             for field in chunk._fields:
-                print(field.name)
-                print(getattr(chunk, field.name))
+                getattr(chunk, field.name)
             id = chunk.id
             id = self._chunk.id
             if chunk.id != self._chunk.id:
@@ -68,9 +65,9 @@ class ChunkMixin:
 
 
 class Payload(Bytes):
-    def extract(self, obj):
-        value = super(Payload, self).extract(obj)
-        return io.BytesIO(value)
+    def read(self, file):
+        value_bytes = super(Payload, self).read(file)
+        raise FullyDecoded(value_bytes, io.BytesIO(value_bytes))
 
 
 class ChunkList(Field):
@@ -80,10 +77,12 @@ class ChunkList(Field):
         self.known_types = {cls._chunk.id: cls for cls in known_classes}
         super(ChunkList, self).__init__()
 
-    def extract(self, obj):
+    def read(self, file):
+        chunks_bytes = b''
         chunks = ChunkValueList()
         while 1:
-            chunk = self.base_chunk.extract(obj)
+            chunk_bytes, chunk = self.base_chunk.read(file)
+            chunks_bytes += chunk_bytes
             if chunk.id in self.known_types:
                 value = self.known_types[chunk.id](chunk.payload, process_chunk=False)
                 if self.terminator and isinstance(chunk, self.terminator):
@@ -95,7 +94,7 @@ class ChunkList(Field):
             else:
                 # This is not a valid chunk, which is probably the end of the file
                 break
-        return chunks
+        raise FullyDecoded(chunks_bytes, chunks)
 
 
 class ChunkValueList(list):

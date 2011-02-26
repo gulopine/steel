@@ -63,7 +63,7 @@ class Structure(metaclass=common.DeclarativeMetaclass):
                         bytes = obj.bytes
                         self.__dict__[other_field.name] = obj.value
                     self._raw_values[instance_field.name] = bytes
-                if other_field is field:
+                if other_field.name == field.name:
                     break
         return self._raw_values[field.name]
 
