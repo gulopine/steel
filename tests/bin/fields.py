@@ -174,12 +174,6 @@ class StringTest(unittest.TestCase):
         self.assertEqual(field.encode('\u00fcber'), b'\xc3\xbcber\x00')
         self.assertEqual(field.extract(io.BytesIO(b'\xc3\xbcber\x00')), '\u00fcber')
 
-    def test_invalid_encoding(self):
-        with self.assertRaises(TypeError):
-            fields.String()
-        with self.assertRaises(LookupError):
-            fields.String(encoding='invalid')
-
 
 class LengthIndexedString(unittest.TestCase):
     encoded_data = b'\x05valid'
