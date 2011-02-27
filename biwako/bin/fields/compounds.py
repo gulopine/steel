@@ -46,6 +46,8 @@ class List(Field):
         encoded_values = []
         if self.instance:
             instance_field = self.field.for_instance(self.instance)
+        else:
+            instance_field = self.field
         for value in values:
             encoded_values.append(instance_field.encode(value))
         return b''.join(encoded_values)
