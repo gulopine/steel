@@ -192,6 +192,6 @@ class CalculatedValue(Integer):
         # Defer to the stored field in order to get a base value
         field = self.field.for_instance(self.instance)
         bytes, value = field.read_value(file)
-        return self.calculate(value, self.other)
+        raise FullyDecoded(b'', self.calculate(value, self.other))
 
 
