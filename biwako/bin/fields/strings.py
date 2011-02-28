@@ -1,14 +1,13 @@
 from .base import Field, DynamicValue
 from .numbers import Integer
+from ..fields import args
 
 
 class String(Field):
-    def __init__(self, *args, encoding, padding=b'\x00',
-                 terminator=b'\x00', **kwargs):
-        self.encoding = DynamicValue(encoding)
-        self.padding = padding
-        self.terminator = terminator
-        super(String, self).__init__(*args, **kwargs)
+    size = args.Argument(default=None)
+    encoding = args.Argument(accept_field=True)
+    padding = args.Argument(default=b'\x00')
+    terminator = args.Argument(default=b'\x00')
 
     def read(self, file):
         if self.size is not None:
@@ -88,10 +87,7 @@ class FixedString(String):
 
 
 class Bytes(Field):
-    def __init__(self, *args, **kwargs):
-        super(Bytes, self).__init__(*args, **kwargs)
-        if not self.size:
-            raise TypeError("Size is required for Bytes fields")
+    size = args.Argument() # Must be specified
 
     def encode(self, value):
         # Nothing to do here

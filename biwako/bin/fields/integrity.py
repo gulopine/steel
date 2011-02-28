@@ -3,6 +3,7 @@ import functools
 import zlib
 
 from .numbers import Integer
+from ..fields import args
 
 
 class IntegrityError(ValueError):
@@ -10,10 +11,8 @@ class IntegrityError(ValueError):
 
 
 class CheckSum(Integer):
-    def __init__(self, *args, first=None, last=None, **kwargs):
-        super(CheckSum, self).__init__(*args, **kwargs)
-        self.first = first
-        self.last = last
+    first = args.Argument(default=None)
+    last = args.Argument(default=None)
 
     def attach_to_class(self, cls):
         super(CheckSum, self).attach_to_class(cls)
@@ -64,16 +63,14 @@ class CheckSum(Integer):
 
 
 class CRC32(CheckSum):
-    def __init__(self, *args, **kwargs):
-        super(CRC32, self).__init__(*args, size=4, **kwargs)
+    size = 4
 
     def calculate(self, data):
         return zlib.crc32(data) & 0xffffffff
 
 
 class Adler32(CheckSum):
-    def __init__(self, *args, **kwargs):
-        super(Adler32, self).__init__(*args, size=4, **kwargs)
+    size = 4
 
     def calculate(self, data):
         return zlib.adler32(data) & 0xffffffff

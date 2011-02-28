@@ -1,4 +1,5 @@
 from .base import Field, DynamicValue, FullyDecoded
+from ..fields import args
 
 
 # Endianness options
@@ -87,12 +88,17 @@ class TwosComplement:
 # Numeric types
 
 class Integer(Field):
-    def __init__(self, *args, size, signed=False, endianness=BigEndian,
-                 signing=TwosComplement, **kwargs):
-        super(Integer, self).__init__(*args, size=size, **kwargs)
-        self.endianness = endianness(size)
-        self.signed = signed
-        self.signing = signing(size)
+    signed = args.Argument(default=False)
+    endianness = args.Arguments(default=BigEndian)
+    signing = args.Arguments(default=TwosComplement)
+
+    @endianness.init
+    def init_endianness(self, value):
+        return value(self.size)
+
+    @signing.init
+    def init_signing(self, value):
+        return value(self.size)
 
     def encode(self, value):
         if self.signed:
@@ -161,11 +167,10 @@ class Integer(Field):
 
 
 class FixedInteger(Integer):
-    def __init__(self, value, *args, size=None, **kwargs):
+    def __init__(self, value, *args, **kwargs):
         if size is None:
             size = int((value.bit_length() + 7) / 8) or 1
         super(FixedInteger, self).__init__(*args, size=size, signed=value < 0, **kwargs)
-        self.size = self.size.value
         self.decoded_value = value
         self.encoded_value = super(FixedInteger, self).encode(value)
 

@@ -1,9 +1,10 @@
 import copy
 
 from biwako import common
+from ..fields import args
 
 
-class Trigger:
+class UnboundTrigger:
     def __init__(self):
         self.cache = {}
 
@@ -34,17 +35,28 @@ class BoundTrigger:
 
 
 class Field(metaclass=common.DeclarativeFieldMetaclass):
-    def __init__(self, label=None, *, size=None, offset=None, choices=(), **kwargs):
-        self.name = ''
-        self.label = label
-        self.size = DynamicValue(size)
-        if isinstance(size, Field):
-            @self.after_encode
-            def update_size(obj, value):
-                setattr(obj, size.name, len(value))
-        self.offset = offset
-        # TODO: Actually support choices properly later
-        self.choices = choices
+    label = args.Argument(default=None, positional=True)
+    size = args.Argument(accept_field=True)
+    offset = args.Argument(default=None, accept_field=True)
+    choices = args.Arguments(default=())
+
+    after_encode = Trigger()
+    after_decode = Trigger()
+
+    @after_encode
+    def update_size(self, obj, value):
+        setattr(obj, self.size.name, len(value))
+
+    def __init__(self, **kwargs):
+        for arg in self.arguments:
+            try:
+                value = kwargs[arg.name]
+            except KeyError:
+                if arg.has_default:
+                    value = arg.default
+                else:
+                    raise TypeError("The %s argument is required for %s fields" % arg.name, self.__class__.__name__)
+            setattr(self, arg.name, kwargs.gets(arg.name, arg.default))
         self.instance = None
 
     def for_instance(self, instance):
@@ -100,9 +112,6 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
 
     def get_encoded_name(self):
         return '%s_encoded' % self.name
-
-    after_encode = Trigger()
-    after_decode = Trigger()
 
     def _extract(self, instance):
         field = self.for_instance(instance)
