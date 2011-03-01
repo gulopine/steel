@@ -14,7 +14,8 @@ class Argument:
         # Because of all that default mess, we need to make sure kwargs
         # doesn't have any arguments we don't know how to deal with
         if kwargs:
-            raise TypeError('Unknown argument %r' % kwargs.keys()[0])
+            # Just grab the first one to show in the error message
+            raise TypeError('Unknown argument %r' % iter(kwargs).__next__())
 
     def set_name(self, name):
         self.name = name

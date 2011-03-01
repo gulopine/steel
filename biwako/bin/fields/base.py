@@ -4,38 +4,44 @@ from biwako import common
 from ..fields import args
 
 
-class UnboundTrigger:
+class Trigger:
     def __init__(self):
         self.cache = {}
-
-    def __get__(self, instance, owner):
-        if owner is None:
-            return self
-        if instance not in self.cache:
-            self.cache[instance] = BoundTrigger(instance)
-        return self.cache[instance]
-
-
-class BoundTrigger:
-    def __init__(self, field):
-        self.field = field
         self.functions = set()
-
-    def __iter__(self):
-        return iter(self.function)
 
     def __call__(self, func):
         # Used as a decorator
         self.functions.add(func)
 
+    def __get__(self, instance, owner):
+        if owner is None:
+            return self
+        if instance not in self.cache:
+            self.cache[instance] = BoundTrigger(instance, self.functions)
+        return self.cache[instance]
+
+
+class BoundTrigger:
+    def __init__(self, field, unbound_functions):
+        self.field = field
+        self.unbound_functions = unbound_functions
+        self.bound_functions = set()
+
+    def __iter__(self):
+        return iter(self.bound_functions)
+
+    def __call__(self, func):
+        # Used as a decorator
+        self.bound_functions.add(func)
+
     def apply(self, *args, **kwargs):
         # Called from within the appropriate code
-        for func in self.functions:
+        for func in self.bound_functions:
             func(*args, **kwargs)
 
 
 class Field(metaclass=common.DeclarativeFieldMetaclass):
-    size = args.Argument(accept_field=True)
+    size = args.Argument(resolve_field=True)
     offset = args.Argument(default=None, resolve_field=True)
     choices = args.Argument(default=())
 

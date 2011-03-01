@@ -91,8 +91,8 @@ class Integer(Field):
     size = args.Override(resolve_field=False)
 
     signed = args.Argument(default=False)
-    endianness = args.Arguments(default=BigEndian)
-    signing = args.Arguments(default=TwosComplement)
+    endianness = args.Argument(default=BigEndian)
+    signing = args.Argument(default=TwosComplement)
 
     @endianness.init
     def init_endianness(self, value):

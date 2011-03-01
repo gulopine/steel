@@ -39,7 +39,7 @@ class DeclarativeFieldMetaclass(type):
         return NameAwareOrderedDict()
 
     def __init__(cls, name, bases, attrs, **options):
-        cls._fields = []
+        cls.arguments = {}
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)
