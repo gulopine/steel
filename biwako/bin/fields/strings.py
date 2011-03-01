@@ -5,7 +5,7 @@ from ..fields import args
 
 class String(Field):
     size = args.Argument(default=None)
-    encoding = args.Argument(accept_field=True)
+    encoding = args.Argument(resolve_field=True)
     padding = args.Argument(default=b'\x00')
     terminator = args.Argument(default=b'\x00')
 

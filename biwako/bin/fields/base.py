@@ -35,10 +35,9 @@ class BoundTrigger:
 
 
 class Field(metaclass=common.DeclarativeFieldMetaclass):
-    label = args.Argument(default=None, positional=True)
     size = args.Argument(accept_field=True)
-    offset = args.Argument(default=None, accept_field=True)
-    choices = args.Arguments(default=())
+    offset = args.Argument(default=None, resolve_field=True)
+    choices = args.Argument(default=())
 
     after_encode = Trigger()
     after_decode = Trigger()
@@ -47,7 +46,9 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def update_size(self, obj, value):
         setattr(obj, self.size.name, len(value))
 
-    def __init__(self, **kwargs):
+    def __init__(self, label='', **kwargs):
+        self.label = label
+
         for arg in self.arguments:
             try:
                 value = kwargs[arg.name]

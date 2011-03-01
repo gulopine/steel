@@ -15,6 +15,11 @@ class NameAwareOrderedDict(collections.OrderedDict):
 
 
 class DeclarativeMetaclass(type):
+    @classmethod
+    def __prepare__(cls, name, bases, **options):
+        data.field_options = options
+        return NameAwareOrderedDict()
+
     def __new__(cls, name, bases, attrs, **options):
         # Nothing to do here, but we need to make sure options
         # don't get passed in to type.__new__() itself.
@@ -27,13 +32,18 @@ class DeclarativeMetaclass(type):
                 attr.attach_to_class(cls)
         data.field_options = {}
 
-    @classmethod
-    def __prepare__(cls, name, bases, **options):
-        data.field_options = options
-        return NameAwareOrderedDict()
-
 
 class DeclarativeFieldMetaclass(type):
+    @classmethod
+    def __prepare__(cls, name, bases, **options):
+        return NameAwareOrderedDict()
+
+    def __init__(cls, name, bases, attrs, **options):
+        cls._fields = []
+        for name, attr in attrs.items():
+            if hasattr(attr, 'attach_to_class'):
+                attr.attach_to_class(cls)
+
     def __call__(cls, *args, **kwargs):
         if data.field_options:
             options = data.field_options.copy()

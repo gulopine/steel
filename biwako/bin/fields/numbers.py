@@ -88,6 +88,8 @@ class TwosComplement:
 # Numeric types
 
 class Integer(Field):
+    size = args.Override(resolve_field=False)
+
     signed = args.Argument(default=False)
     endianness = args.Arguments(default=BigEndian)
     signing = args.Arguments(default=TwosComplement)
