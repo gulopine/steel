@@ -72,8 +72,8 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
 
     def for_instance(self, instance):
         field = copy.copy(self)
-        for name, attr in self.__dict__.items():
-            if isinstance(attr, Field):
+        for name, attr in self.arguments.items():
+            if attr.resolve_field and isinstance(getattr(self, name), Field):
                 setattr(field, name, getattr(instance, attr.name))
         field.instance = instance
         return field
