@@ -244,9 +244,9 @@ class ListTest(unittest.TestCase):
         data = self.field.encode(self.decoded_data)
         self.assertEqual(data, self.encoded_data)
 
-    def test_extract(self):
-        data = self.field.extract(io.BytesIO(self.encoded_data))
-        self.assertSequenceEqual(data, self.decoded_data)
+    def test_decode(self):
+        data = self.field.decode(self.encoded_data)
+        self.assertEqual(data, self.decoded_data)
 
 
 class ZlibTest(unittest.TestCase):
