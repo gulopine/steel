@@ -12,11 +12,6 @@ class IOTest(unittest.TestCase):
         self.output = io.BytesIO()
 
     def test_read(self):
-        # If no size is provided, a simple field can't be read.
-        field = fields.Field()
-        with self.assertRaises(NotImplementedError):
-            field.read(self.input)
-
         field = fields.Field(size=2)
         data = field.read(self.input)
         self.assertEqual(data, self.data)
