@@ -1,8 +1,12 @@
 import io
+
 from .base import Field, DynamicValue, FullyDecoded
+from ..fields import args
 
 
 class SubStructure(Field):
+    size = args.Override(default=None)
+
     def __init__(self, structure, *args, **kwargs):
         self.structure = structure
         super(SubStructure, self).__init__(*args, **kwargs)
@@ -26,6 +30,8 @@ class SubStructure(Field):
 
 
 class List(Field):
+    size = args.Override(default=None)
+
     def __init__(self, field, *args, **kwargs):
         super(List, self).__init__(*args, **kwargs)
         self.field = field

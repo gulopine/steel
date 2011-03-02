@@ -8,7 +8,6 @@ class Argument:
         # fall back in the event that no defualt value was provided
         if 'default' in kwargs:
             self.default = kwargs.pop('default')
-            self.has_default = True
         else:
             self.default = None
             self.has_default = False
@@ -18,6 +17,20 @@ class Argument:
         if kwargs:
             # Just grab the first one to show in the error message
             raise TypeError('Unknown argument %r' % iter(kwargs).__next__())
+
+    @property
+    def default(self):
+        return self.__dict__['default']
+
+    @default.setter
+    def default(self, value):
+        self.__dict__['default'] = value
+        self.has_default = True
+
+    @default.deleter
+    def default(self):
+        self.__dict__['default'] = None
+        self.has_default = False
 
     def set_name(self, name):
         self.name = name

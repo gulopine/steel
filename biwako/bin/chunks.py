@@ -4,6 +4,7 @@ from biwako import common
 from .fields import Field, FullyDecoded
 from .base import Structure
 from .fields.strings import Bytes
+from .fields import args
 
 
 class ChunkMetaclass(common.DeclarativeMetaclass):
@@ -71,6 +72,8 @@ class Payload(Bytes):
 
 
 class ChunkList(Field):
+    size = args.Override(default=None)
+
     def __init__(self, base_chunk, known_classes=(), terminator=None, **options):
         self.base_chunk = base_chunk
         self.terminator = terminator

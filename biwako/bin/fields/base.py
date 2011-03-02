@@ -62,7 +62,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
                 if arg.has_default:
                     value = arg.default
                 else:
-                    raise TypeError("The %s argument is required for %s fields" % arg.name, self.__class__.__name__)
+                    raise TypeError("The %s argument is required for %s fields" % (arg.name, self.__class__.__name__))
             setattr(self, name, value)
 
         # Once the base values are all in place, arguments can be initialized properly
@@ -73,8 +73,8 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def for_instance(self, instance):
         field = copy.copy(self)
         for name, attr in self.__dict__.items():
-            if isinstance(attr, DynamicValue):
-                setattr(field, name, attr(instance))
+            if isinstance(attr, Field):
+                setattr(field, name, getattr(instance, attr.name))
         field.instance = instance
         return field
 
