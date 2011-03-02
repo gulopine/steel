@@ -50,7 +50,8 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
 
     @after_encode
     def update_size(self, obj, value):
-        setattr(obj, self.size.name, len(value))
+        if isinstance(self.size, Field):
+            setattr(obj, self.size.name, len(value))
 
     def __init__(self, label='', **kwargs):
         self.label = label
