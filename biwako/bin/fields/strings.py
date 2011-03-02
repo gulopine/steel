@@ -1,4 +1,4 @@
-from .base import Field
+from .base import Field, DynamicValue
 from .numbers import Integer
 from ..fields import args
 

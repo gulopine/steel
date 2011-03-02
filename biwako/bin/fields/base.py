@@ -173,6 +173,21 @@ class FullyDecoded(Exception):
         self.value = value
 
 
+class DynamicValue:
+    def __init__(self, value):
+        self.value = value
+
+    def __call__(self, obj):
+        if isinstance(self.value, DynamicValue):
+            return self.value(obj)
+        elif isinstance(self.value, Field):
+            return obj._get_value(self.value)
+        elif hasattr(self.value, '__call__'):
+            return self.value(obj)
+        else:
+            return self.value
+
+
 # Special object used to instruct the reader to continue to the end of the file
 def Remainder(obj):
     return -1
