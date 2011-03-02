@@ -188,14 +188,19 @@ class CalculatedValue(Integer):
     def __init__(self, field, other, calculate, **kwargs):
         super(CalculatedValue, self).__init__(size=field.size, **kwargs)
         self.field = field
-        self.other = DynamicValue(other)
+        if isinstance(other, Field) and self.instance:
+            other = getattr(self.instance, other.name)
+        self.other = other
         self.calculate = calculate
-        self.set_name(field.name)
+        if hasattr(field, 'name'):
+            self.set_name(field.name)
 
     def read(self, file):
         # Defer to the stored field in order to get a base value
         field = self.field.for_instance(self.instance)
-        bytes, value = field.read_value(file)
-        raise FullyDecoded(b'', self.calculate(value, self.other))
+        return field.read(file)
+
+    def decode(self, value):
+        return self.calculate(self.field.decode(value), self.other)
 
 
