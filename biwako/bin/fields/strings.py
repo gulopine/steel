@@ -4,7 +4,7 @@ from ..fields import args
 
 
 class String(Field):
-    size = args.Argument(default=None)
+    size = args.Override(default=None)
     encoding = args.Argument(resolve_field=True)
     padding = args.Argument(default=b'\x00')
     terminator = args.Argument(default=b'\x00')
