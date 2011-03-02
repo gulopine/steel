@@ -1,6 +1,6 @@
 import io
 
-from .base import Field, DynamicValue, FullyDecoded
+from .base import Field, FullyDecoded
 from ..fields import args
 
 
