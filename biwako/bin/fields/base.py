@@ -1,4 +1,5 @@
 import copy
+import functools
 
 from biwako import common
 from ..fields import args
@@ -22,21 +23,20 @@ class Trigger:
 
 
 class BoundTrigger:
-    def __init__(self, field, unbound_functions):
+    def __init__(self, field, functions):
         self.field = field
-        self.unbound_functions = unbound_functions
-        self.bound_functions = set()
+        self.functions = set(functools.partial(func, field) for func in functions)
 
     def __iter__(self):
-        return iter(self.bound_functions)
+        return iter(self.functions)
 
     def __call__(self, func):
         # Used as a decorator
-        self.bound_functions.add(func)
+        self.functions.add(func)
 
     def apply(self, *args, **kwargs):
         # Called from within the appropriate code
-        for func in self.bound_functions:
+        for func in self.functions:
             func(*args, **kwargs)
 
 
