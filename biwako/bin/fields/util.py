@@ -22,7 +22,7 @@ class Reserved(Field):
             i += 1
 
     def set_name(self, name):
-        if self.name:
+        if hasattr(self, 'name'):
             raise TypeError('Reserved fields must not be given an attribute name')
         super(Reserved, self).set_name(name)
 
