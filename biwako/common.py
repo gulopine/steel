@@ -40,6 +40,11 @@ class DeclarativeFieldMetaclass(type):
 
     def __init__(cls, name, bases, attrs, **options):
         cls.arguments = {}
+        # Go backwards so that the left-most classes take priority
+        for base in reversed(bases):
+            if hasattr(base, 'arguments'):
+                cls.arguments.update(base.arguments)
+
         for name, attr in attrs.items():
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)

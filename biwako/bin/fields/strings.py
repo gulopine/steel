@@ -69,7 +69,6 @@ class FixedString(String):
             self.decoded_value = value
             self.encoding = None
         elif isinstance(value, str):
-            self.encoding = self.encoding.value
             self.decoded_value = value
             self.encoded_value = super(FixedString, self).encode(value)
         self.size = len(self.encoded_value)

@@ -1,3 +1,5 @@
+import copy
+
 class Argument:
     def __init__(self, positional=False, resolve_field=False, **kwargs):
         self.resolve_field = resolve_field
@@ -21,7 +23,16 @@ class Argument:
         self.name = name
 
     def attach_to_class(self, cls):
-        cls.arguments[self.name] = cls
+        cls.arguments[self.name] = self
+
+    def init(self, func):
+        # Decorator for setting an initialization function
+        self.initialize = func
+        return func
+
+    def initialize(self, instance, value):
+        # By default, initialization doesn't do anything
+        return value
 
 
 class Override(Argument):
@@ -30,13 +41,18 @@ class Override(Argument):
         self.overrides = kwargs
 
     def attach_to_class(self, cls):
+        if self.name not in cls.arguments:
+            raise TypeError("%r is not an argument, so it can't be overridden" % self.name)
+
+        argument = copy.copy(cls.arguments[self.name])
         # Replace the original options with any replacements provided
         for name, value in self.overrides.items():
-            if name in cls.arguments:
-                setattr(cls.arguments[self.name], name, value)
+            if hasattr(argument, name):
+                setattr(argument, name, value)
             else:
-                raise TypeError("%r is not an argument, so it can't be overridden" % self.name)
+                raise TypeError("%r is not an attribute of %r, so it can't be overridden" % (name, self.name))
 
+        cls.arguments[self.name] = argument
 
 class Removed(Argument):
     def __init__(self):

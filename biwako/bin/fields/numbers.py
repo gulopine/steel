@@ -94,12 +94,9 @@ class Integer(Field):
     endianness = args.Argument(default=BigEndian)
     signing = args.Argument(default=TwosComplement)
 
-    @endianness.init
-    def init_endianness(self, value):
-        return value(self.size)
-
     @signing.init
-    def init_signing(self, value):
+    @endianness.init
+    def init_size(self, value):
         return value(self.size)
 
     def encode(self, value):
@@ -169,7 +166,7 @@ class Integer(Field):
 
 
 class FixedInteger(Integer):
-    def __init__(self, value, *args, **kwargs):
+    def __init__(self, value, *args, size=None, **kwargs):
         if size is None:
             size = int((value.bit_length() + 7) / 8) or 1
         super(FixedInteger, self).__init__(*args, size=size, signed=value < 0, **kwargs)

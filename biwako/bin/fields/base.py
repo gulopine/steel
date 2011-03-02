@@ -55,15 +55,19 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def __init__(self, label='', **kwargs):
         self.label = label
 
-        for arg in self.arguments:
+        for name, arg in self.arguments.items():
             try:
-                value = kwargs[arg.name]
+                value = kwargs[name]
             except KeyError:
                 if arg.has_default:
                     value = arg.default
                 else:
                     raise TypeError("The %s argument is required for %s fields" % arg.name, self.__class__.__name__)
-            setattr(self, arg.name, kwargs.gets(arg.name, arg.default))
+            setattr(self, name, value)
+
+        # Once the base values are all in place, arguments can be initialized properly
+        for name, arg in self.arguments.items():
+            setattr(self, name, arg.initialize(self, getattr(self, name)))
         self.instance = None
 
     def for_instance(self, instance):
