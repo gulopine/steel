@@ -39,8 +39,7 @@ class List(Field):
     def read(self, file):
         value_bytes = b''
         values = []
-        if self.instance:
-            instance_field = self.field.for_instance(self.instance)
+        instance_field = self.field.for_instance(self.instance)
 
         for i in range(self.size):
             bytes, value = instance_field.read_value(file)
