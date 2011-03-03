@@ -33,7 +33,14 @@ class Structure(metaclass=common.DeclarativeMetaclass):
         for field in self.__class__._fields:
             if field.name not in self.__dict__:
                 try:
-                    self.__dict__[field.name] = field.extract(file)
+                    try:
+                        bytes = field.read(file)
+                        value = field.decode(bytes)
+                    except FullyDecoded as obj:
+                        bytes = obj.bytes
+                        value = obj.value
+                    self._raw_values[field.name] = bytes
+                    self.__dict__[field.name] = value
                     last_position = file.tell()
                 except EOFError:
                     file.seek(last_position)
