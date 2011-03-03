@@ -1,9 +1,12 @@
 import sys
 
 from .base import Field
+from ..fields import args
 
 
 class Reserved(Field):
+    default = args.Override(default=None)
+
     def __init__(self, *args, **kwargs):
         super(Reserved, self).__init__(*args, **kwargs)
 
