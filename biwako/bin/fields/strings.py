@@ -73,8 +73,7 @@ class FixedString(String):
             self.encoded_value = super(FixedString, self).encode(value)
         self.size = len(self.encoded_value)
 
-    def extract(self, obj):
-        value = obj.read(self.size)
+    def decode(self, value):
         if value != self.encoded_value:
             raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
         return self.decoded_value

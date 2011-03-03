@@ -9,11 +9,10 @@ class Zlib(Field):
         super(Zlib, self).__init__(*args, **kwargs)
         self.field = field
 
-    def extract(self, instance):
-        field = self.for_instance(instance)
-        data = zlib.decompress(instance.read(field.size))
-        other_field = self.field.for_instance(instance)
-        return other_field.extract(io.BytesIO(data))
+    def decode(self, value):
+        data = zlib.decompress(value)
+        other_field = self.field.for_instance(self.instance)
+        return other_field.decode(data)
 
     def encode(self, value):
         data = self.field.encode(value)
