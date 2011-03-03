@@ -338,7 +338,7 @@ class ReservedTest(unittest.TestCase):
         self.assertEqual(obj.b, 2)
 
     def test_save(self):
-        obj = self.ReservedStructure(io.BytesIO())
+        obj = self.ReservedStructure()
         obj.a = 1
         obj.b = 2
         data = io.BytesIO()
