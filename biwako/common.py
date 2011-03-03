@@ -51,7 +51,10 @@ class DeclarativeFieldMetaclass(type):
 
     def __call__(cls, *args, **kwargs):
         if data.field_options:
-            options = data.field_options.copy()
+            options = {}
+            for name, value in data.field_options.items():
+                if name in cls.arguments:
+                    options[name] = value
             options.update(kwargs)
         else:
             options = kwargs
