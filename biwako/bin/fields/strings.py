@@ -86,8 +86,6 @@ class FixedString(String):
 
 
 class Bytes(Field):
-    size = args.Argument() # Must be specified
-
     def encode(self, value):
         # Nothing to do here
         return value
