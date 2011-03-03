@@ -75,6 +75,8 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         self.instance = None
 
     def for_instance(self, instance):
+        if instance is None:
+            return self
         field = copy.copy(self)
         for name, attr in self.arguments.items():
             value = getattr(self, name)
