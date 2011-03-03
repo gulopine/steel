@@ -49,8 +49,8 @@ class Chunk(bin.Chunk, encoding='ascii'):
 
 @Chunk('IHDR')
 class Header(bin.Structure):
-    width = bin.Integer(size=4, min_value=1)
-    height = bin.Integer(size=4, min_value=1)
+    width = bin.Integer(size=4)
+    height = bin.Integer(size=4)
     bit_depth = bin.Integer(size=1, choices=(1, 2, 4, 8, 16))
     color_type = bin.Integer(size=1, choices=(0, 2, 3, 4, 6))
     compression_method  = bin.Integer(size=1, choices=COMPRESSION_CHOICES)
