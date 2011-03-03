@@ -69,14 +69,14 @@ class CheckSum(Integer):
 
 
 class CRC32(CheckSum):
-    size = 4
+    size = args.Override(default=4)
 
     def calculate(self, data):
         return zlib.crc32(data) & 0xffffffff
 
 
 class Adler32(CheckSum):
-    size = 4
+    size = args.Override(default=4)
 
     def calculate(self, data):
         return zlib.adler32(data) & 0xffffffff
