@@ -296,7 +296,7 @@ class CheckSumTest(unittest.TestCase):
     def test_modified_data(self):
         struct = self.IntegrityStructure(io.BytesIO(self.modified_data))
         with self.assertRaises(fields.IntegrityError):
-            self.assertNotEqual(struct.checksum, 15)
+            struct.checksum
 
     def test_modified_both(self):
         struct = self.IntegrityStructure(io.BytesIO(self.original_data))
@@ -313,7 +313,7 @@ class CheckSumTest(unittest.TestCase):
     def test_modified_checksum(self):
         struct = self.IntegrityStructure(io.BytesIO(self.modified_csum))
         with self.assertRaises(fields.IntegrityError):
-            self.assertNotEqual(struct.checksum, 15)
+            struct.checksum
 
 
 class ReservedTest(unittest.TestCase):
