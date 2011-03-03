@@ -125,9 +125,6 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         if self.choices and value not in set(v for v, desc in self.choices):
             raise ValueError("%r is not a valid choice" % value)
 
-    def get_encoded_name(self):
-        return '%s_encoded' % self.name
-
     def _extract(self, instance):
         field = self.for_instance(instance)
         try:

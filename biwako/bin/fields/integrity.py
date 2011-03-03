@@ -40,7 +40,7 @@ class CheckSum(Integer):
 
     def build_cache(self, instance):
         for field in self.fields:
-            if field.get_encoded_name() not in instance.__dict__:
+            if field.name not in instance._raw_values:
                 # Set the value to itself just to update the encoded value
                 setattr(instance, field.name, getattr(instance, field.name))
 

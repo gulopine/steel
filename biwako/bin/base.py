@@ -70,9 +70,9 @@ class Structure(metaclass=common.DeclarativeMetaclass):
     def save(self, file):
         for field in self.__class__._fields:
             value = getattr(self, field.name)
-            if field.get_encoded_name() not in self.__dict__:
+            if field.name not in self._raw_values:
                 setattr(self, field.name, getattr(self, field.name))
-            file.write(self.__dict__[field.get_encoded_name()])
+            file.write(self._raw_values[field.name])
 
     def validate(self):
         errors = []
