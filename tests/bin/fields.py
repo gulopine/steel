@@ -157,7 +157,7 @@ class StringTest(unittest.TestCase):
     def test_ascii(self):
         field = fields.String(encoding='ascii')
         self.assertEqual(field.encode('test'), b'test\x00')
-        self.assertEqual(field.extract(io.BytesIO(b'test\x00')), 'test')
+        self.assertEqual(field.decode(b'test\x00'), 'test')
         
         # Most Unicode can't be encoded in ASCII
         with self.assertRaises(ValueError):
@@ -166,7 +166,7 @@ class StringTest(unittest.TestCase):
     def test_utf8(self):
         field = fields.String(encoding='utf8')
         self.assertEqual(field.encode('\u00fcber'), b'\xc3\xbcber\x00')
-        self.assertEqual(field.extract(io.BytesIO(b'\xc3\xbcber\x00')), '\u00fcber')
+        self.assertEqual(field.decode(b'\xc3\xbcber\x00'), '\u00fcber')
 
 
 class LengthIndexedString(unittest.TestCase):
@@ -180,45 +180,44 @@ class LengthIndexedString(unittest.TestCase):
         self.assertEqual(self.field.encode(self.decoded_data), self.encoded_data)
 
     def test_extract(self):
-        file = io.BytesIO(self.encoded_data)
-        self.assertEqual(self.field.extract(file), self.decoded_data)
+        self.assertEqual(self.field.decode(self.encoded_data), self.decoded_data)
 
 
 class FixedStringTest(unittest.TestCase):
     def test_bytes(self):
         field = fields.FixedString(b'valid')
         field.encode(b'valid')
-        field.extract(io.BytesIO(b'valid'))
+        field.decode(b'valid')
 
         with self.assertRaises(ValueError):
-            field.extract(io.BytesIO(b'invalid'))
+            field.decode(b'invalid')
 
         # Encoding a Unicode string isn't possible with a bytes FixedString
         with self.assertRaises(ValueError):
-            field.extract(io.TextIOBase('valid'))
+            field.decode('valid')
 
     def test_ascii(self):
         field = fields.FixedString('valid')
         field.encode('valid')
-        field.extract(io.BytesIO(b'valid'))
+        field.decode(b'valid')
 
         with self.assertRaises(ValueError):
             field.encode('invalid')
 
         with self.assertRaises(ValueError):
-            field.extract(io.BytesIO(b'invalid'))
+            field.decode(b'invalid')
 
     def test_utf8(self):
         field = fields.FixedString('\u00fcber', encoding='utf8')
         field.encode('\u00fcber')
-        field.extract(io.BytesIO(b'\xc3\xbcber'))
+        field.decode(b'\xc3\xbcber')
 
         # If the value doesn't match what was specified, it's an error
         with self.assertRaises(ValueError):
             field.encode('uber')
 
         with self.assertRaises(ValueError):
-            field.extract(io.BytesIO(b'uber'))
+            field.decode(b'uber')
 
 
 class BytesTest(unittest.TestCase):
@@ -230,7 +229,7 @@ class BytesTest(unittest.TestCase):
 
     def test_extract(self):
         field = fields.Bytes(size=3)
-        self.assertEqual(field.extract(io.BytesIO(self.data)), self.data)
+        self.assertEqual(field.decode(self.data), self.data)
 
 
 class ListTest(unittest.TestCase):
@@ -245,7 +244,7 @@ class ListTest(unittest.TestCase):
         self.assertEqual(data, self.encoded_data)
 
     def test_extract(self):
-        data = self.field.extract(io.BytesIO(self.encoded_data))
+        bytes, data = self.field.read_value(io.BytesIO(self.encoded_data))
         self.assertSequenceEqual(data, self.decoded_data)
 
 
@@ -261,7 +260,7 @@ class ZlibTest(unittest.TestCase):
         self.assertEqual(data, self.encoded_data)
 
     def test_extract(self):
-        data = self.field.extract(io.BytesIO(self.encoded_data))
+        data = self.field.decode(self.encoded_data)
         self.assertSequenceEqual(data, self.decoded_data)
 
 
