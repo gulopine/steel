@@ -66,9 +66,9 @@ class HundredThousand(bin.Integer):
     def __init__(self):
         super(HundredThousand, self).__init__(size=4)
 
-    def extract(self, obj):
-        value = super(HundredThousand, self).extract(obj)
-        return decimal.Decimal('0.%05s' % super(ColorPoint, self).extract(obj))
+    def decode(self, value):
+        value = super(HundredThousand, self).decode(value)
+        return decimal.Decimal('0.%05s' % value)
 
     def encode(self, obj, value):
         return super(HundredThousand, self).encode(obj, int(value * 100000))
