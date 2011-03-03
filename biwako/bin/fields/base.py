@@ -164,7 +164,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def __set__(self, instance, value):
         field = self.for_instance(instance)
         instance.__dict__[self.name] = value
-        instance.__dict__[self.get_encoded_name()] = field.encode(value)
+        instance._raw_values[self.name] = field.encode(value)
         self.after_encode.apply(instance, value)
 
     def __repr__(self):
