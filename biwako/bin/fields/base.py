@@ -58,13 +58,15 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
 
         for name, arg in self.arguments.items():
             try:
-                value = kwargs[name]
+                value = kwargs.pop(name)
             except KeyError:
                 if arg.has_default:
                     value = arg.default
                 else:
                     raise TypeError("The %s argument is required for %s fields" % (arg.name, self.__class__.__name__))
             setattr(self, name, value)
+        if kwargs:
+            raise TypeError("%s is not a valid argument for %s fields" % (list(kwargs.keys())[0], self.__class__.__name__))
 
         # Once the base values are all in place, arguments can be initialized properly
         for name, arg in self.arguments.items():
