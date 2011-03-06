@@ -4,8 +4,6 @@ import functools
 from biwako import common
 from ..fields import args
 
-NotProvided = object()
-
 class Trigger:
     def __init__(self):
         self.cache = {}
@@ -45,7 +43,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     size = args.Argument(resolve_field=True)
     offset = args.Argument(default=None, resolve_field=True)
     choices = args.Argument(default=())
-    default = args.Argument(default=NotProvided)
+    default = args.Argument(default=args.NotProvided)
 
     after_encode = Trigger()
     after_decode = Trigger()
@@ -148,7 +146,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         try:
             value = instance._extract(field)
         except IOError:
-            if field.default is not NotProvided:
+            if field.default is not args.NotProvided:
                 return field.default
             raise AttributeError("Attribute %r has no data" % field.name)
 

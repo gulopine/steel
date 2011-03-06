@@ -1,5 +1,7 @@
 import copy
 
+NotProvided = object()
+
 class Argument:
     def __init__(self, positional=False, resolve_field=False, **kwargs):
         self.resolve_field = resolve_field
