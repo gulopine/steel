@@ -87,14 +87,6 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         field.instance = instance
         return field
 
-    def extract(self, instance):
-        field = self.for_instance(instance)
-        try:
-            bytes = field.read(instance)
-            return field.decode(bytes)
-        except FullyDecoded as obj:
-            return obj.value
-
     def read(self, obj):
         # If the size can be determined easily, read
         # that number of bytes and return it directly.
