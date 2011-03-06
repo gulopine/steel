@@ -59,10 +59,14 @@ class LengthIndexedString(String):
 
 
 class FixedString(String):
-    def __init__(self, value, *args, encoding='ascii', **kwargs):
-        super(FixedString, self).__init__(*args, encoding=encoding, size=None,
-                                          padding=b'', terminator=b'', **kwargs)
-        self.size = None
+    size = args.Override(default=None)
+    encoding = args.Override(default='ascii')
+    padding = args.Override(default=b'')
+    terminator = args.Override(default=b'')
+
+    def __init__(self, value, *args, **kwargs):
+        super(FixedString, self).__init__(*args, **kwargs)
+
         if isinstance(value, bytes):
             # If raw bytes are supplied, encoding is not used
             self.encoded_value = value
