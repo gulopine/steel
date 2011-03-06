@@ -46,6 +46,8 @@ class DeclarativeFieldMetaclass(type):
                 cls.arguments.update(base.arguments)
 
         for name, attr in attrs.items():
+            if name in cls.arguments and attr is None:
+                del cls.arguments[name]
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)
 
