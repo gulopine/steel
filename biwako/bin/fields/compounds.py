@@ -14,12 +14,9 @@ class SubStructure(Field):
     def read(self, file):
         value = self.structure(file)
 
-        value_bytes = b''
         # Force the evaluation of the entire structure in
         # order to make sure other fields work properly
-        for field in self.structure._fields:
-            getattr(value, field.name)
-            value_bytes += value._raw_values[field.name]
+        value_bytes = value.get_raw_bytes()
 
         raise FullyDecoded(value_bytes, value)
 

@@ -63,12 +63,17 @@ class Structure(metaclass=common.DeclarativeMetaclass):
                     break
         return self._raw_values[field.name]
 
-    def save(self, file):
+    def get_raw_bytes(self):
+        output = b''
         for field in self.__class__._fields:
             value = getattr(self, field.name)
             if field.name not in self._raw_values:
                 setattr(self, field.name, getattr(self, field.name))
-            file.write(self._raw_values[field.name])
+            output += self._raw_values[field.name]
+        return output
+
+    def save(self, file):
+        file.write(self.get_raw_bytes())
 
     def validate(self):
         errors = []
