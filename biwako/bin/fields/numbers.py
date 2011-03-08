@@ -1,5 +1,5 @@
 from .base import Field, FullyDecoded
-from ..fields import args
+from biwako import args
 
 
 # Endianness options

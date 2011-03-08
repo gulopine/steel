@@ -1,6 +1,7 @@
 import datetime
 
 from .base import Field
+from biwako import args
 
 
 class Date(Field):
@@ -12,10 +13,7 @@ class Date(Field):
         A strptime()-style format string.
         See http://docs.python.org/library/datetime.html for details
     """
-
-    def __init__(self, *args, format='%Y-%m-%d', **kwargs):
-        super(Date, self).__init__(*args, **kwargs)
-        self.format = format
+    format = args.Argument(default='%Y-%m-%d')
 
     def decode(self, value):
         """

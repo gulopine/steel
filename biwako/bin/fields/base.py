@@ -1,8 +1,7 @@
 import copy
 import functools
 
-from biwako import common
-from ..fields import args
+from biwako import common, args
 
 class Trigger:
     def __init__(self):

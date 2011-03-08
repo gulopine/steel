@@ -1,7 +1,7 @@
 import io
 
 from .base import Field, FullyDecoded
-from ..fields import args
+from biwako import args
 
 
 class SubStructure(Field):

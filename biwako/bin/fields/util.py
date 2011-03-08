@@ -1,7 +1,7 @@
 import sys
 
 from .base import Field
-from ..fields import args
+from biwako import args
 
 
 class Reserved(Field):

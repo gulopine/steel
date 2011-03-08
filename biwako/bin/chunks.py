@@ -1,10 +1,9 @@
 import io
 
-from biwako import common
+from biwako import common, args
 from .fields import Field, FullyDecoded
 from .base import Structure
 from .fields.strings import Bytes
-from .fields import args
 
 
 class ChunkMetaclass(common.DeclarativeMetaclass):
