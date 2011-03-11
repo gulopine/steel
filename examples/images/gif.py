@@ -12,14 +12,14 @@ VERSIONS = (
 class InfoBits(bits.Structure):
     has_color_map = bits.Flag()
     color_resolution = bits.Integer(size=3)
-#    bits.Reserved(size=1)
+    bits.Reserved(size=1)
     bits_per_pixel = bin.Integer(size=3)
 
 
 class ScreenDescriptor(bin.Structure, endianness=bin.LittleEndian):
     width = bin.Integer(size=2)
     height = bin.Integer(size=2)
-    info_byte = bin.SubStructure(InfoBits)  # TODO: Decode this
+    info_byte = bin.SubStructure(InfoBits)
     background_color = bin.Integer(size=1)
     bin.Reserved(size=1)
 
