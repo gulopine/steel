@@ -12,6 +12,7 @@ biwako.bin
  - Flesh out more example formats to see what other features are missing
  - Chunks containing other chunks
  - Additional field types, including 80-bit IEEE-754 floats
+ - if blocks inside of class definitions (possible? use with instead?)
  - 
 
 biwako.csv
