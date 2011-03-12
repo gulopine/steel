@@ -13,13 +13,13 @@ class InfoBits(bits.Structure):
     has_color_map = bits.Flag()
     color_resolution = bits.Integer(size=3)
     bits.Reserved(size=1)
-    bits_per_pixel = bin.Integer(size=3)
+    bits_per_pixel = bits.Integer(size=3)
 
 
 class ScreenDescriptor(bin.Structure, endianness=bin.LittleEndian):
     width = bin.Integer(size=2)
     height = bin.Integer(size=2)
-    info_byte = bin.SubStructure(InfoBits)
+    info = bin.SubStructure(InfoBits)
     background_color = bin.Integer(size=1)
     bin.Reserved(size=1)
 
@@ -48,3 +48,6 @@ class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
 if __name__ == '__main__':
     gif = GIF(open(sys.argv[1], 'rb'))
     print('%s x %s' % (gif.width, gif.height))
+    print(gif.screen.info.has_color_map)
+    print(gif.screen.info.color_resolution)
+    print(gif.screen.info.bits_per_pixel)
