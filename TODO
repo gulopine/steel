@@ -13,6 +13,7 @@ biwako.bin
  - Chunks containing other chunks
  - Additional field types, including 80-bit IEEE-754 floats
  - if blocks inside of class definitions (possible? use with instead?)
+ - Support for raw offsets, for both reading and writing
  - 
 
 biwako.csv
