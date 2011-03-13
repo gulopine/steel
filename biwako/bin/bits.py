@@ -93,6 +93,17 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def for_instance(self, instance):
         return self
 
+    def resolve(self, instance):
+        field = self
+        fields = [field]
+        while field._parent is not None:
+            field = field._parent
+            fields.append(field)
+        value = instance
+        for field in reversed(fields):
+            value = getattr(value, field.name)
+        return value
+
     def read(self, obj):
         # If the size can be determined easily, read
         # that number of bytes and return it directly.

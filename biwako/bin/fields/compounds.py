@@ -1,3 +1,4 @@
+import copy
 import io
 
 from .base import Field, FullyDecoded
@@ -24,6 +25,15 @@ class SubStructure(Field):
         output = io.BytesIO()
         value.save(output)
         return output.getvalue()
+
+    def __getattr__(self, name):
+        if 'structure' in self.__dict__:
+            field = getattr(self.structure, name)
+            if field in self.structure._fields:
+                field = copy.copy(field)
+                field._parent = self
+                return field
+        raise AttributeError(name)
 
 
 class List(Field):

@@ -54,6 +54,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
 
     def __init__(self, label='', **kwargs):
         self.label = label
+        self._parent = None
 
         for name, arg in self.arguments.items():
             if name in kwargs:
@@ -77,12 +78,24 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         field = copy.copy(self)
         for name, attr in self.arguments.items():
             value = getattr(self, name)
-            if attr.resolve_field and isinstance(value, Field):
-                setattr(field, name, getattr(instance, value.name))
+            if attr.resolve_field and hasattr(value, 'resolve'):
+                resolved = value.resolve(instance)
+                setattr(field, name, resolved)
             elif hasattr(value, '__call__'):
                 setattr(field, name, value(instance))
         field.instance = instance
         return field
+
+    def resolve(self, instance):
+        field = self
+        fields = [field]
+        while field._parent is not None:
+            field = field._parent
+            fields.append(field)
+        value = instance
+        for field in reversed(fields):
+            value = getattr(value, field.name)
+        return value
 
     def read(self, obj):
         # If the size can be determined easily, read

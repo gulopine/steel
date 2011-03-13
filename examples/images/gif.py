@@ -51,3 +51,5 @@ if __name__ == '__main__':
     print(gif.screen.info.has_color_map)
     print(gif.screen.info.color_resolution)
     print(gif.screen.info.bits_per_pixel)
+#    print(gif.palette)
+#    print(len(gif.palette))

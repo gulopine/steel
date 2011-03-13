@@ -13,6 +13,9 @@ biwako.bin
  - Additional field types, including 80-bit IEEE-754 floats
  - with blocks inside of class definitions to handle branching
  - Support for raw offsets, for both reading and writing
+ - Loosen the coupling between structures, fields and field internals
+ - Share more behavior between standard fields and bit fields
+ - Support calculated bit fields
  - 
 
 biwako.csv
