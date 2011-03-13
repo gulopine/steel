@@ -6,7 +6,6 @@ Biwako is far from finished even in the short term. It's come a long way in just
 biwako.bin
 ----------
 
- - Finish getting bit structures to work properly and integrate them with regular structures
  - Conditionally load different structures based on previous values
  - Support referencing previous values on substructures, not just peer fields
  - Flesh out more example formats to see what other features are missing
