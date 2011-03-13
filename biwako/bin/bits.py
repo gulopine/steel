@@ -189,6 +189,56 @@ class Integer(Field):
             raise ValueError("Value is large for this field.")
         return value & ((1 << self.size) - 1)
 
+    def __add__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a + b)
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a - b)
+
+    def __rsub__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: b - a)
+
+    def __mul__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a * b)
+    __rmul__ = __mul__
+
+    def __pow__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a ** b)
+
+    def __rpow__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: b ** a)
+
+    def __truediv__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a / b)
+
+    def __rtruediv__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: b / a)
+
+    def __floordiv__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a // b)
+
+    def __rfloordiv__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: b // a)
+
+    def __divmod__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: divmod(a, b))
+
+    def __rdivmod__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: divmod(b, a))
+
+    def __and__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a & b)
+    __rand__ = __and__
+
+    def __or__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a | b)
+    __ror__ = __or__
+
+    def __xor__(self, other):
+        return bin.CalculatedValue(self, other, lambda a, b: a ^ b)
+    __rxor__ = __xor__
+
 
 class FixedInteger(Integer):
     def __init__(self, value, *args, **kwargs):
