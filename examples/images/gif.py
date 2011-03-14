@@ -29,6 +29,9 @@ class Color(bin.Structure):
     green = bin.Integer(size=1)
     blue = bin.Integer(size=1)
 
+    def __str__(self):
+        return '#%x%x%x' % (self.red, self.green, self.blue)
+
 
 class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
     tag = bin.FixedString('GIF')
