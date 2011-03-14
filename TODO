@@ -7,7 +7,6 @@ biwako.bin
 ----------
 
  - Conditionally load different structures based on previous values
- - Support referencing previous values on substructures, not just peer fields
  - Flesh out more example formats to see what other features are missing
  - Chunks containing other chunks
  - Additional field types, including 80-bit IEEE-754 floats
