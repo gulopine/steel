@@ -10,24 +10,6 @@ class BitStructureMetaclass(common.DeclarativeMetaclass):
         return super(BitStructureMetaclass, cls).__prepare__(name, bases, **options)
 
 
-#bits_left = 0
-#
-#struct.read(5)
-#super.read(1)
-#bits_left = 3
-#
-#struct.read(5)
-#super.read(1)
-#bits_left = 6
-#
-#struct.read(5)
-#bits_left = 1
-#
-#struct.read(5)
-#super.read(1)
-#bits_left = 4
-
-
 class Structure(bin.Structure, metaclass=BitStructureMetaclass):
     def __init__(self, *args, **kwargs):
         super(Structure, self).__init__(*args, **kwargs)
