@@ -87,15 +87,9 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         return field
 
     def resolve(self, instance):
-        field = self
-        fields = [field]
-        while field._parent is not None:
-            field = field._parent
-            fields.append(field)
-        value = instance
-        for field in reversed(fields):
-            value = getattr(value, field.name)
-        return value
+        if self._parent is not None:
+            instance = self._parent.resolve(instance)
+        return getattr(instance, self.name)
 
     def read(self, obj):
         # If the size can be determined easily, read
