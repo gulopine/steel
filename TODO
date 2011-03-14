@@ -15,7 +15,6 @@ biwako.bin
  - Support for raw offsets, for both reading and writing
  - Loosen the coupling between structures, fields and field internals
  - Share more behavior between standard fields and bit fields
- - Support calculated bit fields
  - 
 
 biwako.csv
