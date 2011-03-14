@@ -1,16 +1,10 @@
 import sys
 import builtins
 
-from biwako import bin, common, args
+from biwako import bin, args
 
 
-class BitStructureMetaclass(common.DeclarativeMetaclass):
-    @classmethod
-    def __prepare__(cls, name, bases, **options):
-        return super(BitStructureMetaclass, cls).__prepare__(name, bases, **options)
-
-
-class Structure(bin.Structure, metaclass=BitStructureMetaclass):
+class Structure(bin.Structure):
     def __init__(self, *args, **kwargs):
         super(Structure, self).__init__(*args, **kwargs)
         self._bits_left = 0
@@ -49,7 +43,7 @@ class Structure(bin.Structure, metaclass=BitStructureMetaclass):
         return output
 
 
-class Field(metaclass=common.DeclarativeFieldMetaclass):
+class Field(bin.Field):
     size = args.Argument(resolve_field=True)
     choices = args.Argument(default=())
     default = args.Argument(default=args.NotProvided)
@@ -72,87 +66,9 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         for name, arg in self.arguments.items():
             setattr(self, name, arg.initialize(self, getattr(self, name)))
 
-    def for_instance(self, instance):
-        return self
 
-    def resolve(self, instance):
-        if self._parent is not None:
-            instance = self._parent.resolve(instance)
-        return getattr(instance, self.name)
-
-    def read(self, obj):
-        # If the size can be determined easily, read
-        # that number of bytes and return it directly.
-        if self.size is not None:
-            return obj.read(self.size)
-
-        # Otherwise, the field needs to supply its own
-        # technique for determining how much data to read.
-        raise NotImplementedError()
-
-    def write(self, obj, value):
-        # By default, this doesn't do much, but individual
-        # fields can/should override it if necessary
-        obj.write(value)
-
-    def set_name(self, name):
-        self.name = name
-        label = self.label or name.replace('_', ' ')
-        self.label = label.title()
-
-    def attach_to_class(self, cls):
-        cls._fields.append(self)
-
-    def validate(self, obj, value):
-        # This should raise a ValueError if the value is invalid
-        # It should simply return without an error if it's valid
-
-        # First, make sure the value can be encoded
-        self.encode(value)
-
-        # Then make sure it's a valid option, if applicable
-        if self.choices and value not in set(v for v, desc in self.choices):
-            raise ValueError("%r is not a valid choice" % value)
-
-    def _extract(self, instance):
-        try:
-            return self.read(instance), None
-        except FullyDecoded as obj:
-            return obj.bytes, obj.value
-
-    def read_value(self, file):
-        try:
-            bytes = self.read(file)
-            value = self.decode(bytes)
-            return bytes, value
-        except FullyDecoded as obj:
-            return obj.bytes, obj.value
-
-    def __get__(self, instance, owner):
-        if not instance:
-            return self
-
-        try:
-            value = instance._extract(self)
-        except IOError:
-            if self.default is not args.NotProvided:
-                return self.default
-            raise AttributeError("Attribute %r has no data" % field.name)
-
-        if self.name not in instance.__dict__:
-            instance.__dict__[self.name] = self.decode(value)
-        return instance.__dict__[self.name]
-
-    def __set__(self, instance, value):
-        instance.__dict__[self.name] = value
-        instance._raw_values[self.name] = self.encode(value)
-
-    def __repr__(self):
-        return '<%s: %s>' % (self.name, type(self).__name__)
-
-
-class Integer(Field):
-    size = args.Argument()
+class Integer(bin.Integer):
+    size = args.Override(resolve_field=False)
     signed = args.Argument(default=False)
 
     def encode(self, value):
@@ -164,56 +80,6 @@ class Integer(Field):
         if value > (1 << self.size) - 1:
             raise ValueError("Value is large for this field.")
         return value & ((1 << self.size) - 1)
-
-    def __add__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a + b)
-    __radd__ = __add__
-
-    def __sub__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a - b)
-
-    def __rsub__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: b - a)
-
-    def __mul__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a * b)
-    __rmul__ = __mul__
-
-    def __pow__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a ** b)
-
-    def __rpow__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: b ** a)
-
-    def __truediv__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a / b)
-
-    def __rtruediv__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: b / a)
-
-    def __floordiv__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a // b)
-
-    def __rfloordiv__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: b // a)
-
-    def __divmod__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: divmod(a, b))
-
-    def __rdivmod__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: divmod(b, a))
-
-    def __and__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a & b)
-    __rand__ = __and__
-
-    def __or__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a | b)
-    __ror__ = __or__
-
-    def __xor__(self, other):
-        return bin.CalculatedValue(self, other, lambda a, b: a ^ b)
-    __rxor__ = __xor__
 
 
 class FixedInteger(Integer):
@@ -243,35 +109,8 @@ class Flag(Integer):
         return bool(super(Flag, self).decode(value))
 
 
-class Reserved(Field):
-    default = args.Override(default=None)
-
-    def __init__(self, *args, **kwargs):
-        super(Reserved, self).__init__(*args, **kwargs)
-
-        # Hack to add the reserved field to the class without
-        # having to explicitly give it a (likely useless) name
-        frame = sys._getframe(2)
-        locals = frame.f_locals
-        locals[self.get_available_name(locals.keys())] = self
-
-    def get_available_name(self, locals):
-        i = 0
-        while True:
-            name = '_reserved_%s' % i
-            if name not in locals:
-                return name
-            i += 1
-
-    def set_name(self, name):
-        if hasattr(self, 'name'):
-            raise TypeError('Reserved fields must not be given an attribute name')
-        super(Reserved, self).set_name(name)
-
+class Reserved(bin.Reserved):
     def encode(self, value):
-        return 2 ** self.size - 1
-
-    def decode(self, value):
-        return None
+        return 0
 
 
