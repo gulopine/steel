@@ -23,7 +23,9 @@ class Structure(metaclass=common.DeclarativeMetaclass):
             raise IOError("not readable")
         if size is None:
             return self._file.read()
-        return self._file.read(size)
+        value = self._file.read(size)
+        self._position += len(value)
+        return value
 
     def write(self, data):
         if self._mode != 'wb':
@@ -47,6 +49,9 @@ class Structure(metaclass=common.DeclarativeMetaclass):
                     self._write_buffer = file.read()
                 else:
                     self._write_buffer = b''
+
+    def tell(self):
+        return self._position
 
     def _extract(self, field):
         if field.name not in self._raw_values:
