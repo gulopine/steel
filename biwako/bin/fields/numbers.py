@@ -188,6 +188,7 @@ class CalculatedValue(Integer):
     def __init__(self, field, other, calculate, **kwargs):
         super(CalculatedValue, self).__init__(size=field.size, **kwargs)
         self.field = field
+        self._parent = field._parent
         if isinstance(other, Field) and self.instance:
             other = getattr(self.instance, other.name)
         self.other = other
@@ -202,5 +203,8 @@ class CalculatedValue(Integer):
 
     def decode(self, value):
         return self.calculate(self.field.decode(value), self.other)
+
+    def resolve(self, value):
+        return self.decode(self.field.resolve(value))
 
 
