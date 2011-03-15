@@ -11,9 +11,9 @@ VERSIONS = (
 
 class InfoBits(bits.Structure):
     has_color_map = bits.Flag()
-    color_resolution = bits.Integer(size=3)
+    color_resolution = bits.Integer(size=3) + 1
     bits.Reserved(size=1)
-    bits_per_pixel = bits.Integer(size=3)
+    bits_per_pixel = bits.Integer(size=3) + 1
 
 
 class ScreenDescriptor(bin.Structure, endianness=bin.LittleEndian):

@@ -205,6 +205,7 @@ class CalculatedValue(Integer):
         return self.calculate(self.field.decode(value), self.other)
 
     def resolve(self, value):
-        return self.decode(self.field.resolve(value))
+        value = super(CalculatedValue, self).resolve(value)
+        return self.calculate(value, self.other)
 
 
