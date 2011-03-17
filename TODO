@@ -13,6 +13,7 @@ biwako.bin
  - with blocks inside of class definitions to handle branching
  - Support for raw offsets, for both reading and writing
  - Loosen the coupling between structures, fields and field internals
+ - Fix resolution of calculated values in the face of complex expressions
  - 
 
 biwako.csv
