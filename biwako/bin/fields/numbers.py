@@ -205,7 +205,14 @@ class CalculatedValue(Integer):
         return self.calculate(self.field.decode(value), self.other)
 
     def resolve(self, value):
-        value = super(CalculatedValue, self).resolve(value)
-        return self.calculate(value, self.other)
+        if hasattr(self.field, 'name'):
+            value = self.field.resolve(value)
+        else:
+            return super(CalculatedValue, self).resolve(value)
+        other = self.other
+        if hasattr(self.other, 'resolve'):
+            other = self.other.resolve(value)
+        value = self.calculate(value, other)
+        return value
 
 
