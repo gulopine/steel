@@ -37,7 +37,7 @@ class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
     tag = bin.FixedString('GIF')
     version = bin.String(size=3, choices=VERSIONS)
     screen = bin.SubStructure(ScreenDescriptor)
-    palette = bin.List(bin.SubStructure(Color), size=2 ** screen.info.bits_per_pixel * 3)
+    palette = bin.List(bin.SubStructure(Color), size=2 ** screen.info.bits_per_pixel)
 
     @property
     def width(self):
