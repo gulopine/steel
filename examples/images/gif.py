@@ -9,7 +9,7 @@ VERSIONS = (
 )
 
 
-class InfoBits(bits.Structure):
+class ScreenInfoBits(bits.Structure):
     has_color_map = bits.Flag()
     color_resolution = bits.Integer(size=3) + 1
     bits.Reserved(size=1)
@@ -19,9 +19,15 @@ class InfoBits(bits.Structure):
 class ScreenDescriptor(bin.Structure, endianness=bin.LittleEndian):
     width = bin.Integer(size=2)
     height = bin.Integer(size=2)
-    info = bin.SubStructure(InfoBits)
+    info = bin.SubStructure(ScreenInfoBits)
     background_color = bin.Integer(size=1)
-    bin.Reserved(size=1)
+    pixel_ratio = bin.Integer(size=1)
+
+    @property
+    def aspect_ratio(self):
+        if self.pixel_ratio == 0:
+            return None
+        return (self.pixel_ratio + 15) / 64
 
 
 class Color(bin.Structure):
@@ -31,6 +37,22 @@ class Color(bin.Structure):
 
     def __str__(self):
         return '#%x%x%x' % (self.red, self.green, self.blue)
+
+
+class ImageInfoBits(bits.Structure):
+    has_color_map = bits.Flag()
+    is_interlaced = bits.Flag()
+    bits.Reserved(size=3)
+    bits_per_pixel = bits.Integer(size=3) + 1
+
+
+class ImageDescriptor(bin.Structure):
+    separator = bin.FixedString(b',')
+    left = bin.Integer(size=2)
+    top = bin.Integer(size=2)
+    width = bin.Integer(size=2)
+    height = bin.Integer(size=2)
+    info = bin.SubStructure(ImageInfoBits)
 
 
 class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
