@@ -2,6 +2,7 @@ import copy
 import functools
 
 from biwako import common, args
+from ..conditional import Condition
 
 class Trigger:
     def __init__(self):
@@ -169,6 +170,15 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
 
     def __repr__(self):
         return '<%s: %s>' % (self.name, type(self).__name__)
+
+    def __hash__(self):
+        return id(self)
+
+    def __eq__(self, other):
+        return Condition(self, other, lambda a, b: a == b)
+
+    def __ne__(self, other):
+        return Condition(self, other, lambda a, b: a != b)
 
 
 class FullyDecoded(Exception):

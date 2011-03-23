@@ -9,6 +9,15 @@ VERSIONS = (
 )
 
 
+class Color(bin.Structure):
+    red = bin.Integer(size=1)
+    green = bin.Integer(size=1)
+    blue = bin.Integer(size=1)
+
+    def __str__(self):
+        return '#%x%x%x' % (self.red, self.green, self.blue)
+
+
 class ScreenInfoBits(bits.Structure):
     has_color_map = bits.Flag()
     color_resolution = bits.Integer(size=3) + 1
@@ -23,20 +32,14 @@ class ScreenDescriptor(bin.Structure, endianness=bin.LittleEndian):
     background_color = bin.Integer(size=1)
     pixel_ratio = bin.Integer(size=1)
 
+    with info.has_color_map == True:
+        color_map = bin.List(bin.SubStructure(Color), size=2 ** info.bits_per_pixel)
+
     @property
     def aspect_ratio(self):
         if self.pixel_ratio == 0:
             return None
         return (self.pixel_ratio + 15) / 64
-
-
-class Color(bin.Structure):
-    red = bin.Integer(size=1)
-    green = bin.Integer(size=1)
-    blue = bin.Integer(size=1)
-
-    def __str__(self):
-        return '#%x%x%x' % (self.red, self.green, self.blue)
 
 
 class ImageInfoBits(bits.Structure):
@@ -54,12 +57,14 @@ class ImageDescriptor(bin.Structure):
     height = bin.Integer(size=2)
     info = bin.SubStructure(ImageInfoBits)
 
+    with info.has_color_map == True:
+        color_map = bin.List(bin.SubStructure(Color), size=2 ** info.bits_per_pixel)
+
 
 class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
     tag = bin.FixedString('GIF')
     version = bin.String(size=3, choices=VERSIONS)
     screen = bin.SubStructure(ScreenDescriptor)
-    palette = bin.List(bin.SubStructure(Color), size=2 ** screen.info.bits_per_pixel)
 
     @property
     def width(self):
@@ -76,5 +81,5 @@ if __name__ == '__main__':
     print(gif.screen.info.has_color_map)
     print(gif.screen.info.color_resolution)
     print(gif.screen.info.bits_per_pixel)
-    print(gif.palette)
-    print(len(gif.palette))
+    print(gif.screen.color_map)
+    print(len(gif.screen.color_map))
