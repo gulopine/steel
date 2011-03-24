@@ -6,18 +6,21 @@ class NameAwareOrderedDict(collections.OrderedDict):
     """
     A custom namespace that not only orders its items, but can
     also make those items aware of their names immediately.
+    It also helps maintain the list of fields in the stack.
     """
 
     def __setitem__(self, name, obj):
         super(NameAwareOrderedDict, self).__setitem__(name, obj)
         if hasattr(obj, 'set_name'):
             obj.set_name(name)
+            data.field_stack[-1].append(obj)
 
 
 class DeclarativeMetaclass(type):
     @classmethod
     def __prepare__(cls, name, bases, **options):
         data.field_options = options
+        data.field_stack = [[]]
         return NameAwareOrderedDict()
 
     def __new__(cls, name, bases, attrs, **options):
@@ -31,6 +34,7 @@ class DeclarativeMetaclass(type):
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)
         data.field_options = {}
+        data.field_stack = [[]]
 
 
 class DeclarativeFieldMetaclass(type):
@@ -66,4 +70,5 @@ class DeclarativeFieldMetaclass(type):
 # Temporary storage
 data = threading.local()
 data.field_options = {}
+data.field_stack = [[]]
 
