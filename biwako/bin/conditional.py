@@ -16,6 +16,9 @@ class Condition:
         locals = frame.f_locals
         locals[self.get_available_name(locals.keys())] = self
 
+        # Return it anyway, just to check if someone does try to give it a name
+        return self
+
     def __exit__(self, 	exception_type, exception, traceback):
         self.fields = data.field_stack.pop()
 
@@ -29,4 +32,9 @@ class Condition:
             if name not in locals:
                 return name
             i += 1
+
+    def set_name(self, name):
+        if hasattr(self, 'name'):
+            raise TypeError('Field conditions must not use the "as" form')
+        self.name = name
 
