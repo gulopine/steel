@@ -10,7 +10,10 @@ class NameAwareOrderedDict(collections.OrderedDict):
     """
 
     def __setitem__(self, name, obj):
-        super(NameAwareOrderedDict, self).__setitem__(name, obj)
+        if len(data.field_stack) == 1:
+            # Only assign to the root namespace if it's not nested in a with block
+            super(NameAwareOrderedDict, self).__setitem__(name, obj)
+
         if hasattr(obj, 'set_name'):
             obj.set_name(name)
             data.field_stack[-1].append(obj)
