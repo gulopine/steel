@@ -1,4 +1,5 @@
 from .base import Field, FullyDecoded
+from ..conditional import Condition
 from biwako import args
 
 
@@ -163,6 +164,18 @@ class Integer(Field):
     def __xor__(self, other):
         return CalculatedValue(self, other, lambda a, b: a ^ b)
     __rxor__ = __xor__
+
+    def __lt__(self, other):
+        return Condition(self, other, lambda a, b: a < b)
+
+    def __lte__(self, other):
+        return Condition(self, other, lambda a, b: a <= b)
+
+    def __gte__(self, other):
+        return Condition(self, other, lambda a, b: a >= b)
+
+    def __gt__(self, other):
+        return Condition(self, other, lambda a, b: a > b)
 
 
 class FixedInteger(Integer):
