@@ -219,13 +219,14 @@ class CalculatedValue(Integer):
 
     def resolve(self, value):
         if hasattr(self.field, 'name'):
-            value = self.field.resolve(value)
+            resolved_value = self.field.resolve(value)
         else:
             return super(CalculatedValue, self).resolve(value)
-        other = self.other
+
+        resolved_other = self.other
         if hasattr(self.other, 'resolve'):
-            other = self.other.resolve(value)
-        value = self.calculate(value, other)
-        return value
+            resolved_other = self.other.resolve(value)
+
+        return self.calculate(resolved_value, resolved_other)
 
 
