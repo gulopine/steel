@@ -1,3 +1,4 @@
+import copy
 import sys
 
 from ..common import data
@@ -45,40 +46,47 @@ class Condition:
     def attach_to_class(self, cls):
         cls._fields.append(self)
 
+    def for_instance(self, instance):
+        if instance is None:
+            return self
+        field = copy.copy(self)
+        if hasattr(field.a, 'for_instance'):
+            field.a = field.a.for_instance(instance)
+        if hasattr(field.b, 'for_instance'):
+            field.b = field.b.for_instance(instance)
+        return field
+
     def __get__(self, instance, owner):
         if not instance:
             return self
         
         if self.name in instance.__dict__:
             # This condition has already been processed, so don't try getting it again
-            print('Already been processed')
             return None
 
         # Customizes the field for this particular instance
         # Use field instead of self for the rest of the method
-        a = self.a
-        if hasattr(self.a, 'for_instance'):
-            a = a.for_instance(instance)
+        field = self.for_instance(instance)
+
+        a = field.a
         if hasattr(a, 'resolve'):
             a = a.resolve(instance)
 
-        b = self.b
-        if hasattr(self.b, 'for_instance'):
-            b = b.for_instance(instance)
+        b = field.b
         if hasattr(b, 'resolve'):
             b = b.resolve(instance)
 
-        if self.compare(a, b):
+        if field.compare(a, b):
             # The comparison succeeded, so the fields should be processed
 
             raw_bytes = b''
-            for field in self.fields:
-                field = field.for_instance(instance)
-                bytes, value = field.read_value(instance)
+            for f in field.fields:
+                f = field.for_instance(instance)
+                bytes, value = f.read_value(instance)
                 raw_bytes += bytes
-                instance.__dict__[field.name] = value
-                field.after_decode.apply(instance, value)
-            instance._raw_values[self.name] = raw_bytes
+                instance.__dict__[f.name] = value
+                f.after_decode.apply(instance, value)
+            instance._raw_values[field.name] = raw_bytes
 
         return None
 
