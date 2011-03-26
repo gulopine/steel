@@ -64,6 +64,10 @@ class ImageDescriptor(bin.Structure):
 class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
     tag = bin.FixedString('GIF')
     version = bin.String(size=3, choices=VERSIONS)
+    
+#    with tag == 'GIF':
+#        version = bin.String(size=3, choices=VERSIONS)
+
     screen = bin.SubStructure(ScreenDescriptor)
 
     @property
