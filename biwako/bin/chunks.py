@@ -70,33 +70,44 @@ class Payload(Bytes):
         raise FullyDecoded(value_bytes, io.BytesIO(value_bytes))
 
 
-class ChunkList(Field):
+class ChunkIterator(Field):
     size = args.Override(default=None)
 
     def __init__(self, base_chunk, known_classes=(), terminator=None, **options):
         self.base_chunk = base_chunk
         self.terminator = terminator
         self.known_types = {cls._chunk.id: cls for cls in known_classes}
-        super(ChunkList, self).__init__()
+        super(ChunkIterator, self).__init__()
 
     def read(self, file):
         chunks_bytes = b''
-        chunks = ChunkValueList()
         while 1:
+#            print('Position: %x' % file.tell())
             chunk_bytes, chunk = self.base_chunk.read(file)
             chunks_bytes += chunk_bytes
             if chunk.id in self.known_types:
                 value = self.known_types[chunk.id](chunk.payload, process_chunk=False)
                 if self.terminator and isinstance(chunk, self.terminator):
                     break
-                chunks.append(value)
+                yield value
             elif chunk.id:
                 # This is a valid chunk, just not a recognized type
                 continue
             else:
                 # This is not a valid chunk, which is probably the end of the file
                 break
-        raise FullyDecoded(chunks_bytes, chunks)
+        raise FullyDecoded(chunks_bytes, None)
+
+
+class ChunkList(ChunkIterator):
+    def read(self, file):
+        chunks = ChunkValueList()
+        try:
+            for chunk in super(ChunkList).read(file):
+                chunks.append(chunk)
+        except FullyDecoded as obj:
+            chunk_bytes = obj.bytes
+        raise FullyDecoded(chunk_bytes, chunks)
 
 
 class ChunkValueList(list):
