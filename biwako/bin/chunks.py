@@ -104,3 +104,34 @@ class ChunkValueList(list):
         return [chunk for chunk in self if isinstance(chunk, type)]
 
 
+class ChunkStreamer:
+    def __init__(self, base_chunk, terminator=None, **options):
+        self.base_chunk = base_chunk
+        self.terminator = terminator
+        self.parsers = {}
+
+    def parser(self, *chunk_classes):
+        def wrapper(func):
+            for cls in chunk_classes:
+                self.parsers[cls._chunk.id] = func
+        return wrapper
+
+    def parse(self, file):
+        while 1:
+            chunk = self.base_chunk.structure(file)
+            if chunk.id in self.parsers:
+                for field in chunk._fields:
+                    getattr(chunk, field.name)
+                value = self.parsers[chunk.id](chunk.payload, process_chunk=False)
+                if self.terminator and isinstance(chunk, self.terminator):
+                    break
+                yield value
+            elif chunk.id:
+                # This is a valid chunk, just not a recognized type
+                for field in chunk._fields:
+                    getattr(chunk, field.name)
+                yield chunk
+            else:
+                # This is not a valid chunk, which is probably the end of the file
+                break
+
