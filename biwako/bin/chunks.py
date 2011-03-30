@@ -52,6 +52,7 @@ class ChunkMixin:
             if chunk.id != self._chunk.id:
                 raise ValueError('Expected %r, got %r' % (self._chunk.id, chunk.id))
             super(ChunkMixin, self).__init__(chunk.payload)
+            self._chunk_data = chunk
         else:
             super(ChunkMixin, self).__init__(*args, **kwargs)
 
