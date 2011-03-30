@@ -105,7 +105,7 @@ class ChunkValueList(list):
 
 
 class ChunkStreamer:
-    def __init__(self, base_chunk, terminator=None, **options):
+    def __init__(self, base_chunk, terminator=None):
         self.base_chunk = base_chunk
         self.terminator = terminator
         self.parsers = {}
