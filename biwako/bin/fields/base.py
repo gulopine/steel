@@ -65,7 +65,6 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
                 value = arg.default
             else:
                 raise TypeError("The %s argument is required for %s fields" % (arg.name, self.__class__.__name__))
-            print('Trying to set %s to %r' % (name, value))
             setattr(self, name, value)
         if kwargs:
             raise TypeError("%s is not a valid argument for %s fields" % (list(kwargs.keys())[0], self.__class__.__name__))
@@ -76,7 +75,6 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
                 value = getattr(self, name)
             else:
                 value = None
-            print('Initializing %s' % name)
             setattr(self, name, arg.initialize(self, value))
 
     def resolve(self, instance):

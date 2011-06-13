@@ -52,27 +52,25 @@ class Argument:
         return value
 
     def __get__(self, instance, owner):
-        print('Getting %s' % self.name)
+        arg = instance.arguments[self.name]
         try:
-            value = instance.__dict__[self.name]
+            value = instance.__dict__[arg.name]
         except KeyError:
             raise AttributeError(self.name)
-        if common.data.instance_stack and self.resolve_field and hasattr(value, 'resolve'):
+        if common.data.instance_stack and arg.resolve_field and hasattr(value, 'resolve'):
             value = value.resolve(common.data.instance_stack[-1])
         elif common.data.instance_stack and hasattr(value, '__call__'):
             value = value(common.data.instance_stack[-1])
         return value
 
     def __set__(self, instance, value):
-        print('Setting %s to %r' % (self.name, value))
         instance.__dict__[self.name] = value
 
 
 class Override(Argument):
-    def __init__(self, resolve_field=False, **kwargs):
+    def __init__(self, **kwargs):
         # For now, just save the arguments for later
         self.overrides = kwargs.copy()
-        self.resolve_field = resolve_field
 
         # Default can be None, so we have to do some extra work to
         # fall back in the event that no defualt value was provided
