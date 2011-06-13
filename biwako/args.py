@@ -71,7 +71,7 @@ class Argument:
 class Override(Argument):
     def __init__(self, resolve_field=False, **kwargs):
         # For now, just save the arguments for later
-        self.overrides = kwargs
+        self.overrides = kwargs.copy()
         self.resolve_field = resolve_field
 
         # Default can be None, so we have to do some extra work to
