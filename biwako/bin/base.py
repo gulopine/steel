@@ -57,13 +57,13 @@ class Structure(metaclass=common.DeclarativeMetaclass):
         if field.name not in self._raw_values:
             for other_field in self._fields:
                 if other_field.name not in self._raw_values:
-                    instance_field = other_field.for_instance(self)
-                    try:
-                        bytes = instance_field.read(self)
-                    except FullyDecoded as obj:
-                        bytes = obj.bytes
-                        self.__dict__[other_field.name] = obj.value
-                    self._raw_values[instance_field.name] = bytes
+                    with common.AttributeInstance(self):
+                        try:
+                            bytes = other_field.read(self)
+                        except FullyDecoded as obj:
+                            bytes = obj.bytes
+                            self.__dict__[other_field.name] = obj.value
+                        self._raw_values[other_field.name] = bytes
                 if other_field.name == field.name:
                     break
         return self._raw_values[field.name]
@@ -107,4 +107,23 @@ class EOFBytesIO(io.BytesIO):
             raise EOFError
         return data
 
+
+class StructureStreamer:
+    def __init__(self, structure):
+        self.structure = structure
+
+    def parse(self, file):
+        while 1:
+            position = file.tell()
+            try:
+                value = self.structure(file)
+                for field in self.structure._fields:
+                    getattr(value, field.name)
+            except Exception as e:
+                if file.tell() == position:
+                    # The file didn't move, so it must be at the end
+                    break
+                # Otherwise, something else went wrong
+                raise e
+            yield value
 

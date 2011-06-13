@@ -70,8 +70,20 @@ class DeclarativeFieldMetaclass(type):
         return super(DeclarativeFieldMetaclass, cls).__call__(*args, **options)
 
 
+class AttributeInstance:
+    def __init__(self, instance):
+        self.instance = instance
+
+    def __enter__(self):
+        data.instance_stack.append(self.instance)
+
+    def __exit__(self, exception_type, exception, traceback):
+        data.instance_stack.pop()
+
+
 # Temporary storage
 data = threading.local()
 data.field_options = {}
 data.field_stack = [[]]
+data.instance_stack = []
 

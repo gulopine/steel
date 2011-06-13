@@ -56,6 +56,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def __init__(self, label='', **kwargs):
         self.label = label
         self._parent = None
+        self.instance = None
 
         for name, arg in self.arguments.items():
             if name in kwargs:
@@ -64,28 +65,19 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
                 value = arg.default
             else:
                 raise TypeError("The %s argument is required for %s fields" % (arg.name, self.__class__.__name__))
+            print('Trying to set %s to %r' % (name, value))
             setattr(self, name, value)
         if kwargs:
             raise TypeError("%s is not a valid argument for %s fields" % (list(kwargs.keys())[0], self.__class__.__name__))
 
         # Once the base values are all in place, arguments can be initialized properly
         for name, arg in self.arguments.items():
-            setattr(self, name, arg.initialize(self, getattr(self, name)))
-        self.instance = None
-
-    def for_instance(self, instance):
-        if instance is None:
-            return self
-        field = copy.copy(self)
-        for name, attr in self.arguments.items():
-            value = getattr(self, name)
-            if attr.resolve_field and hasattr(value, 'resolve'):
-                resolved = value.resolve(instance)
-                setattr(field, name, resolved)
-            elif hasattr(value, '__call__'):
-                setattr(field, name, value(instance))
-        field.instance = instance
-        return field
+            if hasattr(self, name):
+                value = getattr(self, name)
+            else:
+                value = None
+            print('Initializing %s' % name)
+            setattr(self, name, arg.initialize(self, value))
 
     def resolve(self, instance):
         if self._parent is not None:
@@ -118,21 +110,20 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def validate(self, obj, value):
         # This should raise a ValueError if the value is invalid
         # It should simply return without an error if it's valid
-        field = self.for_instance(obj)
-
-        # First, make sure the value can be encoded
-        field.encode(value)
-
-        # Then make sure it's a valid option, if applicable
-        if self.choices and value not in set(v for v, desc in self.choices):
-            raise ValueError("%r is not a valid choice" % value)
+        with common.AttributeInstance(obj):
+            # First, make sure the value can be encoded
+            self.encode(value)
+    
+            # Then make sure it's a valid option, if applicable
+            if self.choices and value not in set(v for v, desc in self.choices):
+                raise ValueError("%r is not a valid choice" % value)
 
     def _extract(self, instance):
-        field = self.for_instance(instance)
-        try:
-            return field.read(instance), None
-        except FullyDecoded as obj:
-            return obj.bytes, obj.value
+        with common.AttributeInstance(instance):
+            try:
+                return self.read(instance), None
+            except FullyDecoded as obj:
+                return obj.bytes, obj.value
 
     def read_value(self, file):
         try:
@@ -148,25 +139,24 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
 
         # Customizes the field for this particular instance
         # Use field instead of self for the rest of the method
-        field = self.for_instance(instance)
-
-        try:
-            value = instance._extract(field)
-        except IOError:
-            if field.default is not args.NotProvided:
-                return field.default
-            raise AttributeError("Attribute %r has no data" % field.name)
-
-        if field.name not in instance.__dict__:
-            instance.__dict__[field.name] = field.decode(value)
-            field.after_decode.apply(instance, value)
-        return instance.__dict__[field.name]
+        with common.AttributeInstance(instance):
+            try:
+                value = instance._extract(self)
+            except IOError:
+                if self.default is not args.NotProvided:
+                    return self.default
+                raise AttributeError("Attribute %r has no data" % self.name)
+    
+            if self.name not in instance.__dict__:
+                instance.__dict__[self.name] = self.decode(value)
+                self.after_decode.apply(instance, value)
+            return instance.__dict__[self.name]
 
     def __set__(self, instance, value):
-        field = self.for_instance(instance)
-        instance.__dict__[self.name] = value
-        instance._raw_values[self.name] = field.encode(value)
-        self.after_encode.apply(instance, value)
+        with common.AttributeInstance(instance):
+            instance.__dict__[self.name] = value
+            instance._raw_values[self.name] = self.encode(value)
+            self.after_encode.apply(instance, value)
 
     def __repr__(self):
         return '<%s: %s>' % (self.name, type(self).__name__)

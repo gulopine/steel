@@ -3,6 +3,7 @@ import io
 
 from .base import Field, FullyDecoded
 from biwako import args
+from biwako import common
 
 
 class SubStructure(Field):
@@ -46,22 +47,18 @@ class List(Field):
     def read(self, file):
         value_bytes = b''
         values = []
-        instance_field = self.field.for_instance(self.instance)
-
-        for i in range(self.size):
-            bytes, value = instance_field.read_value(file)
-            value_bytes += bytes
-            values.append(value)
+        with common.AttributeInstance(self.instance):
+            for i in range(self.size):
+                bytes, value = self.field.read_value(file)
+                value_bytes += bytes
+                values.append(value)
         raise FullyDecoded(value_bytes, values)
 
     def encode(self, values):
         encoded_values = []
-        if self.instance:
-            instance_field = self.field.for_instance(self.instance)
-        else:
-            instance_field = self.field
-        for value in values:
-            encoded_values.append(instance_field.encode(value))
+        with common.AttributeInstance(self.instance):
+            for value in values:
+                encoded_values.append(self.field.encode(value))
         return b''.join(encoded_values)
 
 

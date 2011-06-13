@@ -2,6 +2,7 @@ import io
 import zlib
 
 from .base import Field
+from biwako import common
 
 
 class Zlib(Field):
@@ -11,8 +12,8 @@ class Zlib(Field):
 
     def decode(self, value):
         data = zlib.decompress(value)
-        other_field = self.field.for_instance(self.instance)
-        return other_field.decode(data)
+        with common.AttributeInstance(self.instance):
+            return self.field.decode(data)
 
     def encode(self, value):
         data = self.field.encode(value)

@@ -211,8 +211,8 @@ class CalculatedValue(Integer):
 
     def read(self, file):
         # Defer to the stored field in order to get a base value
-        field = self.field.for_instance(self.instance)
-        return field.read(file)
+        with common.AttributeInstance(self.instance):
+            return self.field.read(file)
 
     def decode(self, value):
         return self.calculate(self.field.decode(value), self.other)

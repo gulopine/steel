@@ -66,27 +66,27 @@ class Condition:
 
         # Customizes the field for this particular instance
         # Use field instead of self for the rest of the method
-        field = self.for_instance(instance)
+        with common.AttributeInstance(instance):
 
-        a = field.a
-        if hasattr(a, 'resolve'):
-            a = a.resolve(instance)
+            a = self.a
+            if hasattr(a, 'resolve'):
+                a = a.resolve(instance)
 
-        b = field.b
-        if hasattr(b, 'resolve'):
-            b = b.resolve(instance)
+            b = self.b
+            if hasattr(b, 'resolve'):
+                b = b.resolve(instance)
 
-        if field.compare(a, b):
-            # The comparison succeeded, so the fields should be processed
+            if self.compare(a, b):
+                # The comparison succeeded, so the fields should be processed
 
-            raw_bytes = b''
-            for f in field.fields:
-                f = field.for_instance(instance)
-                bytes, value = f.read_value(instance)
-                raw_bytes += bytes
-                instance.__dict__[f.name] = value
-                f.after_decode.apply(instance, value)
-            instance._raw_values[field.name] = raw_bytes
+                raw_bytes = b''
+                for f in self.fields:
+                    with common.AttributeInstance(instance):
+                        bytes, value = self.read_value(instance)
+                        raw_bytes += bytes
+                        instance.__dict__[self.name] = value
+                        self.after_decode.apply(instance, value)
+                instance._raw_values[self.name] = raw_bytes
 
         return None
 
