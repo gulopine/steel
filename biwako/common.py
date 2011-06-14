@@ -71,19 +71,20 @@ class DeclarativeFieldMetaclass(type):
 
 
 class AttributeInstance:
-    def __init__(self, instance):
+    def __init__(self, field, instance):
+        self.field = field
         self.instance = instance
 
     def __enter__(self):
-        data.instance_stack.append(self.instance)
+        data.instance_stack[hash(self.field)].append(self.instance)
 
     def __exit__(self, exception_type, exception, traceback):
-        data.instance_stack.pop()
+        data.instance_stack[hash(self.field)].pop()
 
 
 # Temporary storage
 data = threading.local()
 data.field_options = {}
 data.field_stack = [[]]
-data.instance_stack = []
+data.instance_stack = collections.defaultdict(list)
 

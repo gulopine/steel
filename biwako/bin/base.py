@@ -57,7 +57,7 @@ class Structure(metaclass=common.DeclarativeMetaclass):
         if field.name not in self._raw_values:
             for other_field in self._fields:
                 if other_field.name not in self._raw_values:
-                    with common.AttributeInstance(self):
+                    with other_field.for_instance(self):
                         try:
                             bytes = other_field.read(self)
                         except FullyDecoded as obj:

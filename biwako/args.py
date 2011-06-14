@@ -57,10 +57,11 @@ class Argument:
             value = instance.__dict__[arg.name]
         except KeyError:
             raise AttributeError(self.name)
-        if common.data.instance_stack and arg.resolve_field and hasattr(value, 'resolve'):
-            value = value.resolve(common.data.instance_stack[-1])
-        elif common.data.instance_stack and hasattr(value, '__call__'):
-            value = value(common.data.instance_stack[-1])
+        key = hash(instance)
+        if common.data.instance_stack[key] and arg.resolve_field and hasattr(value, 'resolve'):
+            value = value.resolve(common.data.instance_stack[key][-1])
+        elif common.data.instance_stack[key] and hasattr(value, '__call__'):
+            value = value(common.data.instance_stack[key][-1])
         return value
 
     def __set__(self, instance, value):

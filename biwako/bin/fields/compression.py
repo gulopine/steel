@@ -12,7 +12,7 @@ class Zlib(Field):
 
     def decode(self, value):
         data = zlib.decompress(value)
-        with common.AttributeInstance(self.instance):
+        with self.for_instance(self.instance):
             return self.field.decode(data)
 
     def encode(self, value):

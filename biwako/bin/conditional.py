@@ -66,7 +66,7 @@ class Condition:
 
         # Customizes the field for this particular instance
         # Use field instead of self for the rest of the method
-        with common.AttributeInstance(instance):
+        with self.for_instance(instance):
 
             a = self.a
             if hasattr(a, 'resolve'):
@@ -81,7 +81,7 @@ class Condition:
 
                 raw_bytes = b''
                 for f in self.fields:
-                    with common.AttributeInstance(instance):
+                    with self.for_instance(instance):
                         bytes, value = self.read_value(instance)
                         raw_bytes += bytes
                         instance.__dict__[self.name] = value

@@ -108,7 +108,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
     def validate(self, obj, value):
         # This should raise a ValueError if the value is invalid
         # It should simply return without an error if it's valid
-        with common.AttributeInstance(obj):
+        with self.for_instance(obj):
             # First, make sure the value can be encoded
             self.encode(value)
     
@@ -117,7 +117,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
                 raise ValueError("%r is not a valid choice" % value)
 
     def _extract(self, instance):
-        with common.AttributeInstance(instance):
+        with self.for_instance(instance):
             try:
                 return self.read(instance), None
             except FullyDecoded as obj:
@@ -131,13 +131,16 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
         except FullyDecoded as obj:
             return obj.bytes, obj.value
 
+    def for_instance(self, instance):
+        return common.AttributeInstance(self, instance)
+
     def __get__(self, instance, owner):
         if not instance:
             return self
 
         # Customizes the field for this particular instance
         # Use field instead of self for the rest of the method
-        with common.AttributeInstance(instance):
+        with self.for_instance(instance):
             try:
                 value = instance._extract(self)
             except IOError:
@@ -151,10 +154,10 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
             return instance.__dict__[self.name]
 
     def __set__(self, instance, value):
-        with common.AttributeInstance(instance):
+        with self.for_instance(instance):
             instance.__dict__[self.name] = value
             instance._raw_values[self.name] = self.encode(value)
-            self.after_encode.apply(instance, value)
+        self.after_encode.apply(instance, value)
 
     def __repr__(self):
         return '<%s: %s>' % (self.name, type(self).__name__)

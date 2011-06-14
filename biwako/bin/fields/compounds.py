@@ -47,7 +47,7 @@ class List(Field):
     def read(self, file):
         value_bytes = b''
         values = []
-        with common.AttributeInstance(self.instance):
+        with self.for_instance(self.instance):
             for i in range(self.size):
                 bytes, value = self.field.read_value(file)
                 value_bytes += bytes
@@ -56,7 +56,7 @@ class List(Field):
 
     def encode(self, values):
         encoded_values = []
-        with common.AttributeInstance(self.instance):
+        with self.for_instance(self.instance):
             for value in values:
                 encoded_values.append(self.field.encode(value))
         return b''.join(encoded_values)
