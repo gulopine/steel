@@ -76,10 +76,12 @@ class AttributeInstance:
         self.instance = instance
 
     def __enter__(self):
-        data.instance_stack[hash(self.field)].append(self.instance)
+        if self.instance is not None:
+            data.instance_stack[hash(self.field)].append(self.instance)
 
     def __exit__(self, exception_type, exception, traceback):
-        data.instance_stack[hash(self.field)].pop()
+        if self.instance is not None:
+            data.instance_stack[hash(self.field)].pop()
 
 
 # Temporary storage

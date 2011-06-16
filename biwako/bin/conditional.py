@@ -81,11 +81,11 @@ class Condition:
 
                 raw_bytes = b''
                 for f in self.fields:
-                    with self.for_instance(instance):
-                        bytes, value = self.read_value(instance)
+                    with f.for_instance(instance):
+                        bytes, value = f.read_value(instance)
                         raw_bytes += bytes
-                        instance.__dict__[self.name] = value
-                        self.after_decode.apply(instance, value)
+                        instance.__dict__[f.name] = value
+                        f.after_decode.apply(instance, value)
                 instance._raw_values[self.name] = raw_bytes
 
         return None
