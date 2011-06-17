@@ -26,21 +26,20 @@ class Structure(bin.Structure):
         return bits
 
     def get_raw_bytes(self):
-        output = b''
+        output = bytearray()
         bits_read = 0
         byte = 0
         for field in self.__class__._fields:
-            value = getattr(self, field.name)
             if field.name not in self._raw_values:
                 setattr(self, field.name, getattr(self, field.name))
             bits_read += field.size
             bits = self._raw_values[field.name]
             byte = (byte << field.size) + bits
-            if bits_read > 8:
-                byte >>= bits_read - (bits_read % 8)
-                bits_read -= bits_read - (bits_read % 8)
-            output += bytes([byte])
-        return output
+            while bits_read >= 8:
+                byte >>= 8
+                output.append(byte & 0xFF)
+                bits_read -= 8
+        return bytes(output)
 
 
 class Field(bin.Field):
