@@ -214,6 +214,9 @@ class CalculatedValue(Integer):
         with self.for_instance(self.instance):
             return self.field.read(file)
 
+    def encode(self, value):
+        return self.field.encode(value)
+
     def decode(self, value):
         return self.calculate(self.field.decode(value), self.other)
 
