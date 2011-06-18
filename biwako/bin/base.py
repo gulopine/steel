@@ -1,10 +1,11 @@
 import io
 
-from biwako import common
-from .fields import FullyDecoded
+from ..common import meta, fields
+
+__all__ = ['Structure', 'StructureStreamer']
 
 
-class Structure(metaclass=common.DeclarativeMetaclass):
+class Structure(metaclass=meta.DeclarativeMetaclass):
     def __init__(self, *args, **kwargs):
         self._file = len(args) > 0 and args[0] or None
         self._mode = self._file and 'rb' or 'wb'
@@ -38,7 +39,7 @@ class Structure(metaclass=common.DeclarativeMetaclass):
                     try:
                         bytes = field.read(file)
                         value = field.decode(bytes)
-                    except FullyDecoded as obj:
+                    except fields.FullyDecoded as obj:
                         bytes = obj.bytes
                         value = obj.value
                     self._raw_values[field.name] = bytes
@@ -60,7 +61,7 @@ class Structure(metaclass=common.DeclarativeMetaclass):
                     with other_field.for_instance(self):
                         try:
                             bytes = other_field.read(self)
-                        except FullyDecoded as obj:
+                        except fields.FullyDecoded as obj:
                             bytes = obj.bytes
                             self.__dict__[other_field.name] = obj.value
                         self._raw_values[other_field.name] = bytes

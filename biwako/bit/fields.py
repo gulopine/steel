@@ -1,5 +1,9 @@
 from ..common import args
 from ..bin import fields
+from ..common.fields import *
+from ..bin.fields import numbers
+
+__all__ = ['Field', 'Integer', 'FixedInteger', 'Flag', 'Reserved']
 
 
 class Field(fields.Field):
@@ -26,7 +30,7 @@ class Field(fields.Field):
             setattr(self, name, arg.initialize(self, getattr(self, name)))
 
 
-class Integer(fields.Integer):
+class Integer(numbers.Integer):
     size = args.Override(resolve_field=False)
     signed = args.Argument(default=False)
 

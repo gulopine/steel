@@ -1,6 +1,8 @@
 import functools
 import zlib
 
+__all__ = ['zlib']
+
 
 def zlib(func=None, *, level=6):
     """Compress a block of data using the DEFLATE method, wrapped in zlib data"""

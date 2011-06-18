@@ -1,9 +1,11 @@
 import io
 
-from ..common import meta, args
-from .fields import Field, FullyDecoded
+from ..common import meta, args, fields
+from .fields import Field
 from .base import Structure
 from .fields.strings import Bytes
+
+__all__ = ['Chunk', 'ChunkList', 'Payload']
 
 
 class ChunkMetaclass(meta.DeclarativeMetaclass):
@@ -68,7 +70,7 @@ class ChunkMixin:
 class Payload(Bytes):
     def read(self, file):
         value_bytes = super(Payload, self).read(file)
-        raise FullyDecoded(value_bytes, io.BytesIO(value_bytes))
+        raise fields.FullyDecoded(value_bytes, io.BytesIO(value_bytes))
 
 
 class ChunkList(Field):
@@ -97,7 +99,7 @@ class ChunkList(Field):
             else:
                 # This is not a valid chunk, which is probably the end of the file
                 break
-        raise FullyDecoded(chunks_bytes, chunks)
+        raise fields.FullyDecoded(chunks_bytes, chunks)
 
 
 class ChunkValueList(list):

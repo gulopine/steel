@@ -2,9 +2,10 @@ import collections
 import functools
 import zlib
 
-from .base import FullyDecoded
 from .numbers import Integer
-from ...common import args
+from ...common import args, fields
+
+__all__ = ['CheckSum', 'CRC32', 'Adler32', 'IntegrityError']
 
 
 class IntegrityError(ValueError):
@@ -49,13 +50,13 @@ class CheckSum(Integer):
         try:
             given_bytes = super(CheckSum, self).read(file)
             given_value = super(CheckSum, self).decode(given_bytes)
-        except FullyDecoded as obj:
+        except fields.FullyDecoded as obj:
             given_bytes = obj.bytes
             given_value = obj.value
         self.build_cache(file)
         if given_value != self.get_calculated_value(file):
             raise IntegrityError('%s does not match calculated value' % self.name)
-        raise FullyDecoded(given_bytes, given_value)
+        raise fields.FullyDecoded(given_bytes, given_value)
 
     def get_calculated_value(self, instance):
         data = b''.join(instance._extract(field) for field in self.fields)

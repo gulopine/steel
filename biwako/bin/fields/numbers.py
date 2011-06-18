@@ -1,6 +1,8 @@
-from .base import Field, FullyDecoded
-from ..conditional import Condition
-from ...common import args
+from ..fields import Field
+from ...common import args, fields
+
+__all__ = ['BigEndian', 'LittleEndian', 'SignMagnitude', 'OnesComplement',
+           'TwosComplement', 'Integer', 'FixedInteger', 'CalculatedValue']
 
 
 # Endianness options
@@ -166,16 +168,16 @@ class Integer(Field):
     __rxor__ = __xor__
 
     def __lt__(self, other):
-        return Condition(self, other, lambda a, b: a < b)
+        return fields.Condition(self, other, lambda a, b: a < b)
 
     def __lte__(self, other):
-        return Condition(self, other, lambda a, b: a <= b)
+        return fields.Condition(self, other, lambda a, b: a <= b)
 
     def __gte__(self, other):
-        return Condition(self, other, lambda a, b: a >= b)
+        return fields.Condition(self, other, lambda a, b: a >= b)
 
     def __gt__(self, other):
-        return Condition(self, other, lambda a, b: a > b)
+        return fields.Condition(self, other, lambda a, b: a > b)
 
 
 class FixedInteger(Integer):

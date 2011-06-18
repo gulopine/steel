@@ -1,4 +1,4 @@
-from .base import Field
+from ..fields import Field
 from .numbers import Integer
 from ...common import args
 

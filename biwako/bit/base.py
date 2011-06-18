@@ -3,6 +3,8 @@ import sys
 from ..common import args
 from biwako import bin
 
+__all__ = ['Structure']
+
 
 class Structure(bin.Structure):
     def __init__(self, *args, **kwargs):
