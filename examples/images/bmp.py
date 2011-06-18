@@ -16,18 +16,21 @@ class PaletteColor(bin.Structure):
     red = bin.Integer(size=1)
     alpha = bin.Integer(size=1)
 
+    def __str__(self):
+        return '#%x%x%x%x' % (self.red, self.green, self.blue, self.alpha)
+
 
 class BMP(bin.Structure, endianness=bin.LittleEndian):
     signature = bin.FixedString('BM')
     filesize = bin.Integer('Total file size', size=4)
-    reserved = bin.Reserved(size=4)
+    bin.Reserved(size=4)
     data_offset = bin.Integer('Offset of the actual image data', size=4)
-    header_size = bin.Integer(size=4, default_value=40)
+    header_size = bin.Integer(size=4, default=40)
     width = bin.Integer(size=4)
     height = bin.Integer(size=4)
-    plane_count = bin.Integer(size=2, default_value=1)
+    plane_count = bin.Integer(size=2, default=1)
     bit_depth = bin.Integer(size=2)
-    compression_type = bin.Integer(size=4, choices=COMPRESSION_TYPES, default_value=0)
+    compression_type = bin.Integer(size=4, choices=COMPRESSION_TYPES, default=0)
     data_size = bin.Integer('Size of the actual image data', size=4)
     ppm_x = bin.Integer('Pixels per meter (X axis)', size=4)
     ppm_y = bin.Integer('Pixels per meter (Y axis)', size=4)
@@ -38,5 +41,6 @@ class BMP(bin.Structure, endianness=bin.LittleEndian):
 
 
 if __name__ == '__main__':
+    import sys
     bmp = BMP(open(sys.argv[1], 'rb'))
     print('%s x %s' % (bmp.width, bmp.height))
