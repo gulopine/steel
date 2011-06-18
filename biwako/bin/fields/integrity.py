@@ -59,7 +59,7 @@ class CheckSum(Integer):
 
     def get_calculated_value(self, instance):
         data = b''.join(instance._extract(field) for field in self.fields)
-        return self.calculate(data)
+        return self.calculate(data) & ((1 << self.size * 8) - 1)
 
     def update_encoded_value(self, instance, value):
         setattr(instance, self.name, self.get_calculated_value(instance))
@@ -72,13 +72,13 @@ class CRC32(CheckSum):
     size = args.Override(default=4)
 
     def calculate(self, data):
-        return zlib.crc32(data) & 0xffffffff
+        return zlib.crc32(data)
 
 
 class Adler32(CheckSum):
     size = args.Override(default=4)
 
     def calculate(self, data):
-        return zlib.adler32(data) & 0xffffffff
+        return zlib.adler32(data)
 
 
