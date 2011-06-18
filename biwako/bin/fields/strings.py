@@ -1,6 +1,6 @@
 from .base import Field
 from .numbers import Integer
-from biwako import args
+from ...common import args
 
 
 class String(Field):

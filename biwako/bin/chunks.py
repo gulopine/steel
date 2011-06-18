@@ -1,14 +1,14 @@
 import io
 
-from biwako import common, args
+from ..common import meta, args
 from .fields import Field, FullyDecoded
 from .base import Structure
 from .fields.strings import Bytes
 
 
-class ChunkMetaclass(common.DeclarativeMetaclass):
+class ChunkMetaclass(meta.DeclarativeMetaclass):
     def __init__(cls, name, bases, attrs, **options):
-        cls.structure = common.DeclarativeMetaclass(name, (Structure,), attrs, **options)
+        cls.structure = meta.DeclarativeMetaclass(name, (Structure,), attrs, **options)
         for name, attr in attrs.items():
             if isinstance(attr, Field):
                 delattr(cls, name)

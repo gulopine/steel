@@ -1,7 +1,7 @@
 import copy
 import functools
 
-from biwako import common, args
+from ...common import args, meta
 from ..conditional import Condition
 
 class Trigger:
@@ -39,7 +39,7 @@ class BoundTrigger:
             func(*args, **kwargs)
 
 
-class Field(metaclass=common.DeclarativeFieldMetaclass):
+class Field(metaclass=meta.DeclarativeFieldMetaclass):
     size = args.Argument(resolve_field=True)
     offset = args.Argument(default=None, resolve_field=True)
     choices = args.Argument(default=())
@@ -132,7 +132,7 @@ class Field(metaclass=common.DeclarativeFieldMetaclass):
             return obj.bytes, obj.value
 
     def for_instance(self, instance):
-        return common.AttributeInstance(self, instance)
+        return meta.AttributeInstance(self, instance)
 
     def __get__(self, instance, owner):
         if not instance:
@@ -176,10 +176,5 @@ class FullyDecoded(Exception):
     def __init__(self, bytes, value):
         self.bytes = bytes
         self.value = value
-
-
-# Special object used to instruct the reader to continue to the end of the file
-def Remainder(obj):
-    return -1
 
 

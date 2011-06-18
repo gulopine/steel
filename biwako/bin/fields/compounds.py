@@ -2,8 +2,7 @@ import copy
 import io
 
 from .base import Field, FullyDecoded
-from biwako import args
-from biwako import common
+from ...common import args
 
 
 class SubStructure(Field):

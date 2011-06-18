@@ -1,5 +1,6 @@
 import collections
-import threading
+
+from ..common import data
 
 
 class NameAwareOrderedDict(collections.OrderedDict):
@@ -83,10 +84,4 @@ class AttributeInstance:
         if self.instance is not None:
             data.instance_stack[hash(self.field)].pop()
 
-
-# Temporary storage
-data = threading.local()
-data.field_options = {}
-data.field_stack = [[]]
-data.instance_stack = collections.defaultdict(list)
 

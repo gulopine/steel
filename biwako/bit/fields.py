@@ -1,5 +1,5 @@
-from biwako import args
-from biwako.bin import fields
+from ..common import args
+from ..bin import fields
 
 
 class Field(fields.Field):

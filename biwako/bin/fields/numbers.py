@@ -1,6 +1,6 @@
 from .base import Field, FullyDecoded
 from ..conditional import Condition
-from biwako import args
+from ...common import args
 
 
 # Endianness options

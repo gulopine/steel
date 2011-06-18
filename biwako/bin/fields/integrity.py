@@ -4,7 +4,7 @@ import zlib
 
 from .base import FullyDecoded
 from .numbers import Integer
-from biwako import args
+from ...common import args
 
 
 class IntegrityError(ValueError):

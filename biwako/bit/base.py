@@ -1,6 +1,6 @@
 import sys
 
-from biwako import args
+from ..common import args
 from biwako import bin
 
 
