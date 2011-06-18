@@ -1,11 +1,11 @@
 import io
 
 from ..common import meta, args, fields
-from .fields import Field
-from .base import Structure
-from .fields.strings import Bytes
+from ..bin.fields import Field
+from ..bin.base import Structure
+from ..bin.fields.strings import Bytes
 
-__all__ = ['Chunk', 'ChunkList', 'Payload']
+__all__ = ['Chunk', 'Payload', 'ChunkList', 'ChunkStreamer']
 
 
 class ChunkMetaclass(meta.DeclarativeMetaclass):
