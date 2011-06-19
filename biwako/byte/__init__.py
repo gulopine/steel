@@ -7,4 +7,3 @@ from .fields.numbers import *
 from .fields.strings import *
 from .fields.compression import *
 from .fields.integrity import *
-from .chunks import *
