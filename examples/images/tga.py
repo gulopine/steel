@@ -1,4 +1,4 @@
-from biwako import bin
+from biwako import bit, byte, common
 
 COLOR_MAP_TYPES = (
     (0, 'No color map included'),
@@ -21,34 +21,34 @@ ORIGINS = (
 )
 
 
-class ColorMap(bin.Structure):
-    first_entry_index = bin.Integer(size=2)
-    length = bin.Integer(size=2)
-    entry_size = bin.Integer(size=1)
+class ColorMap(byte.Structure):
+    first_entry_index = byte.Integer(size=2)
+    length = byte.Integer(size=2)
+    entry_size = byte.Integer(size=1)
 
 
-class AlphaOrigin(bin.PackedStructure):
-    Reserved(size=2)
-    image_origin = bin.Integer(size=2, choices=ORIGINS)
-    alpha_depth = bin.Integer(size=4)
+class AlphaOrigin(bit.Structure):
+    bit.Reserved(size=2)
+    image_origin = bit.Integer(size=2, choices=ORIGINS)
+    alpha_depth = bit.Integer(size=4)
 
 
-class TGA(bin.Structure, endianness=bin.LittleEndian):
-    id_size = bin.Integer(size=1)
-    color_map_type = bin.Integer(size=1, choices=COLOR_MAP_TYPES)
-    image_type = bin.Integer(size=1, choices=IMAGE_TYPES)
-    color_map_info = bin.SubStructure(ColorMap)
-    x_origin = bin.Integer(size=2)
-    y_origin = bin.Integer(size=2)
-    width = bin.Integer(size=2)
-    height = bin.Integer(size=2)
-    bit_depth = bin.Integer(size=1)
-    image_origin, alpha_depth = bin.SubStructure(AlphaOrigin)
-    image_id = bin.Bytes(size=id_size)
-    color_map_data = bin.List(bin.Integer(size=color_map_info.entry_size) / 8, size=color_map_info.length)
-    image_data = bin.List(bin.Integer(size=1), size=width * height * bit_depth)
+class TGA(byte.Structure, endianness=byte.LittleEndian):
+    id_size = byte.Integer(size=1)
+    color_map_type = byte.Integer(size=1, choices=COLOR_MAP_TYPES)
+    image_type = byte.Integer(size=1, choices=IMAGE_TYPES)
+    color_map_info = common.SubStructure(ColorMap)
+    x_origin = byte.Integer(size=2)
+    y_origin = byte.Integer(size=2)
+    width = byte.Integer(size=2)
+    height = byte.Integer(size=2)
+    bit_depth = byte.Integer(size=1)
+    image_origin, alpha_depth = common.SubStructure(AlphaOrigin)
+    image_id = byte.Bytes(size=id_size)
+    color_map_data = common.List(byte.Integer(size=color_map_info.entry_size) / 8, size=color_map_info.length)
+    image_data = common.List(byte.Integer(size=1), size=width * height * bit_depth)
 
 
 if __name__ == '__main__':
     tga = TGA(open(sys.argv[1], 'rb'))
-    print '%s x %s' % (tga.width, tga.height)
+    print('%s x %s' % (tga.width, tga.height))

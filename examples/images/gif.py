@@ -1,7 +1,6 @@
 import sys
 
-from biwako import bin
-from biwako import bit
+from biwako import bit, byte, common
 
 VERSIONS = (
     ('87a', '87a'),
@@ -9,10 +8,10 @@ VERSIONS = (
 )
 
 
-class Color(bin.Structure):
-    red = bin.Integer(size=1)
-    green = bin.Integer(size=1)
-    blue = bin.Integer(size=1)
+class Color(byte.Structure):
+    red = byte.Integer(size=1)
+    green = byte.Integer(size=1)
+    blue = byte.Integer(size=1)
 
     def __str__(self):
         return '#%x%x%x' % (self.red, self.green, self.blue)
@@ -25,15 +24,15 @@ class ScreenInfoBits(bit.Structure):
     bits_per_pixel = bit.Integer(size=3) + 1
 
 
-class ScreenDescriptor(bin.Structure, endianness=bin.LittleEndian):
-    width = bin.Integer(size=2)
-    height = bin.Integer(size=2)
-    info = bin.SubStructure(ScreenInfoBits)
-    background_color = bin.Integer(size=1)
-    pixel_ratio = bin.Integer(size=1)
+class ScreenDescriptor(byte.Structure, endianness=byte.LittleEndian):
+    width = byte.Integer(size=2)
+    height = byte.Integer(size=2)
+    info = common.SubStructure(ScreenInfoBits)
+    background_color = byte.Integer(size=1)
+    pixel_ratio = byte.Integer(size=1)
 
     with info.has_color_map == True:
-        color_map = bin.List(bin.SubStructure(Color), size=2 ** info.bits_per_pixel)
+        color_map = common.List(common.SubStructure(Color), size=2 ** info.bits_per_pixel)
 
     @property
     def aspect_ratio(self):
@@ -49,26 +48,26 @@ class ImageInfoBits(bit.Structure):
     bits_per_pixel = bit.Integer(size=3) + 1
 
 
-class ImageDescriptor(bin.Structure):
-    separator = bin.FixedString(b',')
-    left = bin.Integer(size=2)
-    top = bin.Integer(size=2)
-    width = bin.Integer(size=2)
-    height = bin.Integer(size=2)
-    info = bin.SubStructure(ImageInfoBits)
+class ImageDescriptor(byte.Structure):
+    separator = byte.FixedString(b',')
+    left = byte.Integer(size=2)
+    top = byte.Integer(size=2)
+    width = byte.Integer(size=2)
+    height = byte.Integer(size=2)
+    info = common.SubStructure(ImageInfoBits)
 
     with info.has_color_map == True:
-        color_map = bin.List(bin.SubStructure(Color), size=2 ** info.bits_per_pixel)
+        color_map = common.List(common.SubStructure(Color), size=2 ** info.bits_per_pixel)
 
 
-class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
-    tag = bin.FixedString('GIF')
-    version = bin.String(size=3, choices=VERSIONS)
+class GIF(byte.Structure, endianness=byte.LittleEndian, encoding='ascii'):
+    tag = byte.FixedString('GIF')
+    version = byte.String(size=3, choices=VERSIONS)
     
 #    with tag == 'GIF':
-#        version = bin.String(size=3, choices=VERSIONS)
+#        version = byte.String(size=3, choices=VERSIONS)
 
-    screen = bin.SubStructure(ScreenDescriptor)
+    screen = common.SubStructure(ScreenDescriptor)
 
     @property
     def width(self):

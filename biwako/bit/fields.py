@@ -1,7 +1,7 @@
 from ..common import args
-from ..bin import fields
+from ..byte import fields
 from ..common.fields import *
-from ..bin.fields import numbers
+from ..byte.fields import numbers
 
 __all__ = ['Field', 'Integer', 'FixedInteger', 'Flag', 'Reserved']
 

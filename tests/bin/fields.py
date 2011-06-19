@@ -1,7 +1,7 @@
 import io
 import unittest
 
-from biwako.bin import fields, Structure
+from biwako.byte import fields, Structure
 
 
 class IOTest(unittest.TestCase):

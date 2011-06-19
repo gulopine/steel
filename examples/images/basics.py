@@ -1,6 +1,6 @@
 import os
 import sys
-from biwako import bin
+from biwako import byte
 
 
 GIF_VERSIONS = (
@@ -9,29 +9,29 @@ GIF_VERSIONS = (
 )
 
 
-class BMP(bin.Structure, endianness=bin.LittleEndian):
-    signature = bin.FixedString('BM')
-    filesize = bin.Integer('Total file size', size=4)
-    reserved = bin.Reserved(size=4)
-    data_offset = bin.Integer('Offset of the actual image data', size=4)
-    header_size = bin.Integer(size=4, default_value=40)
-    width = bin.Integer(size=4)
-    height = bin.Integer(size=4)
+class BMP(byte.Structure, endianness=byte.LittleEndian):
+    signature = byte.FixedString('BM')
+    filesize = byte.Integer('Total file size', size=4)
+    byte.Reserved(size=4)
+    data_offset = byte.Integer('Offset of the actual image data', size=4)
+    header_size = byte.Integer(size=4, default_value=40)
+    width = byte.Integer(size=4)
+    height = byte.Integer(size=4)
 
 
-class GIF(bin.Structure, endianness=bin.LittleEndian, encoding='ascii'):
-    tag = bin.FixedString('GIF')
-    version = bin.String(size=3, choices=GIF_VERSIONS)
-    width = bin.Integer(size=2)
-    height = bin.Integer(size=2)
+class GIF(byte.Structure, endianness=byte.LittleEndian, encoding='ascii'):
+    tag = byte.FixedString('GIF')
+    version = byte.String(size=3, choices=GIF_VERSIONS)
+    width = byte.Integer(size=2)
+    height = byte.Integer(size=2)
 
 
-class PNG(bin.Structure):
-    signature = bin.FixedString(b'\x89PNG\x0d\x0a\x1a\x0a')
-    header_size = bin.Integer(size=4)
-    header_id = bin.FixedString(b'IHDR')
-    width = bin.Integer(size=4, min_value=1)
-    height = bin.Integer(size=4, min_value=1)
+class PNG(byte.Structure):
+    signature = byte.FixedString(b'\x89PNG\x0d\x0a\x1a\x0a')
+    header_size = byte.Integer(size=4)
+    header_id = byte.FixedString(b'IHDR')
+    width = byte.Integer(size=4, min_value=1)
+    height = byte.Integer(size=4, min_value=1)
 
 
 if __name__ == '__main__':

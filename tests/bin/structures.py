@@ -1,20 +1,20 @@
 import io
 import unittest
 
-from biwako import bin
+from biwako import byte
 
 
 class AttributeTest(unittest.TestCase):
     def setUp(self):
-        class TestStructure(bin.Structure):
-            integer = bin.Integer('number', size=1)
-            string = bin.String(encoding='ascii')
+        class TestStructure(byte.Structure):
+            integer = byte.Integer('number', size=1)
+            string = byte.String(encoding='ascii')
             
         self.struct = TestStructure
 
     def test_order(self):
-        self.assertEqual(type(self.struct._fields[0]), bin.Integer)
-        self.assertEqual(type(self.struct._fields[1]), bin.String)
+        self.assertEqual(type(self.struct._fields[0]), byte.Integer)
+        self.assertEqual(type(self.struct._fields[1]), byte.String)
 
     def test_names(self):
         self.assertEqual(self.struct._fields[0].name, 'integer')
@@ -39,9 +39,9 @@ class AttributeTest(unittest.TestCase):
             struct = self.struct(io.BytesIO(), integer=1, string='invalid')
             
     def test_related(self):
-        class TestStructure(bin.Structure):
-            length = bin.Integer('number', size=1)
-            content = bin.String(encoding='ascii', size=length)
+        class TestStructure(byte.Structure):
+            length = byte.Integer('number', size=1)
+            content = byte.String(encoding='ascii', size=length)
         
         struct = TestStructure(io.BytesIO(b'\x05validpadding'))
         self.assertEqual(struct.length, 5)
@@ -58,11 +58,11 @@ class IOTest(unittest.TestCase):
         self.input = io.BytesIO(self.data)
         self.output = io.BytesIO()
         
-        class TestStructure(bin.Structure):
-            forty_two = bin.Integer(size=2, endianness=bin.LittleEndian)
-            sixty_six = bin.Integer(size=1)
-            valid = bin.String(encoding='ascii')
-            test = bin.String(encoding='ascii')
+        class TestStructure(byte.Structure):
+            forty_two = byte.Integer(size=2, endianness=byte.LittleEndian)
+            sixty_six = byte.Integer(size=1)
+            valid = byte.String(encoding='ascii')
+            test = byte.String(encoding='ascii')
 
         self.struct = TestStructure
 
@@ -143,7 +143,7 @@ class IOTest(unittest.TestCase):
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):
-        class TestStructure(bin.Structure, attribute='test'):
+        class TestStructure(byte.Structure, attribute='test'):
             pass
 
 

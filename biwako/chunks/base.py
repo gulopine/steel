@@ -1,9 +1,9 @@
 import io
 
 from ..common import meta, args, fields
-from ..bin.fields import Field
-from ..bin.base import Structure
-from ..bin.fields.strings import Bytes
+from ..byte.fields import Field
+from ..byte.base import Structure
+from ..byte.fields.strings import Bytes
 
 __all__ = ['Chunk', 'Payload', 'ChunkList', 'ChunkStreamer']
 

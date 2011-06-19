@@ -1,6 +1,7 @@
 import decimal
 import sys
-from biwako import bin
+from biwako import byte, chunks, common
+from biwako.byte.fields import integrity
 
 COMPRESSION_CHOICES = (
     (0, 'zlib/deflate'),
@@ -24,15 +25,15 @@ INTERLACE_CHOICES = (
 )
 
 
-class Chunk(bin.Chunk, encoding='ascii'):
+class Chunk(chunks.Chunk, encoding='ascii'):
     """
     A special chunk for PNG, which puts the size before the type
     and includes a CRC field for verifying data integrity.
     """
-    size = bin.Integer(size=4)
-    id = bin.String(size=4)
-    payload = bin.Payload(size=size)
-    crc = bin.CRC32(first=id)
+    size = byte.Integer(size=4)
+    id = byte.String(size=4)
+    payload = chunks.Payload(size=size)
+    crc = integrity.CRC32(first=id)
 
     @property
     def is_critical(self):
@@ -48,17 +49,17 @@ class Chunk(bin.Chunk, encoding='ascii'):
 
 
 @Chunk('IHDR')
-class Header(bin.Structure):
-    width = bin.Integer(size=4)
-    height = bin.Integer(size=4)
-    bit_depth = bin.Integer(size=1, choices=(1, 2, 4, 8, 16))
-    color_type = bin.Integer(size=1, choices=(0, 2, 3, 4, 6))
-    compression_method  = bin.Integer(size=1, choices=COMPRESSION_CHOICES)
-    filter_method = bin.Integer(size=1, choices=FILTER_CHOICES)
-    interlace_method = bin.Integer(size=1, choices=INTERLACE_CHOICES)
+class Header(byte.Structure):
+    width = byte.Integer(size=4)
+    height = byte.Integer(size=4)
+    bit_depth = byte.Integer(size=1, choices=(1, 2, 4, 8, 16))
+    color_type = byte.Integer(size=1, choices=(0, 2, 3, 4, 6))
+    compression_method  = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
+    filter_method = byte.Integer(size=1, choices=FILTER_CHOICES)
+    interlace_method = byte.Integer(size=1, choices=INTERLACE_CHOICES)
 
 
-class HundredThousand(bin.Integer):
+class HundredThousand(byte.Integer):
     """
     Value is usable as a Decimal in Python, but stored
     as an integer after multiplying the value by 100,000
@@ -75,7 +76,7 @@ class HundredThousand(bin.Integer):
 
 
 @Chunk('cHRM')
-class Chromaticity(bin.Structure):
+class Chromaticity(byte.Structure):
     white_x = HundredThousand()
     white_y = HundredThousand()
     red_x = HundredThousand()
@@ -87,139 +88,139 @@ class Chromaticity(bin.Structure):
 
 
 @Chunk('gAMA')
-class Gamma(bin.Structure):
+class Gamma(byte.Structure):
     value = HundredThousand()
 
 
 @Chunk('iCCP')
-class ICCProfile(bin.Structure):
-    name = bin.String(encoding='latin-1')
-    compression = bin.Integer(size=1, choices=COMPRESSION_CHOICES)
-    profile = bin.Bytes(size=bin.Remainder)  # TODO: decompress
+class ICCProfile(byte.Structure):
+    name = byte.String(encoding='latin-1')
+    compression = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
+    profile = byte.Bytes(size=common.Remainder)  # TODO: decompress
 
 
 @Chunk('sBIT')
-class SignificantBits(bin.Structure):
-    data = bin.Bytes(size=bin.Remainder)
+class SignificantBits(byte.Structure):
+    data = byte.Bytes(size=common.Remainder)
 
     # TODO: decode based on parent Header.color_type
 
 
 @Chunk('sRGB')
-class sRGB(bin.Structure):
-    rendering_intent = bin.Integer(size=1, choices=RENDERING_INTENT_CHOICES)
+class sRGB(byte.Structure):
+    rendering_intent = byte.Integer(size=1, choices=RENDERING_INTENT_CHOICES)
 
 
-class PaletteColor(bin.Structure):
-    red = bin.Integer(size=1)
-    green = bin.Integer(size=1)
-    blue = bin.Integer(size=1)
+class PaletteColor(byte.Structure):
+    red = byte.Integer(size=1)
+    green = byte.Integer(size=1)
+    blue = byte.Integer(size=1)
 
 
 @Chunk('PLTE')
-class Palette(bin.Structure):
-    colors = bin.List(bin.SubStructure(PaletteColor), size=bin.Remainder)
+class Palette(byte.Structure):
+    colors = common.List(common.SubStructure(PaletteColor), size=common.Remainder)
 
     def __iter__(self):
         return iter(self.colors)
 
 
 @Chunk('bKGD')
-class Background(bin.Structure):
-    data = bin.Bytes(size=bin.Remainder)
+class Background(byte.Structure):
+    data = byte.Bytes(size=common.Remainder)
 
     # TODO: decode based on parent Header.color_type
 
 
 @Chunk('hIST')
-class Histogram(bin.Structure):
-    frequencies = bin.List(bin.Integer(size=2), size=bin.Remainder)
+class Histogram(byte.Structure):
+    frequencies = common.List(byte.Integer(size=2), size=common.Remainder)
 
 
 @Chunk('tRNS')
-class Transparency(bin.Structure):
-    data = bin.Bytes(size=bin.Remainder)
+class Transparency(byte.Structure):
+    data = byte.Bytes(size=common.Remainder)
 
     # TODO: decode based on parent Header.color_type
 
 
 @Chunk('IDAT', multiple=True)
-class Data(bin.Structure):
-    data = bin.Bytes(size=bin.Remainder)
+class Data(byte.Structure):
+    data = byte.Bytes(size=common.Remainder)
 
 
 @Chunk('pHYs')
-class PhysicalDimentions(bin.Structure):
-    x = bin.Integer(size=4)
-    y = bin.Integer(size=4)
-    unit = bin.Integer(size=1, choices=PHYSICAL_UNIT_CHOICES)
+class PhysicalDimentions(byte.Structure):
+    x = byte.Integer(size=4)
+    y = byte.Integer(size=4)
+    unit = byte.Integer(size=1, choices=PHYSICAL_UNIT_CHOICES)
 
 
-class SuggestedPaletteEntry(bin.Structure):
-    red = bin.Integer(size=2)
-    green = bin.Integer(size=2)
-    blue = bin.Integer(size=2)
-    alpha = bin.Integer(size=2)
-    frequency = bin.Integer(size=2)
+class SuggestedPaletteEntry(byte.Structure):
+    red = byte.Integer(size=2)
+    green = byte.Integer(size=2)
+    blue = byte.Integer(size=2)
+    alpha = byte.Integer(size=2)
+    frequency = byte.Integer(size=2)
 
     # TODO: figure out a good way to handle size based on sample_depth below
 
 
 @Chunk('sPLT')
-class SuggestedPalette(bin.Structure):
-    name = bin.String(encoding='latin-1')
-    sample_depth = bin.Integer(size=1)
-    colors = bin.List(bin.SubStructure(SuggestedPaletteEntry), size=bin.Remainder)
+class SuggestedPalette(byte.Structure):
+    name = byte.String(encoding='latin-1')
+    sample_depth = byte.Integer(size=1)
+    colors = common.List(common.SubStructure(SuggestedPaletteEntry), size=common.Remainder)
 
 
 @Chunk('tIME')
-class Timestamp(bin.Structure):
-    year = bin.Integer(size=2)
-    month = bin.Integer(size=1)
-    day = bin.Integer(size=1)
-    hour = bin.Integer(size=1)
-    minute = bin.Integer(size=1)
-    second = bin.Integer(size=1)
+class Timestamp(byte.Structure):
+    year = byte.Integer(size=2)
+    month = byte.Integer(size=1)
+    day = byte.Integer(size=1)
+    hour = byte.Integer(size=1)
+    minute = byte.Integer(size=1)
+    second = byte.Integer(size=1)
 
     # TODO: convert this into a datetime object
 
 
 @Chunk('tEXt', multiple=True)
-class Text(bin.Structure, encoding='latin-1'):
-    keyword = bin.String()
-    content = bin.String(size=bin.Remainder)
+class Text(byte.Structure, encoding='latin-1'):
+    keyword = byte.String()
+    content = byte.String(size=common.Remainder)
 
 
 @Chunk('zTXt', multiple=True)
-class CompressedText(bin.Structure, encoding='latin-1'):
-    keyword = bin.String()
-    compression = bin.Integer(size=1, choices=COMPRESSION_CHOICES)
-    content = bin.Bytes(size=bin.Remainder)  # TODO: decompress
+class CompressedText(byte.Structure, encoding='latin-1'):
+    keyword = byte.String()
+    compression = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
+    content = byte.Bytes(size=common.Remainder)  # TODO: decompress
 
 
 @Chunk('iTXt', multiple=True)
-class InternationalText(bin.Structure, encoding='utf8'):
-    keyword = bin.String()
-    is_compressed = bin.Integer(size=1)
-    compression = bin.Integer(size=1, choices=COMPRESSION_CHOICES)
-    language = bin.String()
-    translated_keyword = bin.String()
-    content = bin.Bytes(size=bin.Remainder)  # TODO: decompress
+class InternationalText(byte.Structure, encoding='utf8'):
+    keyword = byte.String()
+    is_compressed = byte.Integer(size=1)
+    compression = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
+    language = byte.String()
+    translated_keyword = byte.String()
+    content = byte.Bytes(size=common.Remainder)  # TODO: decompress
 
 
 @Chunk('IEND')
-class End(bin.Structure):
+class End(byte.Structure):
     pass
 
 
-class PNG(bin.Structure):
-    signature = bin.FixedString(b'\x89PNG\x0d\x0a\x1a\x0a')
-    header = bin.SubStructure(Header)
-    chunks = bin.ChunkList(Chunk, (Header, Chromaticity, Gamma, ICCProfile,
-                                   SignificantBits, sRGB, Palette, Background,
-                                   Histogram, Transparency, PhysicalDimentions,
-                                   SuggestedPalette, Data, Timestamp, Text,
-                                   CompressedText, InternationalText), terminator=End)
+class PNG(byte.Structure):
+    signature = byte.FixedString(b'\x89PNG\x0d\x0a\x1a\x0a')
+    header = common.SubStructure(Header)
+    chunks = chunks.ChunkList(Chunk, (Header, Chromaticity, Gamma, ICCProfile,
+                                      SignificantBits, sRGB, Palette, Background,
+                                      Histogram, Transparency, PhysicalDimentions,
+                                      SuggestedPalette, Data, Timestamp, Text,
+                                      CompressedText, InternationalText), terminator=End)
 
     @property
     def data_chunks(self):

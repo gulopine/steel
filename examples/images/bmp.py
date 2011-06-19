@@ -1,4 +1,4 @@
-from biwako import bin
+from biwako import byte, common
 
 COMPRESSION_TYPES = (
     (0, 'No compression'),
@@ -10,34 +10,34 @@ COMPRESSION_TYPES = (
 )
 
 
-class PaletteColor(bin.Structure):
-    blue = bin.Integer(size=1)
-    green = bin.Integer(size=1)
-    red = bin.Integer(size=1)
-    alpha = bin.Integer(size=1)
+class PaletteColor(byte.Structure):
+    blue = byte.Integer(size=1)
+    green = byte.Integer(size=1)
+    red = byte.Integer(size=1)
+    alpha = byte.Integer(size=1)
 
     def __str__(self):
         return '#%x%x%x%x' % (self.red, self.green, self.blue, self.alpha)
 
 
-class BMP(bin.Structure, endianness=bin.LittleEndian):
-    signature = bin.FixedString('BM')
-    filesize = bin.Integer('Total file size', size=4)
-    bin.Reserved(size=4)
-    data_offset = bin.Integer('Offset of the actual image data', size=4)
-    header_size = bin.Integer(size=4, default=40)
-    width = bin.Integer(size=4)
-    height = bin.Integer(size=4)
-    plane_count = bin.Integer(size=2, default=1)
-    bit_depth = bin.Integer(size=2)
-    compression_type = bin.Integer(size=4, choices=COMPRESSION_TYPES, default=0)
-    data_size = bin.Integer('Size of the actual image data', size=4)
-    ppm_x = bin.Integer('Pixels per meter (X axis)', size=4)
-    ppm_y = bin.Integer('Pixels per meter (Y axis)', size=4)
-    color_count = bin.Integer('Number of colors', size=4)
-    important_color_count = bin.Integer('Number of important colors', size=4)
-    palette = bin.List(PaletteColor, size=color_count)
-    pixel_data = bin.Bytes(size=bin.Remainder)
+class BMP(byte.Structure, endianness=byte.LittleEndian):
+    signature = byte.FixedString('BM')
+    filesize = byte.Integer('Total file size', size=4)
+    byte.Reserved(size=4)
+    data_offset = byte.Integer('Offset of the actual image data', size=4)
+    header_size = byte.Integer(size=4, default=40)
+    width = byte.Integer(size=4)
+    height = byte.Integer(size=4)
+    plane_count = byte.Integer(size=2, default=1)
+    bit_depth = byte.Integer(size=2)
+    compression_type = byte.Integer(size=4, choices=COMPRESSION_TYPES, default=0)
+    data_size = byte.Integer('Size of the actual image data', size=4)
+    ppm_x = byte.Integer('Pixels per meter (X axis)', size=4)
+    ppm_y = byte.Integer('Pixels per meter (Y axis)', size=4)
+    color_count = byte.Integer('Number of colors', size=4)
+    important_color_count = byte.Integer('Number of important colors', size=4)
+    palette = common.List(PaletteColor, size=color_count)
+    pixel_data = byte.Bytes(size=common.Remainder)
 
 
 if __name__ == '__main__':

@@ -1,12 +1,12 @@
 import sys
 
 from ..common import args
-from biwako import bin
+from biwako import byte
 
 __all__ = ['Structure']
 
 
-class Structure(bin.Structure):
+class Structure(byte.Structure):
     def __init__(self, *args, **kwargs):
         super(Structure, self).__init__(*args, **kwargs)
         self._bits_left = 0
@@ -17,7 +17,7 @@ class Structure(bin.Structure):
         if size > self._bits_left:
             # Read more bytes from the file
             read_size = int(((size - self._bits_left) + 7) / 8)
-            field = bin.Integer(size=read_size)
+            field = byte.Integer(size=read_size)
             bytes = self._file.read(read_size)
             value = field.decode(bytes)
             bit_buffer = (bit_buffer << size) | value

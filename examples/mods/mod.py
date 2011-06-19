@@ -1,26 +1,26 @@
-from biwako import bin
+from biwako import bit, byte, common
 
 
-class FineTune(bin.PackedStructure):
-    Reserved(size=4)
-    value = bin.Integer(size=4)
+class FineTune(bit.Structure):
+    bit.Reserved(size=4)
+    value = bit.Integer(size=4)
 
 
-class SampleLength(bin.PositiveInteger):
-    def to_python(self, value):
-        return value * 2
-    
-    def to_bytes(self, value):
+class SampleLength(bit.Integer):
+    def encode(self, value):
         return int(value / 2)
 
+    def decode(self, value):
+        return value * 2
+    
 
-class Sample(bin.Structure):
-    name = bin.FixedLengthString(size=22)
+class Sample(byte.Structure):
+    name = byte.String(size=22, encoding='ascii')
     size = SampleLength(size=2)
-    finetune = bin.SubStructure(FineTune)
-    volume = bin.PositiveInteger(size=1)
-    loop_start = SampleLength(size=2, default_value=0)
-    loop_length = SampleLength(size=2, default_value=0)
+    finetune = common.SubStructure(FineTune)
+    volume = byte.Integer(size=1)
+    loop_start = SampleLength(size=2, default=0)
+    loop_length = SampleLength(size=2, default=0)
     
     @property
     def loop_end(self):
@@ -35,11 +35,11 @@ class Sample(bin.Structure):
         return self.name
 
 
-class Note(bin.PackedStructure):
-    sample_hi = bin.PositiveInteger(size=4)
-    period = bin.PositiveInteger(size=12)
-    sample_lo = bin.PositiveInteger(size=4)
-    effect = bin.PositiveInteger(size=12)
+class Note(bit.Structure):
+    sample_hi = bit.Integer(size=4)
+    period = bit.Integer(size=12)
+    sample_lo = bit.Integer(size=4)
+    effect = bit.Integer(size=12)
     
     @property
     def sample(self):
@@ -53,31 +53,31 @@ class Note(bin.PackedStructure):
         self.sample_lo = index & 0xF
 
 
-class Row(bin.Structure):
-    notes = bin.List(Note, size=lambda self: self.get_parent().channels)
+class Row(byte.Structure):
+    notes = common.List(Note, size=lambda self: self.get_parent().channels)
     
     def __iter__(self):
         return iter(self.rows)
 
 
-class Pattern(bin.Structure):
-    rows = bin.List(Row, size=64)
+class Pattern(byte.Structure):
+    rows = common.List(Row, size=64)
     
     def __iter__(self):
         return iter(self.rows)
 
 
-class MOD(bin.File):
+class MOD(byte.Structure, endianness=byte.BigEndian):
     channels = 4
     
-    title = bin.FixedLengthString(size=20)
-    samples = bin.List(Sample, size=15)
-    order_count = bin.PositiveInteger(size=1)
-    restart_position = bin.PositiveInteger(size=1)
-    pattern_order = bin.List(bin.PositiveInteger(size=1), size=128)
-    marker = bin.FixedString('M.K.')
-    patterns = bin.List(Pattern, size=lambda self: max(self.pattern_order) + 1)
-    sample_data = bin.ByteString(size=bin.REMAINDER)
+    title = byte.String(size=20, encoding='ascii')
+    samples = common.List(Sample, size=15)
+    order_count = byte.Integer(size=1)
+    restart_position = byte.Integer(size=1)
+    pattern_order = common.List(byte.Integer(size=1), size=128)
+    marker = byte.FixedString('M.K.')
+    patterns = common.List(Pattern, size=lambda self: max(self.pattern_order) + 1)
+    sample_data = byte.Bytes(size=common.Remainder)
     
     @property
     def pattern_count(self):
@@ -103,12 +103,9 @@ class MOD(bin.File):
     def __unicode__(self):
         return self.title
     
-    class Options:
-        endianness = bin.BigEndian
-
 
 if __name__ == '__main__':
     for format in (MOD,):
         track = format(open(sys.argv[1], 'rb'))
-        print '%s: %s' % (format.__name__, track.title)
+        print('%s: %s' % (format.__name__, track.title))
 

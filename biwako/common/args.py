@@ -1,6 +1,6 @@
 import copy
 
-from biwako import common
+from ..common import data
 
 NotProvided = object()
 
@@ -58,8 +58,8 @@ class Argument:
         except KeyError:
             raise AttributeError(self.name)
         key = hash(instance)
-        if common.data.instance_stack[key]:
-            instance = common.data.instance_stack[key][-1]
+        if data.instance_stack[key]:
+            instance = data.instance_stack[key][-1]
             if arg.resolve_field and hasattr(value, 'resolve'):
                 value = value.resolve(instance)
             elif hasattr(value, '__call__'):
