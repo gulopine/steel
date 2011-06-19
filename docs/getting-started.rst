@@ -72,7 +72,7 @@ and every field. Instead, you can provide it as an argument to the main class
 definition itself. The functionality you'll need is controlled by a class named
 :class:`~biwako.bin.fields.numbers.LittleEndian`.
 
-::
+.. code-block:: python3
 
   class GIF(bin.Structure, endianness=bin.LittleEndian):
       tag = bin.FixedString('GIF')
