@@ -6,7 +6,7 @@ which may contain one or more :doc:`fields <fields>`. The structure itself
 encapsulates those fields into a single class, which can then manage all the
 conversion to and from files and other file-like objects.
 
-.. py:currentmodule:: bin
+.. py:currentmodule:: ~biwako.byte
 
 .. class:: Structure
 
