@@ -224,10 +224,11 @@ class PNG(byte.Structure):
 
     @property
     def data_chunks(self):
-        for chunk in chunks:
+        for chunk in self.chunks:
             if isinstance(chunk, Data):
                 yield chunk
 
 if __name__ == '__main__':
     png = PNG(open(sys.argv[1], 'rb'))
     print('%s x %s' % (png.header.width, png.header.height))
+    print(list(png.data_chunks))
