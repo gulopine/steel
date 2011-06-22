@@ -1,7 +1,7 @@
 import io
 import zlib
 
-from .base import Field
+from ..fields import Field
 from biwako import common
 
 
