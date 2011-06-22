@@ -12,8 +12,9 @@ the module.
 
 Many different classes are available in this namespace, but you'll spend most
 of your time working with two different types: structures and fields. The most
-basic structure is simply called :class:`~biwako.byte.base.Structure`, and it
-works using a declarative approach. To start off, simply subclass `Structure`.
+basic structure is simply called :class:`~biwako.byte.base.Structure`, which
+represents a block of data. It works using a declarative approach, which starts
+by simply subclassing `Structure`.
 
 ::
 
@@ -81,3 +82,5 @@ definition itself. The functionality you'll need is controlled by a class named
       height = byte.Integer(size=2)
 
 And that's it!
+
+How 

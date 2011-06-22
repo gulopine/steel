@@ -44,12 +44,10 @@ way too much fun to work with to even consider going back to 2.x.
 Beyond that, Biwako has no dependencies on any external libraries. Everything
 you need is in the box.
 
-Topics
-------
-
 .. toctree::
    :maxdepth: 2
 
    getting-started
    byte/structures
    byte/fields
+   byte/numbers

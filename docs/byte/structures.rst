@@ -1,14 +1,14 @@
-Data Structures
-===============
+Byte-level Structures
+=====================
 
 For the purposes of Biwako, every block of data is considered a structure,
 which may contain one or more :doc:`fields <fields>`. The structure itself
 encapsulates those fields into a single class, which can then manage all the
 conversion to and from files and other file-like objects.
 
-.. py:currentmodule:: biwako.byte
+All structures 
 
-.. class:: Structure
+.. class:: biwako.byte.base.Structure
 
    .. method:: read([size=None])
    
