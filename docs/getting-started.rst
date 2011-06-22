@@ -83,4 +83,3 @@ definition itself. The functionality you'll need is controlled by a class named
 
 And that's it!
 
-How 
