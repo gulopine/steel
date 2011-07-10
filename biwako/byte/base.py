@@ -50,6 +50,7 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
                     self._write_buffer = file.read()
                 else:
                     self._write_buffer = b''
+        self._position += last_position
 
     def tell(self):
         return self._position
