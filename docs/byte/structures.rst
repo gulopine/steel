@@ -124,17 +124,17 @@ position and writing provide another powerful way to populate a structure.
 
 .. method:: Structure.tell()
 
-Returns the current offset from the beginning of the structure, which indicates
-where further reads and writes will take place.
+   Returns the current offset from the beginning of the structure, which indicates
+   where further reads and writes will take place.
 
 .. method:: Structure.write(data)
 
-Writes the given bytes to the structure. Because the structure maintains an
-internal pointer as it works with data, writing directly to the structure like
-this is also able to populate attributes as it goes. This way, you can create an
-instance of a structure, pass it into a library that writes data to a file and
-your structure object will automatically have all of its attributes populated
-and decoded properly, without having to do any extra work.
+   Writes the given bytes to the structure. Because the structure maintains an
+   internal pointer as it works with data, writing directly to the structure like
+   this is also able to populate attributes as it goes. This way, you can create an
+   instance of a structure, pass it into a library that writes data to a file and
+   your structure object will automatically have all of its attributes populated
+   and decoded properly, without having to do any extra work.
 
 ::
 
@@ -156,10 +156,10 @@ you should explicitly validate your data prior to storing it in a file.
 
 .. method:: Structure.validate()
 
-This method will return a list of error messages that are raised by individual
-fields each validating their values in sequence. An empty list means everything
-validated successfully, so you can proceed to the next step, which is often to
-write that data to a file.
+   This method will return a list of error messages that are raised by individual
+   fields each validating their values in sequence. An empty list means everything
+   validated successfully, so you can proceed to the next step, which is often to
+   write that data to a file.
 
 Writing out to a file
 ---------------------
@@ -169,9 +169,9 @@ well.
 
 .. method:: Structure.save(file)
 
-This accepts any object with a `write()` method and will encode the structure's
-values to a stream of bytes and write it to the file. The bytes are written out
-sequentially, so the file object doesn't need to implement `seek()` or `tell()`.
+   This accepts any object with a `write()` method and will encode the structure's
+   values to a stream of bytes and write it to the file. The bytes are written out
+   sequentially, so the file object doesn't need to implement `seek()` or `tell()`.
 
 ::
 
