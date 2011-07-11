@@ -15,6 +15,7 @@ useful. You'll always need to include at least one field in order to tell your
 class how to process whatever data you pass into it.
 
 ::
+
     from biwako import byte
     
     class Dimensions(byte.Structure):
@@ -30,6 +31,7 @@ were declared for the class. The type of values that can be assigned will vary
 with each type of field, but it's all just standard Python assignment.
 
 ::
+
     >>> vga = Dimensions()
     >>> vga.width = 640
     >>> vga.height = 480
@@ -41,6 +43,7 @@ instantiating it. This povides a more convenien way to supply a few values that
 you know right away, before supplying the rest later.
 
 ::
+
     >>> vga = Dimensions(width=640, height=480)
     >>> vga.width, vga.height
     (640, 480)
@@ -58,6 +61,7 @@ structure has enough information to retrieve the necessary informtion, decode it
 into native Python values and set those values to the corresponding attributes.
 
 ::
+
     >>> import io
     >>> data = io.BytesIO(b'\x02\x80\x01\xe0')  # Just an example
     >>> vga = Dimensions(data)
@@ -71,6 +75,7 @@ structure will only read as much of the file as it needs to populate the
 attributes that you request.
 
 ::
+
     >>> data.seek(0)  # Reset the file
     >>> vga = Dimensions(data)
     >>> vga.tell()  # How many bytes have been read?
@@ -92,6 +97,7 @@ the corresponding attributes for any data it reads along the way, so that when
 you try to access them later, they're already in place.
 
 ::
+
     >>> data.seek(0)  # Reset the file
     >>> vga = Dimensions(data)
     >>> vga.tell()  # How many bytes have been read?
@@ -131,6 +137,7 @@ your structure object will automatically have all of its attributes populated
 and decoded properly, without having to do any extra work.
 
 ::
+
     >>> vga = Dimensions()
     >>> data.seek(0)  # Reset the file
     >>> vga.write(data.read())
