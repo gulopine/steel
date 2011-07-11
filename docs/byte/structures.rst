@@ -3,6 +3,9 @@ Byte-level Structures
 
 .. class:: biwako.byte.base.Structure
 
+   .. method:: save(file)
+
+
 For the purposes of Biwako, every block of data is considered a structure,
 which may contain one or more :doc:`fields <fields>`. The structure itself
 encapsulates those fields into a single class, which can then manage all the
