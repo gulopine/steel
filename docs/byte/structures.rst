@@ -1,10 +1,7 @@
 Byte-level Structures
 =====================
 
-.. class:: biwako.byte.base.Structure
-
-   .. method:: save(file)
-
+.. currentmodule:: biwako.byte.base
 
 For the purposes of Biwako, every block of data is considered a structure,
 which may contain one or more :doc:`fields <fields>`. The structure itself
@@ -125,12 +122,12 @@ structures provide standard file access methods so you can use them with other
 code that expects a file. It doesn't yet support reading, but support for file
 position and writing provide another powerful way to populate a structure.
 
-   .. method:: tell()
+.. method:: Structure.tell()
 
 Returns the current offset from the beginning of the structure, which indicates
 where further reads and writes will take place.
 
-   .. method:: write(data)
+.. method:: Structure.write(data)
 
 Writes the given bytes to the structure. Because the structure maintains an
 internal pointer as it works with data, writing directly to the structure like
@@ -152,10 +149,37 @@ and decoded properly, without having to do any extra work.
 Validating your data
 --------------------
 
-   .. method:: validate()
+When assigning values to attributes on your structure, very little validation
+takes place at the time of assignment. Basically, it just makes sure that the
+value you assigned can be encoded into raw bytes. For anything more specific,
+you should explicitly validate your data prior to storing it in a file.
+
+.. method:: Structure.validate()
+
+This method will return a list of error messages that are raised by individual
+fields each validating their values in sequence. An empty list means everything
+validated successfully, so you can proceed to the next step, which is often to
+write that data to a file.
 
 Writing out to a file
 ---------------------
 
-   .. method:: save(file)
+Structures can do more than just read data from files; it can write to files as
+well.
 
+.. method:: Structure.save(file)
+
+This accepts any object with a `write()` method and will encode the structure's
+values to a stream of bytes and write it to the file. The bytes are written out
+sequentially, so the file object doesn't need to implement `seek()` or `tell()`.
+
+::
+
+    >>> vga = Dimensions(width=640, height=480)
+    >>> data = io.BytesIO()
+    >>> vga.save(data)
+    >>> data.getvalue()  # Show the bytes that were written
+    b'\x02\x80\x01\xe0'
+
+This requires that each field has a value that can be encoded according to that
+field's own behavior, so you should always validate it before trying to save.
