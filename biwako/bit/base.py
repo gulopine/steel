@@ -22,7 +22,7 @@ class Structure(byte.Structure):
             value = field.decode(bytes)
             bit_buffer = (bit_buffer << size) | value
             self._bits_left += read_size * 8
-        self._bits_left -= size % 8
+        self._bits_left -= size
         bits = bit_buffer >> self._bits_left
         self._bit_buffer = bit_buffer & (1 << self._bits_left) - 1
         return bits
