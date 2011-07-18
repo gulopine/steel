@@ -167,6 +167,18 @@ class Integer(Field):
         return CalculatedValue(self, other, lambda a, b: a ^ b)
     __rxor__ = __xor__
 
+    def __lshift__(self, other):
+        return CalculatedValue(self, other, lambda a, b: a << b)
+
+    def __rlshift__(self, other):
+        return CalculatedValue(self, other, lambda a, b: b << a)
+
+    def __rshift__(self, other):
+        return CalculatedValue(self, other, lambda a, b: a >> b)
+
+    def __rrshift__(self, other):
+        return CalculatedValue(self, other, lambda a, b: b >> a)
+
     def __lt__(self, other):
         return fields.Condition(self, other, lambda a, b: a < b)
 
