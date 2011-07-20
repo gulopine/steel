@@ -1,8 +1,11 @@
+import decimal
+
 from ..fields import Field
 from ...common import args, fields
 
 __all__ = ['BigEndian', 'LittleEndian', 'SignMagnitude', 'OnesComplement',
-           'TwosComplement', 'Integer', 'FixedInteger', 'CalculatedValue']
+           'TwosComplement', 'Integer', 'FixedInteger', 'FixedPoint',
+           'CalculatedValue']
 
 
 # Endianness options
@@ -209,6 +212,22 @@ class FixedInteger(Integer):
         if value != self.encoded_value:
             raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
         return self.decoded_value
+
+
+class FixedPoint(Integer):
+    def __init__(self, *args, decimal_places, **kwargs):
+        super(FixedPoint, self).__init__(*args, **kwargs)
+        self.decimal_places = decimal_places
+
+    def encode(self, value):
+        factor = 10 ** self.decimal_places
+        value = round(value * self._factor)
+        return super(FixedPoint, self).encode(value)
+
+    def decode(self, value):
+        factor = 10 ** self.decimal_places
+        value = super(FixedPoint, self).decode(value)
+        return decimal.Decimal('%d.%d' % (value // factor, value % factor))
 
 
 class CalculatedValue(Integer):
