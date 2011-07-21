@@ -52,6 +52,16 @@ class Field(metaclass=meta.DeclarativeFieldMetaclass):
     after_encode = Trigger()
     after_decode = Trigger()
 
+    def getter(self, func):
+        # For compatibility with typical property usage
+        self.after_decode(func)
+        return self
+
+    def setter(self, func):
+        # For compatibility with typical property usage
+        self.after_encode(func)
+        return self
+
     @after_encode
     def update_size(self, obj, value):
         if isinstance(self.size, Field):
