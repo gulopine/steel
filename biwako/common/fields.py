@@ -201,6 +201,7 @@ class SubStructure(Field):
 
     def read(self, file):
         value = self.structure(file)
+        value._parent = file
 
         # Force the evaluation of the entire structure in
         # order to make sure other fields work properly

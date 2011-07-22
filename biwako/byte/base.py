@@ -12,6 +12,7 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
         self._position = 0
         self._write_buffer = b''
         self._raw_values = {}
+        self._parent = None
 
         if self._file and kwargs:
             raise TypeError("Cannot supply a file and attributes together")
@@ -78,6 +79,11 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
                 setattr(self, field.name, getattr(self, field.name))
             output += self._raw_values[field.name]
         return output
+
+    def get_parent(self):
+        if isinstance(self._parent, Structure):
+            return self._parent
+        return TypeError('%s has no parent' % self.__class__.__name__)
 
     def save(self, file):
         file.write(self.get_raw_bytes())
