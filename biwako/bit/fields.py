@@ -36,12 +36,12 @@ class Integer(numbers.Integer):
 
     def encode(self, value):
         if value > (1 << self.size) - 1:
-            raise ValueError("Value is large for this field.")
+            raise ValueError("Value is too large for this field.")
         return value & ((1 << self.size) - 1)
 
     def decode(self, value):
         if value > (1 << self.size) - 1:
-            raise ValueError("Value is large for this field.")
+            raise ValueError("Value is too large for this field.")
         return value & ((1 << self.size) - 1)
 
 
