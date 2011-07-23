@@ -31,11 +31,11 @@ class Structure(byte.Structure):
         output = bytearray()
         bits_read = 0
         byte = 0
-        for field in self.__class__._fields:
-            if field.name not in self._raw_values:
-                setattr(self, field.name, getattr(self, field.name))
+        for name, field in self.__class__._fields.items():
+            if name not in self._raw_values:
+                setattr(self, name, getattr(self, name))
             bits_read += field.size
-            bits = self._raw_values[field.name]
+            bits = self._raw_values[name]
             byte = (byte << field.size) + bits
             while bits_read >= 8:
                 byte >>= 8

@@ -117,7 +117,7 @@ class Field(metaclass=meta.DeclarativeFieldMetaclass):
         self.label = label.title()
 
     def attach_to_class(self, cls):
-        cls._fields.append(self)
+        cls._fields[self.name] = self
 
     def validate(self, obj, value):
         # This should raise a ValueError if the value is invalid
@@ -217,7 +217,7 @@ class SubStructure(Field):
     def __getattr__(self, name):
         if 'structure' in self.__dict__:
             field = getattr(self.structure, name)
-            if field in self.structure._fields:
+            if field in self.structure._fields.values():
                 field = copy.copy(field)
                 field._parent = self
                 return field

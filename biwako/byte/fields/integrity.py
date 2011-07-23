@@ -21,7 +21,7 @@ class CheckSum(Integer):
 
         self.fields = []
         in_range = False
-        for field in cls._fields:
+        for field in cls._fields.values():
             if field is self:
                 # Can't go beyond the integrity field itself
                 break

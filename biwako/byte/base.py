@@ -34,8 +34,8 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
             raise IOError("not writable")
         file = EOFBytesIO(self._write_buffer + data)
         last_position = 0
-        for field in self.__class__._fields:
-            if field.name not in self.__dict__:
+        for name, field in self.__class__._fields.items():
+            if name not in self.__dict__:
                 try:
                     try:
                         bytes = field.read(file)
@@ -43,8 +43,8 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
                     except fields.FullyDecoded as obj:
                         bytes = obj.bytes
                         value = obj.value
-                    self._raw_values[field.name] = bytes
-                    self.__dict__[field.name] = value
+                    self._raw_values[name] = bytes
+                    self.__dict__[name] = value
                     last_position = file.tell()
                 except EOFError:
                     file.seek(last_position)
@@ -58,26 +58,26 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
 
     def _extract(self, field):
         if field.name not in self._raw_values:
-            for other_field in self._fields:
-                if other_field.name not in self._raw_values:
+            for name, other_field in self._fields.items():
+                if name not in self._raw_values:
                     with other_field.for_instance(self):
                         try:
                             bytes = other_field.read(self)
                         except fields.FullyDecoded as obj:
                             bytes = obj.bytes
-                            self.__dict__[other_field.name] = obj.value
-                        self._raw_values[other_field.name] = bytes
-                if other_field.name == field.name:
+                            self.__dict__[name] = obj.value
+                        self._raw_values[name] = bytes
+                if name == field.name:
                     break
         return self._raw_values[field.name]
 
     def get_raw_bytes(self):
         output = b''
-        for field in self.__class__._fields:
-            value = getattr(self, field.name)
-            if field.name not in self._raw_values:
-                setattr(self, field.name, getattr(self, field.name))
-            output += self._raw_values[field.name]
+        for name, field in self.__class__._fields.items():
+            value = getattr(self, name)
+            if name not in self._raw_values:
+                setattr(self, name, getattr(self, name))
+            output += self._raw_values[name]
         return output
 
     def get_parent(self):
@@ -90,9 +90,9 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
 
     def validate(self):
         errors = []
-        for field in self._fields:
+        for name, field in self._fields.items():
             try:
-                field.validate(self, getattr(self, field.name))
+                field.validate(self, getattr(self, name))
             except ValueError as error:
                 errors.append(str(error))
         return errors
@@ -125,8 +125,8 @@ class StructureStreamer:
             position = file.tell()
             try:
                 value = self.structure(file)
-                for field in self.structure._fields:
-                    getattr(value, field.name)
+                for name, field in self.structure._fields.items():
+                    getattr(value, name)
             except Exception as e:
                 if file.tell() == position:
                     # The file didn't move, so it must be at the end

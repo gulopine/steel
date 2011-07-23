@@ -24,8 +24,8 @@ class ZlibMixin:
         if process_chunk:
             super(ChunkMixin, self).__init__(chunk.payload)
             payload = self._compressor.compress(data)
-            for field in chunk._fields:
-                getattr(chunk, field.name)
+            for name in chunk._fields:
+                getattr(chunk, name)
             id = chunk.id
             id = self._chunk.id
             if chunk.id != self._chunk.id:

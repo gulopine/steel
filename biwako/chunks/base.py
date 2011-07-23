@@ -33,9 +33,9 @@ class Chunk(metaclass=ChunkMetaclass):
         # Force the evaluation of the entire structure in
         # order to make sure other fields work properly
         value_bytes = b''
-        for field in cls.structure._fields:
-            getattr(value, field.name)
-            value_bytes += value._raw_values[field.name]
+        for name in cls.structure._fields:
+            getattr(value, name)
+            value_bytes += value._raw_values[name]
 
         return value_bytes, value
 
@@ -47,8 +47,8 @@ class ChunkMixin:
     def __init__(self, *args, process_chunk=True, **kwargs):
         if process_chunk:
             chunk = self._chunk.structure(*args, **kwargs)
-            for field in chunk._fields:
-                getattr(chunk, field.name)
+            for name in chunk._fields:
+                getattr(chunk, name)
             id = chunk.id
             id = self._chunk.id
             if chunk.id != self._chunk.id:
@@ -123,16 +123,16 @@ class ChunkStreamer:
         while 1:
             chunk = self.base_chunk.structure(file)
             if chunk.id in self.parsers:
-                for field in chunk._fields:
-                    getattr(chunk, field.name)
+                for name in chunk._fields:
+                    getattr(chunk, name)
                 value = self.parsers[chunk.id](chunk.payload, process_chunk=False)
                 if self.terminator and isinstance(chunk, self.terminator):
                     break
                 yield value
             elif chunk.id:
                 # This is a valid chunk, just not a recognized type
-                for field in chunk._fields:
-                    getattr(chunk, field.name)
+                for name in chunk._fields:
+                    getattr(chunk, name)
                 yield chunk
             else:
                 # This is not a valid chunk, which is probably the end of the file
