@@ -35,10 +35,8 @@ class DeclarativeMetaclass(type):
     def __init__(cls, name, bases, attrs, **options):
         cls._fields = collections.OrderedDict()
         # Go backwards so that the left-most classes take priority
-        print('%s: %s (%s)' % (name, ', '.join(b.__name__ for b in bases), cls))
         for base in bases:
             if hasattr(base, '_fields'):
-                print('%s %s' % (base, base._fields))
                 cls._fields.update(base._fields)
 
         for name, attr in attrs.items():
@@ -47,7 +45,6 @@ class DeclarativeMetaclass(type):
             if hasattr(attr, 'attach_to_class'):
                 attr.attach_to_class(cls)
 
-        print('%s %s' % (cls, cls._fields))
         data.field_options = {}
         data.field_stack = [[]]
 
