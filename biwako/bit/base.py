@@ -20,7 +20,7 @@ class Structure(byte.Structure):
             field = byte.Integer(size=read_size)
             bytes = self._file.read(read_size)
             value = field.decode(bytes)
-            bit_buffer = (bit_buffer << size) | value
+            bit_buffer = (bit_buffer << (read_size * 8)) | value
             self._bits_left += read_size * 8
         self._bits_left -= size
         bits = bit_buffer >> self._bits_left
