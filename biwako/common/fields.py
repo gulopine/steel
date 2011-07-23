@@ -1,3 +1,4 @@
+import collections
 import copy
 import functools
 import io
@@ -5,7 +6,7 @@ import sys
 
 from ..common import args, meta, data
 
-__all__ = ['Field', 'FullyDecoded', 'SubStructure', 'List', 'Condition']
+__all__ = ['Field', 'FullyDecoded', 'SubStructure', 'StructureTuple', 'List', 'Condition']
 
 
 class Trigger:
@@ -222,6 +223,25 @@ class SubStructure(Field):
                 field._parent = self
                 return field
         raise AttributeError(name)
+
+
+class StructureTuple(SubStructure):
+    def __init__(self, structure, *args, **kwargs):
+        super(StructureTuple, self).__init__(structure, *args, **kwargs)
+        field_names = ' '.join(self.structure._fields)
+        self.namedtuple = collections.namedtuple(structure.__name__, field_names)
+
+    def read(self, file):
+        try:
+            raw_bytes = super(StructureTuple, self).read(file)
+            value = self.decode(bytes)
+        except FullyDecoded as obj:
+            raw_bytes = obj.bytes
+            value = obj.value
+        values = []
+        value = self.namedtuple(*(getattr(value, name) for name in value._fields))
+
+        raise FullyDecoded(raw_bytes, value)
 
 
 class List(Field):
