@@ -1,6 +1,7 @@
 from ..fields import Field
 from .numbers import Integer
 from ...common import args
+from ...common.fields import FullyDecoded
 
 
 class String(Field):
@@ -76,6 +77,16 @@ class FixedString(String):
             self.decoded_value = value
             self.encoded_value = super(FixedString, self).encode(value)
         self.size = len(self.encoded_value)
+
+    def read(self, file):
+        value = file.read(self.size)
+
+        # Make sure to validate the string, even if it's not explicitly accessed.
+        # This will prevent invalid files from being read beyond the fixed string.
+        if value != self.encoded_value:
+            raise ValueError('Expected %r, got %r.' % (self.encoded_value, value))
+
+        raise FullyDecoded(self.encoded_value, self.decoded_value)
 
     def decode(self, value):
         if value != self.encoded_value:
