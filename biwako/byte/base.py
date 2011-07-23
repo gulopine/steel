@@ -83,7 +83,7 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
     def get_parent(self):
         if isinstance(self._parent, Structure):
             return self._parent
-        return TypeError('%s has no parent' % self.__class__.__name__)
+        raise TypeError('%s has no parent' % self.__class__.__name__)
 
     def save(self, file):
         file.write(self.get_raw_bytes())
