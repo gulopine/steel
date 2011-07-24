@@ -55,12 +55,12 @@ class Field(metaclass=meta.DeclarativeFieldMetaclass):
 
     def getter(self, func):
         # For compatibility with typical property usage
-        self.after_decode(func)
+        self._getters.append(func)
         return self
 
     def setter(self, func):
         # For compatibility with typical property usage
-        self.after_encode(func)
+        self._setters.append(func)
         return self
 
     @after_encode
@@ -72,6 +72,8 @@ class Field(metaclass=meta.DeclarativeFieldMetaclass):
         self.label = label
         self._parent = None
         self.instance = None
+        self._getters = []
+        self._setters = []
 
         for name, arg in self.arguments.items():
             if name in kwargs:
@@ -164,11 +166,19 @@ class Field(metaclass=meta.DeclarativeFieldMetaclass):
                 raise AttributeError("Attribute %r has no data" % self.name)
     
             if self.name not in instance.__dict__:
-                instance.__dict__[self.name] = self.decode(value)
+                value = self.decode(value)
                 self.after_decode.apply(instance, value)
+
+                for getter in self._getters:
+                    value = getter(instance, value)
+
+                instance.__dict__[self.name] = value
             return instance.__dict__[self.name]
 
     def __set__(self, instance, value):
+        for setter in self._setters:
+            value = setter(instance, value)
+
         with self.for_instance(instance):
             instance.__dict__[self.name] = value
             instance._raw_values[self.name] = self.encode(value)
