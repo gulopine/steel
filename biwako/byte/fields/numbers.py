@@ -39,17 +39,17 @@ class SignMagnitude:
         self.size = size
 
     def encode(self, value):
-        if value > (1 << (self.size * 8)) - 1:
+        if value > (1 << self.size) - 1:
             raise ValueError("Value is too large to encode.")
         if value < 0:
             # Set the sign to negative
-            return -value | (1 << (self.size * 8 - 1))
+            return -value | (1 << (self.size - 1))
         return value
 
     def decode(self, value):
-        if value >> (self.size * 8 - 1):
+        if value >> (self.size - 1):
             # The sign is negative
-            return -(value ^ (2 ** (self.size * 8 - 1)))
+            return -(value ^ (2 ** (self.size - 1)))
         return value
 
 
@@ -58,17 +58,17 @@ class OnesComplement:
         self.size = size
 
     def encode(self, value):
-        if value > (1 << (self.size * 8)) - 1:
+        if value > (1 << self.size) - 1:
             raise ValueError("Value is too large to encode.")
         if value < 0:
             # Value is negative
-            return ~(-value) & (2 ** (self.size * 8) - 1)
+            return ~(-value) & (2 ** self.size - 1)
         return value
 
     def decode(self, value):
-        if value >> (self.size * 8 - 1):
+        if value >> (self.size - 1):
             # Value is negative
-            return -(~value & (2 ** (self.size * 8) - 1))
+            return -(~value & (2 ** self.size - 1))
         return value
 
 
@@ -77,17 +77,17 @@ class TwosComplement:
         self.size = size
 
     def encode(self, value):
-        if value > (1 << (self.size * 8 - 1)) - 1:
+        if value > (1 << (self.size - 1)) - 1:
             raise ValueError("Value is too large to encode.")
         if value < 0:
             # Value is negative
-            return (~(-value) & (2 ** (self.size * 8) - 1)) + 1
+            return (~(-value) & (2 ** self.size - 1)) + 1
         return value
 
     def decode(self, value):
-        if value > 2 ** (self.size * 8 - 1) - 1:
+        if value > 2 ** (self.size - 1) - 1:
             # Value is negative
-            return -(~value & (2 ** (self.size * 8) - 1)) - 1
+            return -(~value & (2 ** self.size - 1)) - 1
         return value
 
 
@@ -101,8 +101,11 @@ class Integer(Field):
     signing = args.Argument(default=TwosComplement)
 
     @signing.init
+    def init_signing(self, value):
+        return value(self.size * 8)
+
     @endianness.init
-    def init_size(self, value):
+    def init_endianness(self, value):
         return value(self.size)
 
     def encode(self, value):
