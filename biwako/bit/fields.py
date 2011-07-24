@@ -32,9 +32,14 @@ class Field(fields.Field):
 
 class Integer(numbers.Integer):
     size = args.Override(resolve_field=False)
-    signed = args.Argument(default=False)
+    signed = args.Override(default=False)
+
+    def __init__(self, *args, **kwargs):
+        super(Integer, self).__init__(*args, **kwargs)
+        self.signing = self.signing.__class__(self.size)
 
     def encode(self, value):
+        value = self.signing.encode(value)
         if value > (1 << self.size) - 1:
             raise ValueError("Value is too large for this field.")
         return value & ((1 << self.size) - 1)
@@ -42,7 +47,7 @@ class Integer(numbers.Integer):
     def decode(self, value):
         if value > (1 << self.size) - 1:
             raise ValueError("Value is too large for this field.")
-        return value & ((1 << self.size) - 1)
+        return self.signing.decode(value & ((1 << self.size) - 1))
 
 
 class FixedInteger(Integer):
