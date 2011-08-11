@@ -39,7 +39,8 @@ class Integer(numbers.Integer):
         self.signing = self.signing.__class__(self.size)
 
     def encode(self, value):
-        value = self.signing.encode(value)
+        if self.signed:
+            value = self.signing.encode(value)
         if value > (1 << self.size) - 1:
             raise ValueError("Value is too large for this field.")
         return value & ((1 << self.size) - 1)
@@ -71,7 +72,7 @@ class Flag(Integer):
     size = args.Override(default=1)
 
     def encode(self, value):
-        return int(super(Flag, self).encode(value))
+        return super(Flag, self).encode(value and 1 or 0)
 
     def decode(self, value):
         return bool(super(Flag, self).decode(value))
