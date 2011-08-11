@@ -13,16 +13,19 @@ class AttributeTest(unittest.TestCase):
         self.struct = TestStructure
 
     def test_order(self):
-        self.assertEqual(type(self.struct._fields[0]), byte.Integer)
-        self.assertEqual(type(self.struct._fields[1]), byte.String)
+        fields = list(self.struct._fields.values())
+        self.assertEqual(type(fields[0]), byte.Integer)
+        self.assertEqual(type(fields[1]), byte.String)
 
     def test_names(self):
-        self.assertEqual(self.struct._fields[0].name, 'integer')
-        self.assertEqual(self.struct._fields[1].name, 'string')
+        fields = list(self.struct._fields.values())
+        self.assertEqual(fields[0].name, 'integer')
+        self.assertEqual(fields[1].name, 'string')
 
     def test_labels(self):
-        self.assertEqual(self.struct._fields[0].label, 'Number')
-        self.assertEqual(self.struct._fields[1].label, 'String')
+        fields = list(self.struct._fields.values())
+        self.assertEqual(fields[0].label, 'Number')
+        self.assertEqual(fields[1].label, 'String')
 
     def test_assignment(self):
         struct = self.struct()
