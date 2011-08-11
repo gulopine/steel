@@ -56,19 +56,36 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
     def tell(self):
         return self._position
 
-    def _extract(self, field):
-        if field.name not in self._raw_values:
-            for name, other_field in self._fields.items():
-                if name not in self._raw_values:
-                    with other_field.for_instance(self):
-                        try:
-                            bytes = other_field.read(self)
-                        except fields.FullyDecoded as obj:
-                            bytes = obj.bytes
-                            self.__dict__[name] = obj.value
-                        self._raw_values[name] = bytes
+    def _read_until(self, field):
+        # Reads the file sequentially until the given field is encountered
+        for name, other_field in self._fields.items():
+            if name not in self._raw_values:
                 if name == field.name:
                     break
+                with other_field.for_instance(self):
+                    try:
+                        bytes = other_field.read(self)
+                    except fields.FullyDecoded as obj:
+                        bytes = obj.bytes
+                        self.__dict__[name] = obj.value
+                    self._raw_values[name] = bytes
+
+    def _extract(self, field):
+        if field.name not in self._raw_values:
+            if field.offset is not None:
+                # Seek straight to the field if possible
+                self._file.seek(field.offset)
+            else:
+                # Otherwise, read sequentially up to this point
+                self._read_until(field)
+
+            try:
+                bytes = field.read(self)
+            except fields.FullyDecoded as obj:
+                bytes = obj.bytes
+                self.__dict__[field.name] = obj.value
+            self._raw_values[field.name] = bytes
+
         return self._raw_values[field.name]
 
     def get_raw_bytes(self):

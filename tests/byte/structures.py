@@ -143,6 +143,38 @@ class IOTest(unittest.TestCase):
         struct.save(output)
         self.assertEqual(output.getvalue(), self.data)
 
+    def test_sequential(self):
+        class OffsetStructure(byte.Structure):
+            forty_two = byte.Integer(size=2, endianness=byte.LittleEndian)
+            sixty_six = byte.Integer(size=1)  # Note: No offset is given
+
+        instance = OffsetStructure(io.BytesIO(self.data))
+
+        # It got the second value ...
+        self.assertEqual(instance.sixty_six, 66)
+
+        # ... and grabbed the first value along the way
+        self.assertIn('forty_two', instance._raw_values)
+
+        # Make sure the first value is right, for good measure
+        self.assertEqual(instance.forty_two, 42)
+
+    def test_offset(self):
+        class OffsetStructure(byte.Structure):
+            forty_two = byte.Integer(size=2, endianness=byte.LittleEndian)
+            sixty_six = byte.Integer(size=1, offset=2)
+
+        instance = OffsetStructure(io.BytesIO(self.data))
+
+        # It got the second value ...
+        self.assertEqual(instance.sixty_six, 66)
+
+        # ... but *didn't* grab the first value along the way
+        self.assertNotIn('forty_two', instance._raw_values)
+
+        # Make sure the first value is right, for good measure
+        self.assertEqual(instance.forty_two, 42)
+
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):
