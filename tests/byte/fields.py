@@ -43,7 +43,7 @@ class SigningTest(unittest.TestCase):
     decoded_value = -42
 
     def test_SignMagnitude(self):
-        signer = byte.SignMagnitude(size=1)
+        signer = byte.SignMagnitude(size=8)
         encoded_value = 0b10101010
         self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value), self.decoded_value)
@@ -52,7 +52,7 @@ class SigningTest(unittest.TestCase):
         self.assertEqual(signer.decode(42), 42)
 
     def test_OnesComplement(self):
-        signer = byte.OnesComplement(size=1)
+        signer = byte.OnesComplement(size=8)
         encoded_value = 0b11010101
         self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value), self.decoded_value)
@@ -61,7 +61,7 @@ class SigningTest(unittest.TestCase):
         self.assertEqual(signer.decode(42), 42)
 
     def test_TwosComplement(self):
-        signer = byte.TwosComplement(size=1)
+        signer = byte.TwosComplement(size=8)
         encoded_value = 0b11010110
         self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value), self.decoded_value)
