@@ -238,8 +238,8 @@ class SubStructure(Field):
 class StructureTuple(SubStructure):
     def __init__(self, structure, *args, **kwargs):
         super(StructureTuple, self).__init__(structure, *args, **kwargs)
-        field_names = ' '.join(self.structure._fields)
-        self.namedtuple = collections.namedtuple(structure.__name__, field_names)
+        self.names = [name for name in self.structure._fields if not name.startswith('_')]
+        self.namedtuple = collections.namedtuple(structure.__name__, ' '.join(self.names))
 
     def read(self, file):
         try:
@@ -249,7 +249,7 @@ class StructureTuple(SubStructure):
             raw_bytes = obj.bytes
             value = obj.value
         values = []
-        value = self.namedtuple(*(getattr(value, name) for name in value._fields))
+        value = self.namedtuple(*(getattr(value, name) for name in self.names))
 
         raise FullyDecoded(raw_bytes, value)
 
@@ -319,7 +319,7 @@ class Condition:
         self.name = name
 
     def attach_to_class(self, cls):
-        cls._fields.append(self)
+        cls._fields[self.name] = self
 
     def for_instance(self, instance):
         if instance is None:
