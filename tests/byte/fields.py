@@ -367,6 +367,18 @@ class OffsetTest(unittest.TestCase):
         self.assertEqual(OffsetStructure.four.offset, 4)
         self.assertEqual(OffsetStructure.six.offset, 6)
 
+    def test_substructure_offset(self):
+        class OffsetSubStructure(byte.Structure):
+            zero = byte.Integer(size=4)
+            four = byte.Integer(size=2)
+            six = byte.Integer(size=1)
+
+        class OffsetStructure(byte.Structure):
+            zero = common.SubStructure(OffsetSubStructure)
+            seven = byte.Integer(size=1)
+
+        self.assertEqual(OffsetStructure.seven.offset, 7)
+
 
 if __name__ == '__main__':
     unittest.main()

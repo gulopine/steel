@@ -218,6 +218,9 @@ class SubStructure(Field):
 
     def __init__(self, structure, *args, **kwargs):
         self.structure = structure
+        last_field = list(structure._fields.values())[-1]
+        if 'size' not in kwargs and last_field.offset is not None:
+            kwargs['size'] = last_field.offset + last_field.size
         super(SubStructure, self).__init__(*args, **kwargs)
 
     def read(self, file):
