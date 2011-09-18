@@ -120,6 +120,16 @@ class Field(metaclass=meta.DeclarativeFieldMetaclass):
         self.label = label.title()
 
     def attach_to_class(self, cls):
+        if self.offset is None:
+            # Determine the offset based on the previous field
+            if cls._fields:
+                previous_field = list(cls._fields.values())[-1]
+                if previous_field.size is None:
+                    pass  # TODO Figure out what to do here
+                else:
+                    self.offset = previous_field.offset + previous_field.size
+            else:
+                self.offset = 0
         cls._fields[self.name] = self
 
     def validate(self, obj, value):

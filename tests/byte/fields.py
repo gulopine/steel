@@ -357,6 +357,16 @@ class OffsetTest(unittest.TestCase):
         self.assertEqual(OffsetStructure.four.offset, 4)
         self.assertEqual(OffsetStructure.eight.offset, 8)
 
+    def test_auto_offset(self):
+        class OffsetStructure(byte.Structure):
+            zero = byte.Integer(size=4)
+            four = byte.Integer(size=2)
+            six = byte.Integer(size=1)
+
+        self.assertEqual(OffsetStructure.zero.offset, 0)
+        self.assertEqual(OffsetStructure.four.offset, 4)
+        self.assertEqual(OffsetStructure.six.offset, 6)
+
 
 if __name__ == '__main__':
     unittest.main()
