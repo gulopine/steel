@@ -346,5 +346,17 @@ class ReservedTest(unittest.TestCase):
         self.assertEqual(data.getvalue(), self.data)
 
 
+class OffsetTest(unittest.TestCase):
+    def test_defined_offset(self):
+        class OffsetStructure(byte.Structure):
+            zero = byte.Integer(size=2, offset=0)
+            four = byte.Integer(size=2, offset=4)
+            eight = byte.Integer(size=1, offset=8)
+
+        self.assertEqual(OffsetStructure.zero.offset, 0)
+        self.assertEqual(OffsetStructure.four.offset, 4)
+        self.assertEqual(OffsetStructure.eight.offset, 8)
+
+
 if __name__ == '__main__':
     unittest.main()
