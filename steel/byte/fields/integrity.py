@@ -2,7 +2,7 @@ import collections
 import functools
 import zlib
 
-from steel.byte.fields.numbers import Integer
+from steel.fields.numbers import Integer
 from steel.common import args, fields
 
 __all__ = ['CheckSum', 'CRC32', 'Adler32', 'IntegrityError']

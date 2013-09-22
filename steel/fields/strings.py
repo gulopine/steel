@@ -1,5 +1,5 @@
 from steel.byte.fields import Field
-from steel.byte.fields.numbers import Integer
+from steel.fields.numbers import Integer
 from steel.common import args
 from steel.common.fields import FullyDecoded
 
