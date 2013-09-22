@@ -16,12 +16,12 @@ class Sample(byte.Structure):
         return self.title
 
 
-class Note(bit.Structure):
-    pitch = bit.Integer(size=6)
-    sample = bit.Integer(size=6)
-    volume = bit.Integer(size=4)
-    command = bit.Integer(size=4)
-    command_value = bit.Integer(size=4)
+class Note(bits.Structure):
+    pitch = bits.Integer(size=6)
+    sample = bits.Integer(size=6)
+    volume = bits.Integer(size=4)
+    command = bits.Integer(size=4)
+    command_value = bits.Integer(size=4)
     
     @sample.getter
     def sample(self, index):

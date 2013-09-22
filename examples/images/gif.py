@@ -17,11 +17,11 @@ class Color(byte.Structure):
         return '#%x%x%x' % (self.red, self.green, self.blue)
 
 
-class ScreenInfoBits(bit.Structure):
-    has_color_map = bit.Flag()
-    color_resolution = bit.Integer(size=3) + 1
-    bit.Reserved(size=1)
-    bits_per_pixel = bit.Integer(size=3) + 1
+class ScreenInfoBits(bits.Structure):
+    has_color_map = bits.Flag()
+    color_resolution = bits.Integer(size=3) + 1
+    bits.Reserved(size=1)
+    bits_per_pixel = bits.Integer(size=3) + 1
 
 
 class ScreenDescriptor(byte.Structure, endianness=byte.LittleEndian):
@@ -41,11 +41,11 @@ class ScreenDescriptor(byte.Structure, endianness=byte.LittleEndian):
         return (self.pixel_ratio + 15) / 64
 
 
-class ImageInfoBits(bit.Structure):
-    has_color_map = bit.Flag()
-    is_interlaced = bit.Flag()
-    bit.Reserved(size=3)
-    bits_per_pixel = bit.Integer(size=3) + 1
+class ImageInfoBits(bits.Structure):
+    has_color_map = bits.Flag()
+    is_interlaced = bits.Flag()
+    bits.Reserved(size=3)
+    bits_per_pixel = bits.Integer(size=3) + 1
 
 
 class ImageDescriptor(byte.Structure):

@@ -27,10 +27,10 @@ class ColorMap(byte.Structure):
     entry_size = byte.Integer(size=1)
 
 
-class AlphaOrigin(bit.Structure):
-    bit.Reserved(size=2)
-    image_origin = bit.Integer(size=2, choices=ORIGINS)
-    alpha_depth = bit.Integer(size=4)
+class AlphaOrigin(bits.Structure):
+    bits.Reserved(size=2)
+    image_origin = bits.Integer(size=2, choices=ORIGINS)
+    alpha_depth = bits.Integer(size=4)
 
 
 class TGA(byte.Structure, endianness=byte.LittleEndian):

@@ -1,12 +1,12 @@
 from steel import bit, byte, common
 
 
-class FineTune(bit.Structure):
-    bit.Reserved(size=4)
-    value = bit.Integer(size=4)
+class FineTune(bits.Structure):
+    bits.Reserved(size=4)
+    value = bits.Integer(size=4)
 
 
-class SampleLength(bit.Integer):
+class SampleLength(bits.Integer):
     def encode(self, value):
         return int(value / 2)
 
@@ -35,11 +35,11 @@ class Sample(byte.Structure):
         return self.name
 
 
-class Note(bit.Structure):
-    sample_hi = bit.Integer(size=4)
-    period = bit.Integer(size=12)
-    sample_lo = bit.Integer(size=4)
-    effect = bit.Integer(size=12)
+class Note(bits.Structure):
+    sample_hi = bits.Integer(size=4)
+    period = bits.Integer(size=12)
+    sample_lo = bits.Integer(size=4)
+    effect = bits.Integer(size=12)
     
     @property
     def sample(self):
