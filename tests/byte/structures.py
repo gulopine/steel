@@ -1,31 +1,31 @@
 import io
 import unittest
 
-from steel import byte
+from steel import base, fields
 
 
 class AttributeTest(unittest.TestCase):
     def setUp(self):
-        class TestStructure(byte.Structure):
-            integer = byte.Integer('number', size=1)
-            string = byte.String(encoding='ascii')
+        class TestStructure(base.Structure):
+            integer = fields.Integer('number', size=1)
+            string = fields.String(encoding='ascii')
             
         self.struct = TestStructure
 
     def test_order(self):
-        fields = list(self.struct._fields.values())
-        self.assertEqual(type(fields[0]), byte.Integer)
-        self.assertEqual(type(fields[1]), byte.String)
+        f1, f2 = self.struct._fields.values()
+        self.assertEqual(type(f1), fields.Integer)
+        self.assertEqual(type(f2), fields.String)
 
     def test_names(self):
-        fields = list(self.struct._fields.values())
-        self.assertEqual(fields[0].name, 'integer')
-        self.assertEqual(fields[1].name, 'string')
+        f1, f2 = self.struct._fields.values()
+        self.assertEqual(f1.name, 'integer')
+        self.assertEqual(f2.name, 'string')
 
     def test_labels(self):
-        fields = list(self.struct._fields.values())
-        self.assertEqual(fields[0].label, 'Number')
-        self.assertEqual(fields[1].label, 'String')
+        f1, f2 = self.struct._fields.values()
+        self.assertEqual(f1.label, 'Number')
+        self.assertEqual(f2.label, 'String')
 
     def test_assignment(self):
         struct = self.struct()
@@ -42,9 +42,9 @@ class AttributeTest(unittest.TestCase):
             struct = self.struct(io.BytesIO(), integer=1, string='invalid')
             
     def test_related(self):
-        class TestStructure(byte.Structure):
-            length = byte.Integer('number', size=1)
-            content = byte.String(encoding='ascii', size=length)
+        class TestStructure(base.Structure):
+            length = fields.Integer('number', size=1)
+            content = fields.String(encoding='ascii', size=length)
         
         struct = TestStructure(io.BytesIO(b'\x05validpadding'))
         self.assertEqual(struct.length, 5)
@@ -61,11 +61,11 @@ class IOTest(unittest.TestCase):
         self.input = io.BytesIO(self.data)
         self.output = io.BytesIO()
         
-        class TestStructure(byte.Structure):
-            forty_two = byte.Integer(size=2, endianness=byte.LittleEndian)
-            sixty_six = byte.Integer(size=1)
-            valid = byte.String(encoding='ascii')
-            test = byte.String(encoding='ascii')
+        class TestStructure(base.Structure):
+            forty_two = fields.Integer(size=2, endianness=fields.LittleEndian)
+            sixty_six = fields.Integer(size=1)
+            valid = fields.String(encoding='ascii')
+            test = fields.String(encoding='ascii')
 
         self.struct = TestStructure
 
@@ -146,7 +146,7 @@ class IOTest(unittest.TestCase):
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):
-        class TestStructure(byte.Structure, attribute='test'):
+        class TestStructure(base.Structure, attribute='test'):
             pass
 
 
