@@ -1,7 +1,6 @@
 from steel.common import args
 from steel.byte import fields
 from steel.common.fields import *
-from steel.byte.fields import numbers
 
 __all__ = ['Field', 'Integer', 'FixedInteger', 'Flag', 'Reserved']
 
@@ -30,7 +29,7 @@ class Field(fields.Field):
             setattr(self, name, arg.initialize(self, getattr(self, name)))
 
 
-class Integer(numbers.Integer):
+class Integer(fields.Integer):
     size = args.Override(resolve_field=False)
     signed = args.Override(default=False)
 
