@@ -2,7 +2,7 @@ import io
 import unittest
 
 from steel import byte, common
-from steel.byte.fields import integrity
+from steel.fields import integrity
 
 
 class IOTest(unittest.TestCase):

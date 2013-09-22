@@ -1,7 +1,7 @@
 import decimal
 import sys
 from steel import byte, chunks, common
-from steel.byte.fields import integrity
+from steel.fields import integrity
 
 COMPRESSION_CHOICES = (
     (0, 'zlib/deflate'),
