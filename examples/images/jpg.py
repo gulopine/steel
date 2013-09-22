@@ -1,5 +1,5 @@
 import sys
-from biwako import byte, chunks, common
+from steel import byte, chunks, common
 
 DENSITY_UNITS = (
     (0, 'Aspect ratio only'),

@@ -1,14 +1,14 @@
 Byte-level Structures
 =====================
 
-.. currentmodule:: biwako.byte.base
+.. currentmodule:: steel.byte.base
 
-For the purposes of Biwako, every block of data is considered a structure,
-which may contain one or more :doc:`fields <fields>`. The structure itself
+For the purposes of Steel, every block of data is considered a structure, which
+may contain one or more :doc:`fields <fields>`. The structure itself
 encapsulates those fields into a single class, which can then manage all the
 conversion to and from files and other file-like objects.
 
-A structures is defined as a subclass of :class:`~biwako.byte.base.Structure`,
+A structures is defined as a subclass of :class:`~steeel.byte.base.Structure`,
 which provides everything necessary to utilize fields and process data. In its
 simplest form, though, subclassing `Structure` alone isn't enough to do anything
 useful. You'll always need to include at least one field in order to tell your
@@ -16,7 +16,7 @@ class how to process whatever data you pass into it.
 
 ::
 
-    from biwako import byte
+    from steel import byte
     
     class Dimensions(byte.Structure):
         width = byte.Integer(size=2)
@@ -49,13 +49,13 @@ you know right away, before supplying the rest later.
     (640, 480)
 
 So far, it's pretty obvious how you'd work with a structure, and it hasn't done
-anything for which you'd need a framework like Biwako. Things get much more
+anything for which you'd need a framework like Steel. Things get much more
 interesting when we add a third way to supply data to a structure.
 
 Reading a file
 --------------
 
-Biwako's strength is its ability to parse this data straight from a file or
+Steel's strength is its ability to parse this data straight from a file or
 another file-like object. By passing in an object with a `read()` method, the
 structure has enough information to retrieve the necessary informtion, decode it
 into native Python values and set those values to the corresponding attributes.

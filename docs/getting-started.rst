@@ -2,17 +2,17 @@ Getting Started
 ===============
 
 Most of the tools you'll need for describing a file format can be found in the
-:mod:`biwako.byte` namespace. It's typically best to import :mod:`~biwako.byte`
+:mod:`steel.byte` namespace. It's typically best to import :mod:`~steel.byte`
 directly, so the name is kept short in all your references to it throughout
 the module.
 
 ::
 
-  from biwako import byte
+  from steel import byte
 
 Many different classes are available in this namespace, but you'll spend most
 of your time working with two different types: structures and fields. The most
-basic structure is simply called :class:`~biwako.byte.base.Structure`, which
+basic structure is simply called :class:`~steel.byte.base.Structure`, which
 represents a block of data. It works using a declarative approach, which starts
 by simply subclassing `Structure`.
 
@@ -27,7 +27,7 @@ data is a static string tag, ``"GIF"``, which is followed by a three-character
 string containing the version number of the format used to save the file.
 
 Because the first string, ``"GIF"`` is always the same across all files that
-use this format, it can use a :class:`~biwako.byte.fields.strings.FixedString`.
+use this format, it can use a :class:`~steel.byte.fields.strings.FixedString`.
 This type of field will always check for the specific string and will consider
 the file to be invalid if any other string is found.
 
@@ -44,7 +44,7 @@ using the encoding provided.
       version = byte.String(size=3, encoding='ascii')
 
 The width and height are eaiser to describe, because they're simply numbers,
-and they're represented as :class:`~biwako.byte.fields.numbers.Integer` fields.
+and they're represented as :class:`~steel.byte.fields.numbers.Integer` fields.
 Since numbers can come in a few different sizes, you must specify how many
 bytes are used to store the number, so that it can be processed correctly.
 Each of the numbers for the image dimensions in a GIF file are stored in two
@@ -71,7 +71,7 @@ Unlike most details of fields, though, endianness is typically the same
 throughout the entire file, so it doesn't make much sense to include it on each
 and every field. Instead, you can provide it as an argument to the main class
 definition itself. The functionality you'll need is controlled by a class named
-:class:`~biwako.byte.fields.numbers.LittleEndian`.
+:class:`~steel.byte.fields.numbers.LittleEndian`.
 
 ::
 

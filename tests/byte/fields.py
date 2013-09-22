@@ -1,8 +1,8 @@
 import io
 import unittest
 
-from biwako import byte, common
-from biwako.byte.fields import integrity
+from steel import byte, common
+from steel.byte.fields import integrity
 
 
 class IOTest(unittest.TestCase):

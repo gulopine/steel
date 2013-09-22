@@ -1,6 +1,6 @@
 import sys
 
-from biwako import bit, byte, common
+from steel import bit, byte, common
 
 VERSIONS = (
     ('87a', '87a'),

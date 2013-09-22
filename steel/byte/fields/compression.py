@@ -2,7 +2,7 @@ import io
 import zlib
 
 from ..fields import Field
-from biwako import common
+from steel import common
 
 
 class Zlib(Field):

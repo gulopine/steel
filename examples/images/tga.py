@@ -1,4 +1,4 @@
-from biwako import bit, byte, common
+from steel import bit, byte, common
 
 COLOR_MAP_TYPES = (
     (0, 'No color map included'),

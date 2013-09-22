@@ -1,7 +1,7 @@
 import sys
 
 from ..common import args
-from biwako import byte
+from steel import byte
 
 __all__ = ['Structure']
 

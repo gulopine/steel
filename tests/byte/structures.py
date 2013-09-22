@@ -1,7 +1,7 @@
 import io
 import unittest
 
-from biwako import byte
+from steel import byte
 
 
 class AttributeTest(unittest.TestCase):

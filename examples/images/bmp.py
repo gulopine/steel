@@ -1,4 +1,4 @@
-from biwako import byte, common
+from steel import byte, common
 
 COMPRESSION_TYPES = (
     (0, 'No compression'),

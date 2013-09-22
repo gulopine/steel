@@ -1,10 +1,11 @@
 TODO
 ====
 
-Biwako is far from finished even in the short term. It's come a long way in just a few months, but there's still a lot more to do.
+Steel is far from finished even in the short term. It's come a long way in just
+a few months, but there's still a lot more to do.
 
-biwako.bin
-----------
+steel.bin
+---------
 
  - Conditionally load different structures based on previous values
  - Flesh out more example formats to see what other features are missing
@@ -16,8 +17,8 @@ biwako.bin
  - Fix resolution of calculated values in the face of complex expressions
  - 
 
-biwako.csv
-----------
+steel.csv
+---------
 
  - Additional field types, including currency
  - 

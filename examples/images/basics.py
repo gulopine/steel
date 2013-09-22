@@ -1,6 +1,6 @@
 import os
 import sys
-from biwako import byte
+from steel import byte
 
 
 GIF_VERSIONS = (

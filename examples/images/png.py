@@ -1,7 +1,7 @@
 import decimal
 import sys
-from biwako import byte, chunks, common
-from biwako.byte.fields import integrity
+from steel import byte, chunks, common
+from steel.byte.fields import integrity
 
 COMPRESSION_CHOICES = (
     (0, 'zlib/deflate'),
