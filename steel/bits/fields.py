@@ -1,5 +1,5 @@
 from steel.common import args
-from steel.byte import fields
+from steel import fields
 from steel.common.fields import *
 
 __all__ = ['Field', 'Integer', 'FixedInteger', 'Flag', 'Reserved']

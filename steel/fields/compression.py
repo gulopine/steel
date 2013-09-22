@@ -1,7 +1,7 @@
 import io
 import zlib
 
-from steel.byte.fields import Field
+from steel.fields import Field
 from steel import common
 
 

@@ -1,7 +1,7 @@
 import io
 
 from steel.common import meta, args, fields
-from steel.byte.fields import Field
+from steel.fields import Field
 from steel.byte.base import Structure
 from steel.fields.strings import Bytes
 

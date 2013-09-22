@@ -1,6 +1,6 @@
 import decimal
 
-from steel.byte.fields import Field
+from steel.fields import Field
 from steel.common import args, fields
 
 __all__ = ['BigEndian', 'LittleEndian', 'SignMagnitude', 'OnesComplement',
