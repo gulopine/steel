@@ -1,6 +1,6 @@
 import sys
 
-from ..common import args
+from steel.common import args
 from steel import byte
 
 __all__ = ['Structure']

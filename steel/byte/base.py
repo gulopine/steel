@@ -1,6 +1,6 @@
 import io
 
-from ..common import meta, fields
+from steel.common import meta, fields
 
 __all__ = ['Structure', 'StructureStreamer']
 

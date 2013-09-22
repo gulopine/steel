@@ -1,6 +1,6 @@
 import sys
 
-from ...common import args, fields
+from steel.common import args, fields
 
 __all__ = ['Field', 'Reserved']
 

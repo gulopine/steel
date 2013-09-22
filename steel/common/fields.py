@@ -4,7 +4,7 @@ import functools
 import io
 import sys
 
-from ..common import args, meta, data
+from steel.common import args, meta, data
 
 __all__ = ['Field', 'FullyDecoded', 'SubStructure', 'StructureTuple', 'List', 'Condition']
 

@@ -1,6 +1,6 @@
 import collections
 
-from ..common import data
+from steel.common import data
 
 
 class NameAwareOrderedDict(collections.OrderedDict):

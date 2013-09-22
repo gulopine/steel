@@ -1,6 +1,6 @@
 import copy
 
-from ..common import data
+from steel.common import data
 
 NotProvided = object()
 

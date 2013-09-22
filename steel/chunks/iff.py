@@ -2,7 +2,7 @@ import collections
 import io
 
 from steel import byte
-from ..chunks import base
+from steel.chunks import base
 
 __all__ = ['Chunk', 'Form']
 

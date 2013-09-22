@@ -1,7 +1,7 @@
-from ..common import args
-from ..byte import fields
-from ..common.fields import *
-from ..byte.fields import numbers
+from steel.common import args
+from steel.byte import fields
+from steel.common.fields import *
+from steel.byte.fields import numbers
 
 __all__ = ['Field', 'Integer', 'FixedInteger', 'Flag', 'Reserved']
 

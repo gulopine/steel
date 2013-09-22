@@ -1,9 +1,9 @@
-from ..common import Remainder
-from ..common.fields import *
+from steel.common import Remainder
+from steel.common.fields import *
 
-from .base import *
-from .fields import *
-from .fields.numbers import *
-from .fields.strings import *
-from .fields.compression import *
-from .fields.integrity import *
+from steel.byte.base import *
+from steel.byte.fields import *
+from steel.byte.fields.numbers import *
+from steel.byte.fields.strings import *
+from steel.byte.fields.compression import *
+from steel.byte.fields.integrity import *

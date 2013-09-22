@@ -1,5 +1,5 @@
-from ..common import Remainder
-from ..common.fields import *
+from steel.common import Remainder
+from steel.common.fields import *
 
-from .base import *
-from .fields import *
+from steel.byte.base import *
+from steel.byte.fields import *
