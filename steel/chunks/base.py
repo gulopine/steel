@@ -2,7 +2,7 @@ import io
 
 from steel.common import meta, args, fields
 from steel.fields import Field
-from steel.byte.base import Structure
+from steel.base import Structure
 from steel.fields.strings import Bytes
 
 __all__ = ['Chunk', 'Payload', 'ChunkList', 'ChunkStreamer']
