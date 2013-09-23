@@ -8,13 +8,13 @@ flexible enough to work with data from most file-like objects.
 
 Consider a simple format to retrieve the width and height out of GIF images::
 
-  from steel import byte
+  import steel
 
-  class GIF(byte.Structure, endianness=byte.LittleEndian):
-      tag = byte.FixedString('GIF')
-      version = byte.String(size=3, encoding='ascii')
-      width = byte.Integer(size=2)
-      height = byte.Integer(size=2)
+  class GIF(steel.Structure, endianness=steel.LittleEndian):
+      tag = steel.FixedString('GIF')
+      version = steel.String(size=3, encoding='ascii')
+      width = steel.Integer(size=2)
+      height = steel.Integer(size=2)
 
 That's all it takes to create a class capable of parsing a GIF into a Python
 object. There's certainly more to the GIF image format than just what you see
@@ -51,6 +51,6 @@ Where to Go Next
    :maxdepth: 2
 
    getting-started
-   byte/structures
-   byte/fields
-   byte/numbers
+   structures
+   fields/index
+   fields/numbers

@@ -1,14 +1,14 @@
 Byte-level Structures
 =====================
 
-.. currentmodule:: steel.byte.base
+.. currentmodule:: steel.base
 
 For the purposes of Steel, every block of data is considered a structure, which
 may contain one or more :doc:`fields <fields>`. The structure itself
 encapsulates those fields into a single class, which can then manage all the
 conversion to and from files and other file-like objects.
 
-A structures is defined as a subclass of :class:`~steeel.byte.base.Structure`,
+A structures is defined as a subclass of :class:`~steel.base.Structure`,
 which provides everything necessary to utilize fields and process data. In its
 simplest form, though, subclassing `Structure` alone isn't enough to do anything
 useful. You'll always need to include at least one field in order to tell your
@@ -16,11 +16,11 @@ class how to process whatever data you pass into it.
 
 ::
 
-    from steel import byte
+    import steel
     
-    class Dimensions(byte.Structure):
-        width = byte.Integer(size=2)
-        height = byte.Integer(size=2)
+    class Dimensions(steel.Structure):
+        width = steel.Integer(size=2)
+        height = steel.Integer(size=2)
 
 Adding data
 -----------

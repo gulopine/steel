@@ -21,7 +21,7 @@ Many of the most common combinations are available to you out of the box, but if
 you run into something not listed here, you're always free to create your own
 :doc:`custom type <custom-fields>`.
 
-.. py:currentmodule:: steel.byte.fields.numbers
+.. py:currentmodule:: steel.fields.numbers
 
 Endianness
 ----------
