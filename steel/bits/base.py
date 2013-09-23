@@ -1,12 +1,11 @@
 import sys
 
-from steel.common import args
-from steel import byte
+from steel import base, fields
 
 __all__ = ['Structure']
 
 
-class Structure(byte.Structure):
+class Structure(base.Structure):
     def __init__(self, *args, **kwargs):
         super(Structure, self).__init__(*args, **kwargs)
         self._bits_left = 0
@@ -17,7 +16,7 @@ class Structure(byte.Structure):
         if size > self._bits_left:
             # Read more bytes from the file
             read_size = int(((size - self._bits_left) + 7) / 8)
-            field = byte.Integer(size=read_size)
+            field = fields.Integer(size=read_size)
             bytes = self._file.read(read_size)
             value = field.decode(bytes)
             bit_buffer = (bit_buffer << (read_size * 8)) | value
