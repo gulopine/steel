@@ -1,11 +1,12 @@
-from steel import bit, byte, common
+import steel
+from steel import bits
 
 
-class Sample(byte.Structure):
-    title = byte.String(size=13, encoding='ascii')
-    size = byte.Integer(size=4)
-    loop_start = byte.Integer(size=4, default=0)
-    loop_end = byte.Integer(size=4, default=0xFFFFF)
+class Sample(steel.Structure):
+    title = steel.String(size=13, encoding='ascii')
+    size = steel.Integer(size=4)
+    loop_start = steel.Integer(size=4, default=0)
+    loop_end = steel.Integer(size=4, default=0xFFFFF)
     
     @property
     def data(self):
@@ -32,32 +33,32 @@ class Note(bits.Structure):
         return self.get_parent().samples.index(sample)
 
 
-class Row(byte.Structure):
-    notes = common.List(Note, size=8)
+class Row(steel.Structure):
+    notes = steel.List(Note, size=8)
     
     def __iter__(self):
         return iter(self.notes)
 
 
-class Pattern(byte.Structure):
-    rows = common.List(Row, size=64)
+class Pattern(steel.Structure):
+    rows = steel.List(Row, size=64)
     
     def __iter__(self):
         return iter(self.rows)
 
 
-class _669(byte.Structure, endianness=byte.LittleEndian):
-    marker = byte.FixedString('if')
-    message = common.List(byte.String(size=36, encoding='ascii', padding=' '), size=3)
-    sample_count = byte.Integer(size=1, max_value=64)
-    pattern_count = byte.Integer(size=1, max_value=128)
-    restart_position = byte.Integer(size=1)
-    pattern_order = byte.List(byte.Integer(size=1, max_value=128), size=128)
-    pattern_tempos = byte.List(byte.Integer(size=1), size=128)
-    pattern_breaks = byte.List(byte.Integer(size=1), size=128)
-    samples = common.List(Sample, size=sample_count)
-    patterns = common.List(Pattern, size=pattern_count)
-    sample_data = byte.ByteString(size=byte.REMAINDER)
+class _669(steel.Structure, endianness=steel.LittleEndian):
+    marker = steel.FixedString('if')
+    message = steel.List(steel.String(size=36, encoding='ascii', padding=' '), size=3)
+    sample_count = steel.Integer(size=1, max_value=64)
+    pattern_count = steel.Integer(size=1, max_value=128)
+    restart_position = steel.Integer(size=1)
+    pattern_order = steel.List(steel.Integer(size=1, max_value=128), size=128)
+    pattern_tempos = steel.List(steel.Integer(size=1), size=128)
+    pattern_breaks = steel.List(steel.Integer(size=1), size=128)
+    samples = steel.List(Sample, size=sample_count)
+    patterns = steel.List(Pattern, size=pattern_count)
+    sample_data = steel.ByteString(size=steel.REMAINDER)
     
     @sample_data.getter
     def sample_data(self, data):

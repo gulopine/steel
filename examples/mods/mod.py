@@ -1,4 +1,5 @@
-from steel import bit, byte, common
+import steel
+from steel import bits
 
 
 class FineTune(bits.Structure):
@@ -14,11 +15,11 @@ class SampleLength(bits.Integer):
         return value * 2
     
 
-class Sample(byte.Structure):
-    name = byte.String(size=22, encoding='ascii')
+class Sample(steel.Structure):
+    name = steel.String(size=22, encoding='ascii')
     size = SampleLength(size=2)
-    finetune = common.SubStructure(FineTune)
-    volume = byte.Integer(size=1)
+    finetune = steel.SubStructure(FineTune)
+    volume = steel.Integer(size=1)
     loop_start = SampleLength(size=2, default=0)
     loop_length = SampleLength(size=2, default=0)
     
@@ -53,31 +54,31 @@ class Note(bits.Structure):
         self.sample_lo = index & 0xF
 
 
-class Row(byte.Structure):
-    notes = common.List(Note, size=lambda self: self.get_parent().channels)
+class Row(steel.Structure):
+    notes = steel.List(Note, size=lambda self: self.get_parent().channels)
     
     def __iter__(self):
         return iter(self.rows)
 
 
-class Pattern(byte.Structure):
-    rows = common.List(Row, size=64)
+class Pattern(steel.Structure):
+    rows = steel.List(Row, size=64)
     
     def __iter__(self):
         return iter(self.rows)
 
 
-class MOD(byte.Structure, endianness=byte.BigEndian):
+class MOD(steel.Structure, endianness=steel.BigEndian):
     channels = 4
     
-    title = byte.String(size=20, encoding='ascii')
-    samples = common.List(Sample, size=15)
-    order_count = byte.Integer(size=1)
-    restart_position = byte.Integer(size=1)
-    pattern_order = common.List(byte.Integer(size=1), size=128)
-    marker = byte.FixedString('M.K.')
-    patterns = common.List(Pattern, size=lambda self: max(self.pattern_order) + 1)
-    sample_data = byte.Bytes(size=common.Remainder)
+    title = steel.String(size=20, encoding='ascii')
+    samples = steel.List(Sample, size=15)
+    order_count = steel.Integer(size=1)
+    restart_position = steel.Integer(size=1)
+    pattern_order = steel.List(steel.Integer(size=1), size=128)
+    marker = steel.FixedString('M.K.')
+    patterns = steel.List(Pattern, size=lambda self: max(self.pattern_order) + 1)
+    sample_data = steel.Bytes(size=steel.Remainder)
     
     @property
     def pattern_count(self):
