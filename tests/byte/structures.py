@@ -1,21 +1,21 @@
 import io
 import unittest
 
-from steel import base, fields
+import steel
 
 
 class AttributeTest(unittest.TestCase):
     def setUp(self):
-        class TestStructure(base.Structure):
-            integer = fields.Integer('number', size=1)
-            string = fields.String(encoding='ascii')
+        class TestStructure(steel.Structure):
+            integer = steel.Integer('number', size=1)
+            string = steel.String(encoding='ascii')
             
         self.struct = TestStructure
 
     def test_order(self):
         f1, f2 = self.struct._fields.values()
-        self.assertEqual(type(f1), fields.Integer)
-        self.assertEqual(type(f2), fields.String)
+        self.assertEqual(type(f1), steel.Integer)
+        self.assertEqual(type(f2), steel.String)
 
     def test_names(self):
         f1, f2 = self.struct._fields.values()
@@ -42,9 +42,9 @@ class AttributeTest(unittest.TestCase):
             struct = self.struct(io.BytesIO(), integer=1, string='invalid')
             
     def test_related(self):
-        class TestStructure(base.Structure):
-            length = fields.Integer('number', size=1)
-            content = fields.String(encoding='ascii', size=length)
+        class TestStructure(steel.Structure):
+            length = steel.Integer('number', size=1)
+            content = steel.String(encoding='ascii', size=length)
         
         struct = TestStructure(io.BytesIO(b'\x05validpadding'))
         self.assertEqual(struct.length, 5)
@@ -61,11 +61,11 @@ class IOTest(unittest.TestCase):
         self.input = io.BytesIO(self.data)
         self.output = io.BytesIO()
         
-        class TestStructure(base.Structure):
-            forty_two = fields.Integer(size=2, endianness=fields.LittleEndian)
-            sixty_six = fields.Integer(size=1)
-            valid = fields.String(encoding='ascii')
-            test = fields.String(encoding='ascii')
+        class TestStructure(steel.Structure):
+            forty_two = steel.Integer(size=2, endianness=steel.LittleEndian)
+            sixty_six = steel.Integer(size=1)
+            valid = steel.String(encoding='ascii')
+            test = steel.String(encoding='ascii')
 
         self.struct = TestStructure
 
@@ -146,7 +146,7 @@ class IOTest(unittest.TestCase):
 
 class OptionsTest(unittest.TestCase):
     def test_arguments(self):
-        class TestStructure(base.Structure, attribute='test'):
+        class TestStructure(steel.Structure, attribute='test'):
             pass
 
 

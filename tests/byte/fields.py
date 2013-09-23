@@ -1,8 +1,7 @@
 import io
 import unittest
 
-from steel import base, common, fields
-from steel.fields import integrity
+import steel
 
 
 class IOTest(unittest.TestCase):
@@ -13,12 +12,12 @@ class IOTest(unittest.TestCase):
         self.output = io.BytesIO()
 
     def test_read(self):
-        field = fields.Field(size=2)
+        field = steel.Field(size=2)
         data = field.read(self.input)
         self.assertEqual(data, self.data)
 
     def test_write(self):
-        field = fields.Field(size=2)
+        field = steel.Field(size=2)
         field.write(self.output, self.data)
         self.assertEqual(self.output.getvalue(), self.data)
 
@@ -27,13 +26,13 @@ class EndiannessTest(unittest.TestCase):
     decoded_value = 42
     
     def test_BigEndian(self):
-        endianness = fields.BigEndian(size=2)
+        endianness = steel.BigEndian(size=2)
         encoded_value = b'\x00*'
         self.assertEqual(endianness.encode(self.decoded_value), encoded_value)
         self.assertEqual(endianness.decode(encoded_value), self.decoded_value)
 
     def test_LittleEndian(self):
-        endianness = fields.LittleEndian(size=2)
+        endianness = steel.LittleEndian(size=2)
         encoded_value = b'*\x00'
         self.assertEqual(endianness.encode(self.decoded_value), encoded_value)
         self.assertEqual(endianness.decode(encoded_value), self.decoded_value)
@@ -43,7 +42,7 @@ class SigningTest(unittest.TestCase):
     decoded_value = -42
 
     def test_SignMagnitude(self):
-        signer = fields.SignMagnitude(size=8)
+        signer = steel.SignMagnitude(size=8)
         encoded_value = 0b10101010
         self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value), self.decoded_value)
@@ -52,7 +51,7 @@ class SigningTest(unittest.TestCase):
         self.assertEqual(signer.decode(42), 42)
 
     def test_OnesComplement(self):
-        signer = fields.OnesComplement(size=8)
+        signer = steel.OnesComplement(size=8)
         encoded_value = 0b11010101
         self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value), self.decoded_value)
@@ -61,7 +60,7 @@ class SigningTest(unittest.TestCase):
         self.assertEqual(signer.decode(42), 42)
 
     def test_TwosComplement(self):
-        signer = fields.TwosComplement(size=8)
+        signer = steel.TwosComplement(size=8)
         encoded_value = 0b11010110
         self.assertEqual(bin(signer.encode(self.decoded_value)), bin(encoded_value))
         self.assertEqual(signer.decode(encoded_value), self.decoded_value)
@@ -72,7 +71,7 @@ class SigningTest(unittest.TestCase):
 
 class TestInteger(unittest.TestCase):
     def test_signed(self):
-        field = fields.Integer(size=1, signed=True)
+        field = steel.Integer(size=1, signed=True)
         self.assertEqual(field.encode(127), b'\x7f')
         self.assertEqual(field.encode(-127), b'\x81')
 
@@ -81,7 +80,7 @@ class TestInteger(unittest.TestCase):
             field.encode(128)
 
     def test_unsigned(self):
-        field = fields.Integer(size=1, signed=False)
+        field = steel.Integer(size=1, signed=False)
         self.assertEqual(field.encode(127), b'\x7f')
         self.assertEqual(field.encode(128), b'\x80')
 
@@ -96,7 +95,7 @@ class TestInteger(unittest.TestCase):
 
 class TestFixedInteger(unittest.TestCase):
     def test(self):
-        field = fields.FixedInteger(42, size=1)
+        field = steel.FixedInteger(42, size=1)
         self.assertEqual(field.encode(42), b'\x2a')
         self.assertEqual(field.decode(b'\x2a'), 42)
 
@@ -109,7 +108,7 @@ class TestFixedInteger(unittest.TestCase):
 
 class CalculatedValueTest(unittest.TestCase):
     def setUp(self):
-        self.field = fields.Integer(size=1)
+        self.field = steel.Integer(size=1)
 
     def test_add(self):
         calc_field = self.field + 2
@@ -156,7 +155,7 @@ class CalculatedValueTest(unittest.TestCase):
 
 class StringTest(unittest.TestCase):
     def test_ascii(self):
-        field = fields.String(encoding='ascii')
+        field = steel.String(encoding='ascii')
         self.assertEqual(field.encode('test'), b'test\x00')
         self.assertEqual(field.decode(b'test\x00'), 'test')
         
@@ -165,7 +164,7 @@ class StringTest(unittest.TestCase):
             field.encode('\u00fcber')
 
     def test_utf8(self):
-        field = fields.String(encoding='utf8')
+        field = steel.String(encoding='utf8')
         self.assertEqual(field.encode('\u00fcber'), b'\xc3\xbcber\x00')
         self.assertEqual(field.decode(b'\xc3\xbcber\x00'), '\u00fcber')
 
@@ -175,7 +174,7 @@ class LengthIndexedString(unittest.TestCase):
     decoded_data = 'valid'
 
     def setUp(self):
-        self.field = fields.LengthIndexedString(size=1, encoding='ascii')
+        self.field = steel.LengthIndexedString(size=1, encoding='ascii')
 
     def test_encode(self):
         self.assertEqual(self.field.encode(self.decoded_data), self.encoded_data)
@@ -186,7 +185,7 @@ class LengthIndexedString(unittest.TestCase):
 
 class FixedStringTest(unittest.TestCase):
     def test_bytes(self):
-        field = fields.FixedString(b'valid')
+        field = steel.FixedString(b'valid')
         field.encode(b'valid')
         field.decode(b'valid')
 
@@ -198,7 +197,7 @@ class FixedStringTest(unittest.TestCase):
             field.decode('valid')
 
     def test_ascii(self):
-        field = fields.FixedString('valid')
+        field = steel.FixedString('valid')
         field.encode('valid')
         field.decode(b'valid')
 
@@ -209,7 +208,7 @@ class FixedStringTest(unittest.TestCase):
             field.decode(b'invalid')
 
     def test_utf8(self):
-        field = fields.FixedString('\u00fcber', encoding='utf8')
+        field = steel.FixedString('\u00fcber', encoding='utf8')
         field.encode('\u00fcber')
         field.decode(b'\xc3\xbcber')
 
@@ -225,11 +224,11 @@ class BytesTest(unittest.TestCase):
     data = b'\x42\x00\x2a'
 
     def test_encode(self):
-        field = fields.Bytes(size=3)
+        field = steel.Bytes(size=3)
         self.assertEqual(field.encode(self.data), self.data)
 
     def test_extract(self):
-        field = fields.Bytes(size=3)
+        field = steel.Bytes(size=3)
         self.assertEqual(field.decode(self.data), self.data)
 
 
@@ -238,7 +237,7 @@ class ListTest(unittest.TestCase):
     decoded_data = [66, 82, 42, 58]
 
     def setUp(self):
-        self.field = common.List(fields.Integer(size=1), size=4)
+        self.field = steel.List(steel.Integer(size=1), size=4)
 
     def test_encode(self):
         data = self.field.encode(self.decoded_data)
@@ -254,7 +253,7 @@ class ZlibTest(unittest.TestCase):
     decoded_data = 'test'
 
     def setUp(self):
-        self.field = fields.Zlib(fields.String(size=4, encoding='ascii'), size=common.Remainder)
+        self.field = steel.Zlib(steel.String(size=4, encoding='ascii'), size=steel.Remainder)
 
     def test_encode(self):
         data = self.field.encode(self.decoded_data)
@@ -271,13 +270,13 @@ class CheckSumTest(unittest.TestCase):
     modified_csum = b'\x00\x01\x02\x03\x00\x04\x00\x00\x00\x05\x00\x10'
     modified_both = b'\x00\x02\x02\x03\x00\x04\x00\x00\x00\x05\x00\x10'
 
-    class IntegrityStructure(base.Structure):
-        a = fields.Integer(size=2)
-        b = fields.Integer(size=1)
-        c = fields.Integer(size=1)
-        d = fields.Integer(size=2)
-        e = fields.Integer(size=4)
-        checksum = fields.CheckSum(size=2)
+    class IntegrityStructure(steel.Structure):
+        a = steel.Integer(size=2)
+        b = steel.Integer(size=1)
+        c = steel.Integer(size=1)
+        d = steel.Integer(size=2)
+        e = steel.Integer(size=4)
+        checksum = steel.CheckSum(size=2)
 
     def test_encode(self):
         pass
@@ -295,7 +294,7 @@ class CheckSumTest(unittest.TestCase):
 
     def test_modified_data(self):
         struct = self.IntegrityStructure(io.BytesIO(self.modified_data))
-        with self.assertRaises(fields.IntegrityError):
+        with self.assertRaises(steel.IntegrityError):
             struct.checksum
 
     def test_modified_both(self):
@@ -312,25 +311,25 @@ class CheckSumTest(unittest.TestCase):
 
     def test_modified_checksum(self):
         struct = self.IntegrityStructure(io.BytesIO(self.modified_csum))
-        with self.assertRaises(fields.IntegrityError):
+        with self.assertRaises(steel.IntegrityError):
             struct.checksum
 
 
 class ReservedTest(unittest.TestCase):
-    class ReservedStructure(base.Structure):
-        a = fields.Integer(size=1)
-        fields.Reserved(size=1)
-        b = fields.Integer(size=1)
+    class ReservedStructure(steel.Structure):
+        a = steel.Integer(size=1)
+        steel.Reserved(size=1)
+        b = steel.Integer(size=1)
     data = b'\x01\x00\x02'
 
     def test_assignment(self):
         # Giving no name is the correct approach
-        class ReservedStructure(base.Structure):
-            fields.Reserved(size=1)
+        class ReservedStructure(steel.Structure):
+            steel.Reserved(size=1)
 
         with self.assertRaises(TypeError):
-            class ReservedStructure(base.Structure):
-                name = fields.Reserved(size=1)
+            class ReservedStructure(steel.Structure):
+                name = steel.Reserved(size=1)
 
     def test_read(self):
         obj = self.ReservedStructure(io.BytesIO(self.data))
