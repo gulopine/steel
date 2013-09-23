@@ -1,4 +1,7 @@
-from steel import bit, byte, common
+import sys
+
+import steel
+from steel import bits
 
 COLOR_MAP_TYPES = (
     (0, 'No color map included'),
@@ -21,10 +24,10 @@ ORIGINS = (
 )
 
 
-class ColorMap(byte.Structure):
-    first_entry_index = byte.Integer(size=2)
-    length = byte.Integer(size=2)
-    entry_size = byte.Integer(size=1)
+class ColorMap(steel.Structure):
+    first_entry_index = steel.Integer(size=2)
+    length = steel.Integer(size=2)
+    entry_size = steel.Integer(size=1)
 
 
 class AlphaOrigin(bits.Structure):
@@ -33,20 +36,20 @@ class AlphaOrigin(bits.Structure):
     alpha_depth = bits.Integer(size=4)
 
 
-class TGA(byte.Structure, endianness=byte.LittleEndian):
-    id_size = byte.Integer(size=1)
-    color_map_type = byte.Integer(size=1, choices=COLOR_MAP_TYPES)
-    image_type = byte.Integer(size=1, choices=IMAGE_TYPES)
-    color_map_info = common.SubStructure(ColorMap)
-    x_origin = byte.Integer(size=2)
-    y_origin = byte.Integer(size=2)
-    width = byte.Integer(size=2)
-    height = byte.Integer(size=2)
-    bit_depth = byte.Integer(size=1)
-    image_origin, alpha_depth = common.SubStructure(AlphaOrigin)
-    image_id = byte.Bytes(size=id_size)
-    color_map_data = common.List(byte.Integer(size=color_map_info.entry_size) / 8, size=color_map_info.length)
-    image_data = common.List(byte.Integer(size=1), size=width * height * bit_depth)
+class TGA(steel.Structure, endianness=steel.LittleEndian):
+    id_size = steel.Integer(size=1)
+    color_map_type = steel.Integer(size=1, choices=COLOR_MAP_TYPES)
+    image_type = steel.Integer(size=1, choices=IMAGE_TYPES)
+    color_map_info = steel.SubStructure(ColorMap)
+    x_origin = steel.Integer(size=2)
+    y_origin = steel.Integer(size=2)
+    width = steel.Integer(size=2)
+    height = steel.Integer(size=2)
+    bit_depth = steel.Integer(size=1)
+    alpha_origin = steel.SubStructure(AlphaOrigin)
+    image_id = steel.Bytes(size=id_size)
+    color_map_data = steel.List(steel.Integer(size=color_map_info.entry_size) / 8, size=color_map_info.length)
+    image_data = steel.List(steel.Integer(size=1), size=width * height * bit_depth)
 
 
 if __name__ == '__main__':

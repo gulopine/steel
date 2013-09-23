@@ -1,7 +1,8 @@
 import decimal
 import sys
-from steel import byte, chunks, common
-from steel.fields import integrity
+
+import steel
+from steel import chunks
 
 COMPRESSION_CHOICES = (
     (0, 'zlib/deflate'),
@@ -30,10 +31,10 @@ class Chunk(chunks.Chunk, encoding='ascii'):
     A special chunk for PNG, which puts the size before the type
     and includes a CRC field for verifying data integrity.
     """
-    size = byte.Integer(size=4)
-    id = byte.String(size=4)
+    size = steel.Integer(size=4)
+    id = steel.String(size=4)
     payload = chunks.Payload(size=size)
-    crc = integrity.CRC32(first=id)
+    crc = steel.CRC32(first=id)
 
     @property
     def is_critical(self):
@@ -49,17 +50,17 @@ class Chunk(chunks.Chunk, encoding='ascii'):
 
 
 @Chunk('IHDR')
-class Header(byte.Structure):
-    width = byte.Integer(size=4)
-    height = byte.Integer(size=4)
-    bit_depth = byte.Integer(size=1, choices=(1, 2, 4, 8, 16))
-    color_type = byte.Integer(size=1, choices=(0, 2, 3, 4, 6))
-    compression_method  = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
-    filter_method = byte.Integer(size=1, choices=FILTER_CHOICES)
-    interlace_method = byte.Integer(size=1, choices=INTERLACE_CHOICES)
+class Header(steel.Structure):
+    width = steel.Integer(size=4)
+    height = steel.Integer(size=4)
+    bit_depth = steel.Integer(size=1, choices=(1, 2, 4, 8, 16))
+    color_type = steel.Integer(size=1, choices=(0, 2, 3, 4, 6))
+    compression_method  = steel.Integer(size=1, choices=COMPRESSION_CHOICES)
+    filter_method = steel.Integer(size=1, choices=FILTER_CHOICES)
+    interlace_method = steel.Integer(size=1, choices=INTERLACE_CHOICES)
 
 
-class HundredThousand(byte.Integer):
+class HundredThousand(steel.Integer):
     """
     Value is usable as a Decimal in Python, but stored
     as an integer after multiplying the value by 100,000
@@ -76,7 +77,7 @@ class HundredThousand(byte.Integer):
 
 
 @Chunk('cHRM')
-class Chromaticity(byte.Structure):
+class Chromaticity(steel.Structure):
     white_x = HundredThousand()
     white_y = HundredThousand()
     red_x = HundredThousand()
@@ -88,134 +89,134 @@ class Chromaticity(byte.Structure):
 
 
 @Chunk('gAMA')
-class Gamma(byte.Structure):
+class Gamma(steel.Structure):
     value = HundredThousand()
 
 
 @Chunk('iCCP')
-class ICCProfile(byte.Structure):
-    name = byte.String(encoding='latin-1')
-    compression = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
-    profile = byte.Bytes(size=common.Remainder)  # TODO: decompress
+class ICCProfile(steel.Structure):
+    name = steel.String(encoding='latin-1')
+    compression = steel.Integer(size=1, choices=COMPRESSION_CHOICES)
+    profile = steel.Bytes(size=steel.Remainder)  # TODO: decompress
 
 
 @Chunk('sBIT')
-class SignificantBits(byte.Structure):
-    data = byte.Bytes(size=common.Remainder)
+class SignificantBits(steel.Structure):
+    data = steel.Bytes(size=steel.Remainder)
 
     # TODO: decode based on parent Header.color_type
 
 
 @Chunk('sRGB')
-class sRGB(byte.Structure):
-    rendering_intent = byte.Integer(size=1, choices=RENDERING_INTENT_CHOICES)
+class sRGB(steel.Structure):
+    rendering_intent = steel.Integer(size=1, choices=RENDERING_INTENT_CHOICES)
 
 
-class PaletteColor(byte.Structure):
-    red = byte.Integer(size=1)
-    green = byte.Integer(size=1)
-    blue = byte.Integer(size=1)
+class PaletteColor(steel.Structure):
+    red = steel.Integer(size=1)
+    green = steel.Integer(size=1)
+    blue = steel.Integer(size=1)
 
 
 @Chunk('PLTE')
-class Palette(byte.Structure):
-    colors = common.List(common.SubStructure(PaletteColor), size=common.Remainder)
+class Palette(steel.Structure):
+    colors = steel.List(steel.SubStructure(PaletteColor), size=steel.Remainder)
 
     def __iter__(self):
         return iter(self.colors)
 
 
 @Chunk('bKGD')
-class Background(byte.Structure):
-    data = byte.Bytes(size=common.Remainder)
+class Background(steel.Structure):
+    data = steel.Bytes(size=steel.Remainder)
 
     # TODO: decode based on parent Header.color_type
 
 
 @Chunk('hIST')
-class Histogram(byte.Structure):
-    frequencies = common.List(byte.Integer(size=2), size=common.Remainder)
+class Histogram(steel.Structure):
+    frequencies = steel.List(steel.Integer(size=2), size=steel.Remainder)
 
 
 @Chunk('tRNS')
-class Transparency(byte.Structure):
-    data = byte.Bytes(size=common.Remainder)
+class Transparency(steel.Structure):
+    data = steel.Bytes(size=steel.Remainder)
 
     # TODO: decode based on parent Header.color_type
 
 
 @Chunk('IDAT', multiple=True)
-class Data(byte.Structure):
-    data = byte.Bytes(size=common.Remainder)
+class Data(steel.Structure):
+    data = steel.Bytes(size=steel.Remainder)
 
 
 @Chunk('pHYs')
-class PhysicalDimentions(byte.Structure):
-    x = byte.Integer(size=4)
-    y = byte.Integer(size=4)
-    unit = byte.Integer(size=1, choices=PHYSICAL_UNIT_CHOICES)
+class PhysicalDimentions(steel.Structure):
+    x = steel.Integer(size=4)
+    y = steel.Integer(size=4)
+    unit = steel.Integer(size=1, choices=PHYSICAL_UNIT_CHOICES)
 
 
-class SuggestedPaletteEntry(byte.Structure):
-    red = byte.Integer(size=2)
-    green = byte.Integer(size=2)
-    blue = byte.Integer(size=2)
-    alpha = byte.Integer(size=2)
-    frequency = byte.Integer(size=2)
+class SuggestedPaletteEntry(steel.Structure):
+    red = steel.Integer(size=2)
+    green = steel.Integer(size=2)
+    blue = steel.Integer(size=2)
+    alpha = steel.Integer(size=2)
+    frequency = steel.Integer(size=2)
 
     # TODO: figure out a good way to handle size based on sample_depth below
 
 
 @Chunk('sPLT')
-class SuggestedPalette(byte.Structure):
-    name = byte.String(encoding='latin-1')
-    sample_depth = byte.Integer(size=1)
-    colors = common.List(common.SubStructure(SuggestedPaletteEntry), size=common.Remainder)
+class SuggestedPalette(steel.Structure):
+    name = steel.String(encoding='latin-1')
+    sample_depth = steel.Integer(size=1)
+    colors = steel.List(steel.SubStructure(SuggestedPaletteEntry), size=steel.Remainder)
 
 
 @Chunk('tIME')
-class Timestamp(byte.Structure):
-    year = byte.Integer(size=2)
-    month = byte.Integer(size=1)
-    day = byte.Integer(size=1)
-    hour = byte.Integer(size=1)
-    minute = byte.Integer(size=1)
-    second = byte.Integer(size=1)
+class Timestamp(steel.Structure):
+    year = steel.Integer(size=2)
+    month = steel.Integer(size=1)
+    day = steel.Integer(size=1)
+    hour = steel.Integer(size=1)
+    minute = steel.Integer(size=1)
+    second = steel.Integer(size=1)
 
     # TODO: convert this into a datetime object
 
 
 @Chunk('tEXt', multiple=True)
-class Text(byte.Structure, encoding='latin-1'):
-    keyword = byte.String()
-    content = byte.String(size=common.Remainder)
+class Text(steel.Structure, encoding='latin-1'):
+    keyword = steel.String()
+    content = steel.String(size=steel.Remainder)
 
 
 @Chunk('zTXt', multiple=True)
-class CompressedText(byte.Structure, encoding='latin-1'):
-    keyword = byte.String()
-    compression = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
-    content = byte.Bytes(size=common.Remainder)  # TODO: decompress
+class CompressedText(steel.Structure, encoding='latin-1'):
+    keyword = steel.String()
+    compression = steel.Integer(size=1, choices=COMPRESSION_CHOICES)
+    content = steel.Bytes(size=steel.Remainder)  # TODO: decompress
 
 
 @Chunk('iTXt', multiple=True)
-class InternationalText(byte.Structure, encoding='utf8'):
-    keyword = byte.String()
-    is_compressed = byte.Integer(size=1)
-    compression = byte.Integer(size=1, choices=COMPRESSION_CHOICES)
-    language = byte.String()
-    translated_keyword = byte.String()
-    content = byte.Bytes(size=common.Remainder)  # TODO: decompress
+class InternationalText(steel.Structure, encoding='utf8'):
+    keyword = steel.String()
+    is_compressed = steel.Integer(size=1)
+    compression = steel.Integer(size=1, choices=COMPRESSION_CHOICES)
+    language = steel.String()
+    translated_keyword = steel.String()
+    content = steel.Bytes(size=steel.Remainder)  # TODO: decompress
 
 
 @Chunk('IEND')
-class End(byte.Structure):
+class End(steel.Structure):
     pass
 
 
-class PNG(byte.Structure):
-    signature = byte.FixedString(b'\x89PNG\x0d\x0a\x1a\x0a')
-    header = common.SubStructure(Header)
+class PNG(steel.Structure):
+    signature = steel.FixedString(b'\x89PNG\x0d\x0a\x1a\x0a')
+    header = steel.SubStructure(Header)
     chunks = chunks.ChunkList(Chunk, (Header, Chromaticity, Gamma, ICCProfile,
                                       SignificantBits, sRGB, Palette, Background,
                                       Histogram, Transparency, PhysicalDimentions,

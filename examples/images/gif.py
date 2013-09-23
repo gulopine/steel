@@ -1,6 +1,7 @@
 import sys
 
-from steel import bit, byte, common
+import steel
+from steel import bits
 
 VERSIONS = (
     ('87a', '87a'),
@@ -8,10 +9,10 @@ VERSIONS = (
 )
 
 
-class Color(byte.Structure):
-    red = byte.Integer(size=1)
-    green = byte.Integer(size=1)
-    blue = byte.Integer(size=1)
+class Color(steel.Structure):
+    red = steel.Integer(size=1)
+    green = steel.Integer(size=1)
+    blue = steel.Integer(size=1)
 
     def __str__(self):
         return '#%x%x%x' % (self.red, self.green, self.blue)
@@ -24,15 +25,15 @@ class ScreenInfoBits(bits.Structure):
     bits_per_pixel = bits.Integer(size=3) + 1
 
 
-class ScreenDescriptor(byte.Structure, endianness=byte.LittleEndian):
-    width = byte.Integer(size=2)
-    height = byte.Integer(size=2)
-    info = common.SubStructure(ScreenInfoBits)
-    background_color = byte.Integer(size=1)
-    pixel_ratio = byte.Integer(size=1)
+class ScreenDescriptor(steel.Structure, endianness=steel.LittleEndian):
+    width = steel.Integer(size=2)
+    height = steel.Integer(size=2)
+    info = steel.SubStructure(ScreenInfoBits)
+    background_color = steel.Integer(size=1)
+    pixel_ratio = steel.Integer(size=1)
 
     with info.has_color_map == True:
-        color_map = common.List(common.SubStructure(Color), size=2 ** info.bits_per_pixel)
+        color_map = steel.List(steel.SubStructure(Color), size=2 ** info.bits_per_pixel)
 
     @property
     def aspect_ratio(self):
@@ -48,26 +49,26 @@ class ImageInfoBits(bits.Structure):
     bits_per_pixel = bits.Integer(size=3) + 1
 
 
-class ImageDescriptor(byte.Structure):
-    separator = byte.FixedString(b',')
-    left = byte.Integer(size=2)
-    top = byte.Integer(size=2)
-    width = byte.Integer(size=2)
-    height = byte.Integer(size=2)
-    info = common.SubStructure(ImageInfoBits)
+class ImageDescriptor(steel.Structure):
+    separator = steel.FixedString(b',')
+    left = steel.Integer(size=2)
+    top = steel.Integer(size=2)
+    width = steel.Integer(size=2)
+    height = steel.Integer(size=2)
+    info = steel.SubStructure(ImageInfoBits)
 
     with info.has_color_map == True:
-        color_map = common.List(common.SubStructure(Color), size=2 ** info.bits_per_pixel)
+        color_map = steel.List(steel.SubStructure(Color), size=2 ** info.bits_per_pixel)
 
 
-class GIF(byte.Structure, endianness=byte.LittleEndian, encoding='ascii'):
-    tag = byte.FixedString('GIF')
-    version = byte.String(size=3, choices=VERSIONS)
+class GIF(steel.Structure, endianness=steel.LittleEndian, encoding='ascii'):
+    tag = steel.FixedString('GIF')
+    version = steel.String(size=3, choices=VERSIONS)
     
 #    with tag == 'GIF':
-#        version = byte.String(size=3, choices=VERSIONS)
+#        version = steel.String(size=3, choices=VERSIONS)
 
-    screen = common.SubStructure(ScreenDescriptor)
+    screen = steel.SubStructure(ScreenDescriptor)
 
     @property
     def width(self):

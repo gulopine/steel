@@ -1,5 +1,7 @@
 import sys
-from steel import byte, chunks, common
+
+import steel
+from steel import chunks
 
 DENSITY_UNITS = (
     (0, 'Aspect ratio only'),
@@ -9,39 +11,39 @@ DENSITY_UNITS = (
 
 
 class EmptyChunk(chunks.Chunk):
-    id = byte.Integer(size=2)
-    size = byte.Bytes(size=0)
+    id = steel.Integer(size=2)
+    size = steel.Bytes(size=0)
     payload = chunks.Payload(size=0)
 
 
 class Chunk(chunks.Chunk):
-    id = byte.Integer(size=2)
-    size = byte.Integer(size=2)
+    id = steel.Integer(size=2)
+    size = steel.Integer(size=2)
     payload = chunks.Payload(size=size - 2)
 
 
 class ScanChunk(chunks.Chunk):
-    id = byte.Integer(size=2)
-    size = byte.Integer(size=2)
+    id = steel.Integer(size=2)
+    size = steel.Integer(size=2)
     payload = chunks.Payload(size=size - 2)
 
 
 @EmptyChunk(0xFFD8)
-class Start(byte.Structure):
+class Start(steel.Structure):
     pass
 
 
 @Chunk(0xFFE0)
-class Header(byte.Structure):
-    marker = byte.FixedString(b'JFIF\x00')
-    major_version = byte.Integer(size=1)
-    minor_version = byte.Integer(size=1)
-    density_units = byte.Integer(size=1, choicse=DENSITY_UNITS)
-    x_density = byte.Integer(size=2)
-    y_density = byte.Integer(size=2)
-    thumb_width = byte.Integer(size=1)
-    thumb_height = byte.Integer(size=1)
-    thumb_data = byte.Bytes(size=3 * thumb_width * thumb_height)
+class Header(steel.Structure):
+    marker = steel.FixedString(b'JFIF\x00')
+    major_version = steel.Integer(size=1)
+    minor_version = steel.Integer(size=1)
+    density_units = steel.Integer(size=1, choicse=DENSITY_UNITS)
+    x_density = steel.Integer(size=2)
+    y_density = steel.Integer(size=2)
+    thumb_width = steel.Integer(size=1)
+    thumb_height = steel.Integer(size=1)
+    thumb_data = steel.Bytes(size=3 * thumb_width * thumb_height)
 
     @property
     def version(self):
@@ -49,29 +51,29 @@ class Header(byte.Structure):
 
 
 @Chunk(0xFFC0)
-class StartFrame(byte.Structure):
-    precision = byte.Integer(size=1)
-    width = byte.Integer(size=2)
-    height = byte.Integer(size=2)
+class StartFrame(steel.Structure):
+    precision = steel.Integer(size=1)
+    width = steel.Integer(size=2)
+    height = steel.Integer(size=2)
 
 # 0xFD96 is at offset 0xA8A
 
 @Chunk(0xFFFE)
-class Comment(byte.Structure):
-    value = byte.String(encoding='utf8', size=common.Remainder)
+class Comment(steel.Structure):
+    value = steel.String(encoding='utf8', size=steel.Remainder)
 
     def __str__(self):
         return self.value
 
 
 @EmptyChunk(0xFFD9)
-class End(byte.Structure):
+class End(steel.Structure):
     pass
 
 
-class JFIF(byte.Structure):
-    start = common.SubStructure(Start)
-    header = common.SubStructure(Header)
+class JFIF(steel.Structure):
+    start = steel.SubStructure(Start)
+    header = steel.SubStructure(Header)
     chunks = chunks.ChunkList(Chunk, (StartFrame, Comment), terminator=End)
 
     @property
