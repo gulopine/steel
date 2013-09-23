@@ -24,7 +24,7 @@ class TestDiscovery(Command):
         raise SystemExit(errno)
 
 
-setup(name='Steel',
+setup(name='steel',
       version='0.1',
       description='A Python framework for describing binary file formats',
       author='Marty Alchin',
