@@ -5,7 +5,7 @@ import sys
 
 from steel.common import args, meta, data
 
-__all__ = ['Field', 'FullyDecoded', 'SubStructure', 'Condition']
+__all__ = ['Field', 'FullyDecoded', 'Condition']
 
 
 class Trigger:
@@ -200,38 +200,6 @@ class FullyDecoded(Exception):
     def __init__(self, bytes, value):
         self.bytes = bytes
         self.value = value
-
-
-class SubStructure(Field):
-    size = args.Override(default=None)
-
-    def __init__(self, structure, *args, **kwargs):
-        self.structure = structure
-        super(SubStructure, self).__init__(*args, **kwargs)
-
-    def read(self, file):
-        value = self.structure(file)
-        value._parent = file
-
-        # Force the evaluation of the entire structure in
-        # order to make sure other fields work properly
-        value_bytes = value.get_raw_bytes()
-
-        raise FullyDecoded(value_bytes, value)
-
-    def encode(self, value):
-        output = io.BytesIO()
-        value.save(output)
-        return output.getvalue()
-
-    def __getattr__(self, name):
-        if 'structure' in self.__dict__:
-            field = getattr(self.structure, name)
-            if field in self.structure._fields.values():
-                field = copy.copy(field)
-                field._parent = self
-                return field
-        raise AttributeError(name)
 
 
 class Condition:
