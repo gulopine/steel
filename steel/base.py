@@ -88,6 +88,12 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
     def save(self, file):
         file.write(self.get_raw_bytes())
 
+    def dump(self, file):
+        file.write(self.dumps())
+
+    def dumps(self):
+        return self.get_raw_bytes()
+
     def validate(self):
         errors = []
         for name, field in self._fields.items():
