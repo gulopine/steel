@@ -1,4 +1,3 @@
-import collections
 import copy
 import functools
 import io
@@ -6,7 +5,7 @@ import sys
 
 from steel.common import args, meta, data
 
-__all__ = ['Field', 'FullyDecoded', 'SubStructure', 'StructureTuple', 'Condition']
+__all__ = ['Field', 'FullyDecoded', 'SubStructure', 'Condition']
 
 
 class Trigger:
@@ -233,25 +232,6 @@ class SubStructure(Field):
                 field._parent = self
                 return field
         raise AttributeError(name)
-
-
-class StructureTuple(SubStructure):
-    def __init__(self, structure, *args, **kwargs):
-        super(StructureTuple, self).__init__(structure, *args, **kwargs)
-        self.names = [name for name in self.structure._fields if not name.startswith('_')]
-        self.namedtuple = collections.namedtuple(structure.__name__, ' '.join(self.names))
-
-    def read(self, file):
-        try:
-            raw_bytes = super(StructureTuple, self).read(file)
-            value = self.decode(bytes)
-        except FullyDecoded as obj:
-            raw_bytes = obj.bytes
-            value = obj.value
-        values = []
-        value = self.namedtuple(*(getattr(value, name) for name in self.names))
-
-        raise FullyDecoded(raw_bytes, value)
 
 
 class Condition:

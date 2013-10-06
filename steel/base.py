@@ -1,11 +1,12 @@
+import collections
 import io
 
 from steel.common import meta, fields
 
-__all__ = ['Structure', 'StructureStreamer']
+__all__ = ['Structure', 'StructureStreamer', 'StructureTuple']
 
 
-class Structure(metaclass=meta.DeclarativeMetaclass):
+class StructureBase:
     def __init__(self, *args, **kwargs):
         self._file = len(args) > 0 and args[0] or None
         self._mode = self._file and 'rb' or 'wb'
@@ -110,6 +111,10 @@ class Structure(metaclass=meta.DeclarativeMetaclass):
         return '<%s: %s>' % (type(self).__name__, self)
 
 
+class Structure(StructureBase, metaclass=meta.DeclarativeMetaclass):
+    pass
+
+
 class EOFBytesIO(io.BytesIO):
     """
     A customized BytesIO that raises an EOFError if more data was requested
@@ -141,3 +146,41 @@ class StructureStreamer:
                 raise e
             yield value
 
+
+class StructureTupleMetaclass(meta.DeclarativeMetaclass):
+    def __init__(cls, name, bases, attrs, **options):
+        super(StructureTupleMetaclass, cls).__init__(name, bases, attrs, **options)
+        cls._namedtuple = collections.namedtuple(name, cls._fields.keys())
+
+
+class StructureTuple(StructureBase, metaclass=StructureTupleMetaclass):
+    def __new__(cls, *args, **kwargs):
+        self._file = len(args) > 0 and args[0] or None
+        self._mode = self._file and 'rb' or 'wb'
+        self._position = 0
+        self._write_buffer = b''
+        self._raw_values = {}
+        self._parent = None
+
+        if self._file and kwargs:
+            raise TypeError("Cannot supply a file and attributes together")
+
+        data = (kwargs.get(name, None) for name in cls._fields)
+        return cls._namedtuple(*data)
+
+    def __init__(self, structure, *args, **kwargs):
+        super(StructureTuple, self).__init__(structure, *args, **kwargs)
+        self.names = [name for name in self.structure._fields if not name.startswith('_')]
+        self.namedtuple = collections.namedtuple(structure.__name__, ' '.join(self.names))
+
+    def read(self, file):
+        try:
+            raw_bytes = super(StructureTuple, self).read(file)
+            value = self.decode(bytes)
+        except FullyDecoded as obj:
+            raw_bytes = obj.bytes
+            value = obj.value
+        values = []
+        value = self.namedtuple(*(getattr(value, name) for name in self.names))
+
+        raise FullyDecoded(raw_bytes, value)
