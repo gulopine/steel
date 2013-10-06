@@ -39,5 +39,3 @@ class Prop(base.Chunk):
     size = fields.Integer(size=4, endianness=BigEndian)
     id = fields.String(size=4, encoding='ascii')
     payload = base.Payload(size=size)
-
-
