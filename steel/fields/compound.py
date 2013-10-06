@@ -1,4 +1,4 @@
-from steel.common import args, fields
+from steel.common import args, fields, Remainder
 
 __all__ = ['List', 'Object']
 
@@ -14,6 +14,14 @@ class List(fields.Field):
         value_bytes = b''
         values = []
         with self.for_instance(self.instance):
+            if self.size == -1:
+                while True:
+                    bytes, value = self.field.read_value(file)
+                    if bytes:
+                        values.append(value)
+                        value_bytes += bytes
+                    else:
+                        break
             for i in range(self.size):
                 bytes, value = self.field.read_value(file)
                 value_bytes += bytes
