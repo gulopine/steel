@@ -20,24 +20,24 @@ class ChunkList(base.ChunkList):
         return super(ChunkList, self).__init__(Chunk, *args, **kwargs)
 
 
-class List(base.Chunk, encoding='ascii'):
-    tag = fields.FixedString('LIST')
+class List(base.Chunk):
+    tag = fields.FixedString(b'LIST')
     size = fields.Integer(size=4, endianness=BigEndian)
-    id = fields.String(size=4)
+    id = fields.String(size=4, encoding='ascii')
     payload = base.Payload(size=size)
 
 
-class Form(base.Chunk, encoding='ascii'):
-    tag = fields.FixedString('FORM')
+class Form(base.Chunk):
+    tag = fields.FixedString(b'FORM')
     size = fields.Integer(size=4, endianness=BigEndian)
-    id = fields.String(size=4)
+    id = fields.String(size=4, encoding='ascii')
     payload = base.Payload(size=size)
 
 
-class Prop(base.Chunk, encoding='ascii'):
-    tag = fields.FixedString('PROP')
+class Prop(base.Chunk):
+    tag = fields.FixedString(b'PROP')
     size = fields.Integer(size=4, endianness=BigEndian)
-    id = fields.String(size=4)
+    id = fields.String(size=4, encoding='ascii')
     payload = base.Payload(size=size)
 
 
