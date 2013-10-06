@@ -19,8 +19,11 @@ class String(Field):
             value = b''
             while True:
                 data = file.read(1)
-                value += data
-                if data == self.terminator:
+                if data:
+                    value += data
+                    if data == self.terminator:
+                        break
+                else:
                     break
 
         return value
