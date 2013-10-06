@@ -45,6 +45,8 @@ class Chunk(metaclass=ChunkMetaclass):
 
 class ChunkMixin:
     def __init__(self, *args, process_chunk=True, **kwargs):
+        if process_chunk and not args:
+            process_chunk = False
         if process_chunk:
             chunk = self._chunk.structure(*args, **kwargs)
             for name in chunk._fields:
@@ -100,6 +102,17 @@ class ChunkList(Field):
                 # This is not a valid chunk, which is probably the end of the file
                 break
         raise fields.FullyDecoded(chunks_bytes, chunks)
+
+    def encode(self, chunks):
+        output = io.BytesIO()
+        for chunk in chunks:
+            if not isinstance(chunk, tuple(self.known_types.values())):
+                raise TypeError("Unknown chunk type %r" % chunk._chunk.id)
+            chunk.save(output)
+        if self.terminator and not isinstance(chunk, self.terminator):
+            # The last chunk wasn't a terminator, so add one automatically
+            self.terminator().save(output)
+        return output.getvalue()
 
 
 class ChunkValueList(list):
