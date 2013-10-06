@@ -77,6 +77,7 @@ class FixedString(String):
             self.decoded_value = value
             self.encoded_value = super(FixedString, self).encode(value)
         self.size = len(self.encoded_value)
+        self.default = self.encoded_value
 
     def read(self, file):
         value = file.read(self.size)

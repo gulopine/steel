@@ -205,6 +205,7 @@ class FixedInteger(Integer):
         super(FixedInteger, self).__init__(*args, size=size, signed=value < 0, **kwargs)
         self.decoded_value = value
         self.encoded_value = super(FixedInteger, self).encode(value)
+        self.default = self.encoded_value
 
     def encode(self, value):
         if value != self.decoded_value:
