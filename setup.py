@@ -30,7 +30,7 @@ setup(name='steel',
       author='Marty Alchin',
       author_email='marty@martyalchin.com',
       url='https://github.com/gulopine/steel',
-      packages=['steel'],
+      packages=['steel', 'steel.bits', 'steel.chunks', 'steel.common', 'steel.fields'],
       classifiers=[
           'Development Status :: 2 - Pre-Alpha',
           'Intended Audience :: Developers',
