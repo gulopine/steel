@@ -1,3 +1,5 @@
+import io
+
 from steel.common import args, fields, Remainder
 
 __all__ = ['List', 'Object']
