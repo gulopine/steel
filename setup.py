@@ -25,18 +25,19 @@ class TestDiscovery(Command):
 
 
 setup(name='steel',
-      version='0.1',
+      version='0.2',
       description='A Python framework for describing binary file formats',
       author='Marty Alchin',
       author_email='marty@martyalchin.com',
       url='https://github.com/gulopine/steel',
       packages=['steel', 'steel.bits', 'steel.chunks', 'steel.common', 'steel.fields'],
       classifiers=[
-          'Development Status :: 2 - Pre-Alpha',
+          'Development Status :: 3 - Alpha',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: BSD License',
           'Programming Language :: Python :: 3.1',
           'Programming Language :: Python :: 3.2',
+          'Programming Language :: Python :: 3.3',
           'Topic :: Software Development :: Libraries :: Application Frameworks',
           'Topic :: System :: Filesystems',
           ],
